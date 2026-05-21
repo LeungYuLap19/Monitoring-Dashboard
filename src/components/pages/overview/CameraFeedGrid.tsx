@@ -78,11 +78,20 @@ function CameraCard({ feed, onSelectCamera }: CameraCardProps) {
       <div className="relative aspect-video bg-slate-900 overflow-hidden">
         {feed.isOnline ? (
           <>
-            <div className="size-full bg-slate-950 flex flex-col items-center justify-center text-slate-400 gap-2 font-mono select-none">
-              <Video className="size-6 text-teal-600 animate-pulse" />
-              <span className="text-[9px] tracking-widest text-slate-400 uppercase font-black">CCTV {feed.id.toUpperCase()}</span>
-              <span className="text-[9px] text-slate-500 font-bold">{feed.bunnyName ? `GUEST: ${feed.bunnyName}` : 'STANDBY'}</span>
-            </div>
+            {feed.streamUrl ? (
+              <img
+                src={feed.streamUrl}
+                alt={feed.name}
+                className="size-full object-cover"
+                loading="lazy"
+              />
+            ) : (
+              <div className="size-full bg-slate-950 flex flex-col items-center justify-center text-slate-400 gap-2 font-mono select-none">
+                <Video className="size-6 text-teal-600 animate-pulse" />
+                <span className="text-[9px] tracking-widest text-slate-400 uppercase font-black">CCTV {feed.id.toUpperCase()}</span>
+                <span className="text-[9px] text-slate-500 font-bold">{feed.bunnyName ? `GUEST: ${feed.bunnyName}` : 'STANDBY'}</span>
+              </div>
+            )}
 
             {/* Red Live banner */}
             <div className="absolute top-3 left-3 bg-rose-600/90 text-white font-black text-[9px] px-2 py-0.5 rounded-md flex items-center gap-1 uppercase tracking-widest shadow-md">

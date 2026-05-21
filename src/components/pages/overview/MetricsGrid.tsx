@@ -9,12 +9,20 @@ import { Badge } from '../../ui/badge';
 import { RadialBarChart, RadialBar, PolarAngleAxis } from 'recharts';
 import { ChartContainer, type ChartConfig } from '../../ui/chart';
 import { useTranslation } from '../../../lib/i18n';
+import type { MetricsGridProps } from '../../../types';
 
-const gaugeData = [{ value: 30, fill: '#0d9488' }];
 const gaugeConfig: ChartConfig = { value: { label: 'Capacity', color: '#0d9488' } };
 
-export default function MetricsGrid() {
+export default function MetricsGrid({
+  onlineCameras = 8,
+  totalCameras = 10,
+  alertsToday = 0,
+  isLoading = false,
+}: MetricsGridProps) {
   const { t } = useTranslation();
+  const cameraCapacity = totalCameras > 0 ? Math.round((onlineCameras / totalCameras) * 100) : 0;
+  const gaugeData = [{ value: cameraCapacity, fill: '#0d9488' }];
+
   return (
     <section id="metrics-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
 
@@ -33,14 +41,14 @@ export default function MetricsGrid() {
                 </RadialBarChart>
               </ChartContainer>
               <div className="absolute inset-0 flex items-center justify-center flex-col">
-                <span className="text-[13px] font-black text-slate-800 leading-none">06</span>
-                <span className="text-[9px] text-slate-400 border-t border-slate-100 mt-0.5 leading-none">20</span>
+                <span className="text-[13px] font-black text-slate-800 leading-none">{String(onlineCameras).padStart(2, '0')}</span>
+                <span className="text-[9px] text-slate-400 border-t border-slate-100 mt-0.5 leading-none">{totalCameras || '-'}</span>
               </div>
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-1.5 text-xs">
                 <span className="size-2 rounded-full bg-teal-500" />
-                <span className="text-slate-500 font-medium">{t('overview.metrics.largeCage')} 6/10</span>
+                <span className="text-slate-500 font-medium">{t('overview.metrics.largeCage')} {onlineCameras}/{totalCameras || '-'}</span>
               </div>
               <div className="flex items-center gap-1.5 text-xs">
                 <span className="size-2 rounded-full bg-orange-400" />
@@ -85,11 +93,13 @@ export default function MetricsGrid() {
             <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-600 font-bold px-2 py-0.5 rounded-md font-mono border-0">Alerts</Badge>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-emerald-600 font-display">{t('overview.metrics.noAlerts')}</span>
+            <span className={`text-2xl font-black font-display ${alertsToday ? 'text-rose-600' : 'text-emerald-600'}`}>
+              {alertsToday ? alertsToday : t('overview.metrics.noAlerts')}
+            </span>
           </div>
           <div className="mt-4 flex items-center gap-2 text-xs text-teal-600 font-bold">
             <div className="size-2.5 rounded-full bg-teal-600 animate-ping shrink-0" />
-            <span>{t('overview.metrics.aiDiagnosis')}</span>
+            <span>{isLoading ? 'Loading PetMonitor telemetry...' : t('overview.metrics.aiDiagnosis')}</span>
           </div>
         </CardContent>
       </Card>
@@ -101,12 +111,12 @@ export default function MetricsGrid() {
             <Badge variant="outline" className="text-[10px] bg-slate-50 text-slate-500 font-bold px-2 py-0.5 rounded-md font-mono border-0">Cameras</Badge>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-extrabold text-slate-800 font-display">8</span>
-            <span className="text-sm font-semibold text-slate-400">/ 10 {t('overview.metrics.cameraUnit')}</span>
+            <span className="text-4xl font-extrabold text-slate-800 font-display">{onlineCameras}</span>
+            <span className="text-sm font-semibold text-slate-400">/ {totalCameras || '-'} {t('overview.metrics.cameraUnit')}</span>
           </div>
           <div className="mt-3 flex items-center justify-between text-xs text-slate-400 font-medium">
-            <span>{t('overview.metrics.cameraMaintenance', { count: '2' })}</span>
-            <span className="text-teal-600 font-extrabold font-mono text-[10px]">98% SLA</span>
+            <span>{t('overview.metrics.cameraMaintenance', { count: String(Math.max(totalCameras - onlineCameras, 0)) })}</span>
+            <span className="text-teal-600 font-extrabold font-mono text-[10px]">{cameraCapacity}% LIVE</span>
           </div>
         </CardContent>
       </Card>

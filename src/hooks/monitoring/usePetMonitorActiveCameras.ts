@@ -19,7 +19,7 @@ export function usePetMonitorActiveCameras(options: UsePetMonitorActiveCamerasOp
     getPetMonitorActiveCameras,
     {
       fallbackMessage: 'Failed to fetch active PetMonitor cameras',
-      onSuccess: setActiveCamerasState,
+      onSuccess: (result) => setActiveCamerasState(result),
     },
   ), [runLoadRequest]);
 
@@ -47,7 +47,7 @@ export function usePetMonitorActiveCameras(options: UsePetMonitorActiveCamerasOp
 
   useEffect(() => {
     if (!autoLoad) return;
-    void loadActiveCameras();
+    void loadActiveCameras().catch(() => undefined);
   }, [autoLoad, loadActiveCameras]);
 
   return {

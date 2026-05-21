@@ -5,25 +5,36 @@
 
 import React from 'react';
 import { Video, PlayCircle } from 'lucide-react';
-import { BunnyGuest, LiveStreamViewProps } from '../../../types';
+import { LiveStreamViewProps } from '../../../types';
 import { useTranslation } from '../../../lib/i18n';
 
 export default function LiveStreamView({
   activeBunny,
   streamActive,
-  setStreamActive
+  setStreamActive,
+  streamUrl,
+  camId,
+  statusText,
 }: LiveStreamViewProps) {
   const { t } = useTranslation();
   return (
     <div id="video-stream-dashboard" className="bg-slate-900 rounded-3xl overflow-hidden relative shadow-lg aspect-video group select-none flex items-center justify-center">
       {streamActive ? (
         <>
-          <div className="size-full bg-slate-900 flex flex-col items-center justify-center text-slate-400 gap-3 font-mono relative overflow-hidden select-none">
-            <div className="absolute top-0 left-0 w-full h-1 bg-teal-500/10 animate-pulse" />
-            <Video className="size-10 text-teal-500 animate-pulse" />
-            <span className="text-xs tracking-widest text-slate-300 uppercase font-bold">CCTV PLAYGROUND {activeBunny.id.toUpperCase()}</span>
-            <span className="text-[10px] text-slate-500 font-medium">{activeBunny.name} - {t('overview.liveStream.observing')}</span>
-          </div>
+          {streamUrl ? (
+            <img
+              src={streamUrl}
+              alt={`${activeBunny.name} live stream`}
+              className="size-full object-cover bg-slate-950"
+            />
+          ) : (
+            <div className="size-full bg-slate-900 flex flex-col items-center justify-center text-slate-400 gap-3 font-mono relative overflow-hidden select-none">
+              <div className="absolute top-0 left-0 w-full h-1 bg-teal-500/10 animate-pulse" />
+              <Video className="size-10 text-teal-500 animate-pulse" />
+              <span className="text-xs tracking-widest text-slate-300 uppercase font-bold">CCTV PLAYGROUND {activeBunny.id.toUpperCase()}</span>
+              <span className="text-[10px] text-slate-500 font-medium">{activeBunny.name} - {t('overview.liveStream.observing')}</span>
+            </div>
+          )}
 
           {/* Red blinking dot showing LIVE stream */}
           <div className="absolute top-5 left-5 bg-rose-600 text-white font-black text-xs px-3 py-1 rounded-lg flex items-center gap-1.5 uppercase tracking-widest shadow-md">
@@ -45,13 +56,13 @@ export default function LiveStreamView({
           {/* Animated AI Face Bounding Box */}
           <div className="absolute top-1/3 left-1/3 size-40 border-4 rounded-2xl flex items-start p-2 pointer-events-none animate-pulse shadow-2xl">
             <div className="bg-emerald-500 text-[#042f1a] font-black text-[9px] px-1.5 py-0.5 rounded font-mono shadow leading-none uppercase">
-              ID:04 {activeBunny.currentBehavior === '吃飯' ? 'eating' : 'resting'}
+              ID:{camId ?? 'LIVE'} {activeBunny.currentBehavior === '吃飯' ? 'eating' : activeBunny.currentBehavior}
             </div>
           </div>
 
           {/* Stream bottom-right watermark logo overlay */}
           <div className="absolute bottom-5 right-5 text-[11px] font-bold text-white/50 tracking-wider">
-            HKBR CAM04
+            {statusText || `HKBR CAM${camId ?? 'LIVE'}`}
           </div>
         </>
       ) : (

@@ -26,7 +26,7 @@ export function usePetMonitorStats(options: UsePetMonitorStatsOptions = {}) {
     fetchPetMonitorCameraStats,
     {
       fallbackMessage: 'Failed to fetch PetMonitor camera stats',
-      onSuccess: setStats,
+      onSuccess: (result) => setStats(result),
     },
   ), [runRequest]);
 
@@ -56,7 +56,7 @@ export function usePetMonitorStats(options: UsePetMonitorStatsOptions = {}) {
 
   useEffect(() => {
     if (!autoLoad) return;
-    void loadStats();
+    void loadStats().catch(() => undefined);
   }, [autoLoad, loadStats]);
 
   useEffect(() => {
@@ -64,7 +64,7 @@ export function usePetMonitorStats(options: UsePetMonitorStatsOptions = {}) {
 
     const timer = window.setInterval(() => {
       if (isMountedRef.current) {
-        void loadStats();
+        void loadStats().catch(() => undefined);
       }
     }, pollIntervalMs);
 

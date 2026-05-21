@@ -1,18 +1,40 @@
 import { useState, useMemo } from 'react';
 import { useLayoutContext } from '../hooks/layout';
+import { usePetMonitorDashboard } from '../hooks/monitoring';
 import { CAMERA_FEEDS } from '../constants';
+import { toPetMonitorCameraFeeds } from '../lib/utils/services/pet-monitor-ui';
 import MetricsGrid from '../components/pages/overview/MetricsGrid';
 import MonitoringHeader from '../components/pages/overview/MonitoringHeader';
 import CameraFeedGrid from '../components/pages/overview/CameraFeedGrid';
 
 export default function OverviewPage() {
   const { onSelectCamera } = useLayoutContext();
+  const monitor = usePetMonitorDashboard({
+    autoLoad: true,
+    statsPollIntervalMs: 5000,
+  });
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'online' | 'offline' | 'resting' | 'active'>('all');
 
+  const cameraFeeds = useMemo(() => {
+    const backendFeeds = toPetMonitorCameraFeeds(
+      monitor.stats.cameraSnapshots,
+      monitor.activeCameras.activeCameras,
+      monitor.setup.setupStatus,
+      monitor.urls.getVideoFeedUrl,
+    );
+
+    return backendFeeds.length ? backendFeeds : CAMERA_FEEDS;
+  }, [
+    monitor.activeCameras.activeCameras,
+    monitor.setup.setupStatus,
+    monitor.stats.cameraSnapshots,
+    monitor.urls.getVideoFeedUrl,
+  ]);
+
   const filteredFeeds = useMemo(() => {
-    return CAMERA_FEEDS.filter(feed => {
+    return cameraFeeds.filter(feed => {
       const matchesSearch = feed.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (feed.bunnyName && feed.bunnyName.toLowerCase().includes(searchQuery.toLowerCase()));
       const matchesFilter =
@@ -23,7 +45,12 @@ export default function OverviewPage() {
         filterType === 'active' ? feed.currentBehavior === '活動' || feed.currentBehavior === '放風中' : true;
       return matchesSearch && matchesFilter;
     });
-  }, [searchQuery, filterType]);
+  }, [cameraFeeds, searchQuery, filterType]);
+
+  const onlineCameraCount = useMemo(
+    () => cameraFeeds.filter((feed) => feed.isOnline).length,
+    [cameraFeeds],
+  );
 
   const clearFilters = () => {
     setSearchQuery('');
@@ -32,7 +59,12 @@ export default function OverviewPage() {
 
   return (
     <div id="page-overview" className="p-4 md:p-8 space-y-6 md:space-y-8 select-none">
-      <MetricsGrid />
+      <MetricsGrid
+        onlineCameras={onlineCameraCount}
+        totalCameras={cameraFeeds.length}
+        alertsToday={0}
+        isLoading={monitor.isLoading}
+      />
       <section id="monitoring-grid-container" className="space-y-6">
         <MonitoringHeader
           searchQuery={searchQuery}

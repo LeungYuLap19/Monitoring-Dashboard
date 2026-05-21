@@ -1,4 +1,5 @@
-import { BunnyGuest, ActivityCount, StatByTime } from '../constants/domain';
+import { BunnyGuest, ActivityCount, ActivityClip, StatByTime } from '../constants/domain';
+import { PetMonitorSetupStatus } from '../lib/monitoring';
 
 export type FilterCategory = 'all' | 'active' | 'eat' | 'drink' | 'abnormal';
 
@@ -17,6 +18,9 @@ export interface LiveStreamViewProps {
   activeBunny: BunnyGuest;
   streamActive: boolean;
   setStreamActive: (active: boolean) => void;
+  streamUrl?: string | null;
+  camId?: number | null;
+  statusText?: string | null;
 }
 
 export interface BehaviorStatsProps {
@@ -28,15 +32,24 @@ export interface BehaviorStatsProps {
   activeCategory: ActivityCount[];
   totalActivities: number;
   onGenerateLog: () => void;
+  isLoading?: boolean;
+  error?: Error | null;
 }
 
 export interface ClipSelectorModalProps {
   bunnyName: string;
   onClose: () => void;
+  clips?: ActivityClip[];
+  getVideoUrl?: (clip: ActivityClip) => string | null;
 }
 
 export interface ActivityLogPreviewModalProps {
   bunnyId: string;
   onClose: () => void;
   onSendSuccess: (logId: string) => void;
+}
+
+export interface PetMonitorSetupPanelProps {
+  setupStatus: PetMonitorSetupStatus | null;
+  onSetupChanged: () => Promise<PetMonitorSetupStatus>;
 }

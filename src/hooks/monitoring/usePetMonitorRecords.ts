@@ -68,7 +68,7 @@ export function usePetMonitorRecords(options: UsePetMonitorRecordsOptions = {}) 
 
   useEffect(() => {
     if (!autoLoad) return;
-    void loadRecords(queryRef.current);
+    void loadRecords(queryRef.current).catch(() => undefined);
   }, [autoLoad, loadRecords]);
 
   return {

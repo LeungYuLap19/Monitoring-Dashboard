@@ -46,7 +46,7 @@ export function usePetMonitorCameraConfig(options: UsePetMonitorCameraConfigOpti
       () => getPetMonitorCameraConfig(resolvedCamId),
       {
         fallbackMessage: `Failed to fetch PetMonitor config for camera ${resolvedCamId}`,
-        onSuccess: setConfig,
+        onSuccess: (result) => setConfig(result),
       },
     );
   }, [runLoadRequest]);
@@ -90,7 +90,7 @@ export function usePetMonitorCameraConfig(options: UsePetMonitorCameraConfigOpti
 
   useEffect(() => {
     if (!autoLoad || initialCamId === null) return;
-    void loadCameraConfig(initialCamId);
+    void loadCameraConfig(initialCamId).catch(() => undefined);
   }, [autoLoad, initialCamId, loadCameraConfig]);
 
   return {

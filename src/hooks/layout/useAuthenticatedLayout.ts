@@ -4,7 +4,9 @@ import { BUNNY_GUESTS } from '../../constants';
 import { useTranslation } from '../../lib/i18n';
 import { clearAuthSession, getCurrentSessionUser, logoutAuthSession } from '../../lib/services/authService';
 import { AUTH_STORAGE_KEYS, isManualSignOutActive } from '../../lib/utils/auth';
+import { toActivityClips } from '../../lib/utils/services/pet-monitor-ui';
 import type { AuthUser, TabId } from '../../types';
+import { usePetMonitorRecords } from '../monitoring';
 import { useSessionHeartbeat } from '../auth';
 import { toast } from 'sonner';
 
@@ -20,6 +22,7 @@ export function useAuthenticatedLayout() {
   const [isLogPreviewOpen, setIsLogPreviewOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hasUnsentLogs, setHasUnsentLogs] = useState(true);
+  const monitorRecords = usePetMonitorRecords({ autoLoad: true });
 
   const showToast = useCallback((message: string) => {
     toast.success(message);
@@ -28,6 +31,11 @@ export function useAuthenticatedLayout() {
   const activeBunnyObj = useMemo(
     () => petsList.find((b) => b.id === selectedBunnyId) || petsList[0],
     [petsList, selectedBunnyId],
+  );
+
+  const monitorClips = useMemo(
+    () => toActivityClips(monitorRecords.records, monitorRecords.getRecordThumbnailUrl),
+    [monitorRecords.records, monitorRecords.getRecordThumbnailUrl],
   );
 
   const activeTab: TabId = useMemo(() => {
@@ -43,13 +51,7 @@ export function useAuthenticatedLayout() {
   };
 
   const handleSelectCameraFromOverview = (camId: string) => {
-    if (camId === 'cam-1' || camId === 'cam-4') {
-      setSelectedBunnyId('momo');
-    } else if (camId === 'cam-2') {
-      setSelectedBunnyId('koko');
-    } else if (camId === 'cam-3') {
-      setSelectedBunnyId('pipi');
-    }
+    setSelectedBunnyId(camId);
     navigate('/monitoring');
     showToast(t('monitoring.toasts.cameraSwitch'));
   };
@@ -134,5 +136,7 @@ export function useAuthenticatedLayout() {
     handleSelectBunnyFromOverview,
     handleLogSendSuccess,
     handleLogout,
+    monitorClips,
+    getMonitorClipVideoUrl: monitorRecords.getRecordVideoUrl,
   };
 }

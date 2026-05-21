@@ -51,6 +51,8 @@ export default function AuthenticatedLayout() {
       {state.isClipsOpen && (
         <ClipSelectorModal
           bunnyName={state.activeBunnyObj.name}
+          clips={state.monitorClips}
+          getVideoUrl={(clip) => clip.videoUrl ? state.getMonitorClipVideoUrl(clip.videoUrl) : null}
           onClose={() => state.setIsClipsOpen(false)}
         />
       )}

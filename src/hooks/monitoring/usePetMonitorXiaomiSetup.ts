@@ -28,7 +28,7 @@ export function usePetMonitorXiaomiSetup() {
     () => loginPetMonitorXiaomi(payload),
     {
       fallbackMessage: 'Failed to login Xiaomi account',
-      onSuccess: setLoginResult,
+      onSuccess: (result) => setLoginResult(result),
     },
   ), [runLoginRequest]);
 
@@ -36,7 +36,7 @@ export function usePetMonitorXiaomiSetup() {
     () => getPetMonitorXiaomiCameras(accountId, region),
     {
       fallbackMessage: 'Failed to fetch Xiaomi cameras',
-      onSuccess: setCameraList,
+      onSuccess: (result) => setCameraList(result),
     },
   ), [runCamerasRequest]);
 
@@ -44,7 +44,7 @@ export function usePetMonitorXiaomiSetup() {
     () => selectPetMonitorXiaomiCamera(payload),
     {
       fallbackMessage: 'Failed to select Xiaomi camera',
-      onSuccess: setSelectResult,
+      onSuccess: (result) => setSelectResult(result),
     },
   ), [runSelectRequest]);
 

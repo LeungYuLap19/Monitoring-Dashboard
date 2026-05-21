@@ -36,6 +36,8 @@ export interface CameraFeed {
   bunnyName?: string;
   isLive: boolean;
   vibeText?: string;
+  streamUrl?: string;
+  camId?: number | null;
 }
 
 export interface ActivityClip {
@@ -44,6 +46,7 @@ export interface ActivityClip {
   bunnyName: string;
   action: string;
   thumbnailUrl: string;
+  videoUrl?: string;
   isUrgent: boolean;
 }
 

@@ -14,7 +14,7 @@ export function usePetMonitorSetup(options: UsePetMonitorSetupOptions = {}) {
     getPetMonitorSetupStatus,
     {
       fallbackMessage: 'Failed to fetch PetMonitor setup status',
-      onSuccess: setSetupStatus,
+      onSuccess: (result) => setSetupStatus(result),
     },
   ), [runRequest]);
 
@@ -25,7 +25,7 @@ export function usePetMonitorSetup(options: UsePetMonitorSetupOptions = {}) {
 
   useEffect(() => {
     if (!autoLoad) return;
-    void loadSetupStatus();
+    void loadSetupStatus().catch(() => undefined);
   }, [autoLoad, loadSetupStatus]);
 
   return {

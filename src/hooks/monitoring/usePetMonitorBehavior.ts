@@ -53,7 +53,7 @@ export function usePetMonitorBehavior(options: UsePetMonitorBehaviorOptions = {}
       () => getPetMonitorBehaviorLogs(resolvedQuery),
       {
         fallbackMessage: 'Failed to fetch PetMonitor behavior logs',
-        onSuccess: setBehaviorStats,
+        onSuccess: (result) => setBehaviorStats(result),
       },
     );
   }, [runLogsRequest]);
@@ -72,7 +72,7 @@ export function usePetMonitorBehavior(options: UsePetMonitorBehaviorOptions = {}
       () => getPetMonitorBehaviorTimeline(resolvedQuery),
       {
         fallbackMessage: 'Failed to fetch PetMonitor behavior timeline',
-        onSuccess: setTimeline,
+        onSuccess: (result) => setTimeline(result),
       },
     );
   }, [runTimelineRequest]);
@@ -89,12 +89,12 @@ export function usePetMonitorBehavior(options: UsePetMonitorBehaviorOptions = {}
 
   useEffect(() => {
     if (!autoLoadLogs || !initialLogsQuery) return;
-    void loadBehaviorStats(initialLogsQuery);
+    void loadBehaviorStats(initialLogsQuery).catch(() => undefined);
   }, [autoLoadLogs, initialLogsQuery, loadBehaviorStats]);
 
   useEffect(() => {
     if (!autoLoadTimeline || !initialTimelineQuery) return;
-    void loadBehaviorTimeline(initialTimelineQuery);
+    void loadBehaviorTimeline(initialTimelineQuery).catch(() => undefined);
   }, [autoLoadTimeline, initialTimelineQuery, loadBehaviorTimeline]);
 
   return {

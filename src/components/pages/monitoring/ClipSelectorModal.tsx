@@ -16,30 +16,43 @@ import {
   DialogFooter,
 } from '../../ui/dialog';
 
-export default function ClipSelectorModal({ bunnyName, onClose }: ClipSelectorModalProps) {
+export default function ClipSelectorModal({
+  bunnyName,
+  onClose,
+  clips = ACTIVITY_CLIPS,
+  getVideoUrl,
+}: ClipSelectorModalProps) {
   const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState<FilterCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [downloadedClips, setDownloadedClips] = useState<string[]>([]);
 
   const filteredClips = useMemo(() => {
-    return ACTIVITY_CLIPS.filter(clip => {
-      const matchesBunny = clip.bunnyName.toLowerCase() === bunnyName.toLowerCase();
+    return clips.filter(clip => {
+      const matchesBunny = clip.bunnyName.toLowerCase() === bunnyName.toLowerCase() ||
+        clip.bunnyName.toLowerCase().startsWith('camera');
       const matchesSearch = clip.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             clip.timestamp.toLowerCase().includes(searchQuery.toLowerCase());
+      const normalizedAction = clip.action.toLowerCase();
       const matchesCategory =
         activeCategory === 'all' ? true :
-        activeCategory === 'active' ? (clip.action.includes('活動') || clip.action.includes('奔跑') || clip.action.includes('探索')) :
-        activeCategory === 'eat' ? clip.action.includes('進食') :
-        activeCategory === 'drink' ? clip.action.includes('喝水') :
+        activeCategory === 'active' ? (clip.action.includes('活動') || clip.action.includes('奔跑') || clip.action.includes('探索') || normalizedAction.includes('active')) :
+        activeCategory === 'eat' ? clip.action.includes('進食') || normalizedAction.includes('eat') :
+        activeCategory === 'drink' ? clip.action.includes('喝水') || normalizedAction.includes('drink') :
         activeCategory === 'abnormal' ? clip.isUrgent : true;
       return matchesBunny && matchesSearch && matchesCategory;
     });
-  }, [bunnyName, searchQuery, activeCategory]);
+  }, [activeCategory, bunnyName, clips, searchQuery]);
 
   const handleDownload = (clipId: string) => {
     if (downloadedClips.includes(clipId)) return;
     setDownloadedClips([...downloadedClips, clipId]);
+  };
+
+  const handleOpenClip = (clip: ActivityClip) => {
+    const url = getVideoUrl?.(clip) ?? clip.videoUrl;
+    if (!url) return;
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -103,12 +116,16 @@ export default function ClipSelectorModal({ bunnyName, onClose }: ClipSelectorMo
                     }`}
                   >
                     <div className="relative aspect-video bg-slate-950 overflow-hidden">
-                      <div className="size-full bg-slate-900 flex flex-col items-center justify-center text-slate-500 font-mono text-[10px] select-none">
-                        <Film className="size-6 text-teal-600 mb-1 animate-pulse" />
-                        <span>VIDEO INDEX: {clip.id.toUpperCase()}</span>
-                        <span className="text-[8px] text-slate-600 uppercase font-bold">CLIP PLACEHOLDER</span>
-                      </div>
-                      <div className="absolute inset-0 bg-black/35 flex items-center justify-center cursor-pointer">
+                      {clip.thumbnailUrl ? (
+                        <img src={clip.thumbnailUrl} alt={clip.action} className="size-full object-cover" loading="lazy" />
+                      ) : (
+                        <div className="size-full bg-slate-900 flex flex-col items-center justify-center text-slate-500 font-mono text-[10px] select-none">
+                          <Film className="size-6 text-teal-600 mb-1 animate-pulse" />
+                          <span>VIDEO INDEX: {clip.id.toUpperCase()}</span>
+                          <span className="text-[8px] text-slate-600 uppercase font-bold">CLIP PLACEHOLDER</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/35 flex items-center justify-center cursor-pointer" onClick={() => handleOpenClip(clip)}>
                         <div className="size-12 rounded-full bg-white/95 text-teal-600 flex items-center justify-center shadow-xl hover:scale-105 transition-transform">
                           <Film className="size-5 ml-0.5" />
                         </div>
@@ -143,7 +160,10 @@ export default function ClipSelectorModal({ bunnyName, onClose }: ClipSelectorMo
                         <Button
                           size="xs"
                           variant={isDownloaded ? 'default' : 'secondary'}
-                          onClick={() => handleDownload(clip.id)}
+                          onClick={() => {
+                            handleDownload(clip.id);
+                            handleOpenClip(clip);
+                          }}
                           className={isDownloaded ? 'bg-emerald-500 hover:bg-emerald-600' : ''}
                         >
                           {isDownloaded ? <><Check className="size-3.5" /><span>{t('monitoring.clips.downloaded')}</span></> : <><Download className="size-3.5 animate-bounce" /><span>{t('monitoring.clips.download')}</span></>}

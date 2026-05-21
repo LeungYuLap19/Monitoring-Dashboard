@@ -15,7 +15,9 @@ export default function BehaviorStats({
   statsByTime,
   activeCategory,
   totalActivities,
-  onGenerateLog
+  onGenerateLog,
+  isLoading = false,
+  error = null,
 }: BehaviorStatsProps) {
   const { t } = useTranslation();
 
@@ -40,10 +42,24 @@ export default function BehaviorStats({
     return acc;
   }, {} as ChartConfig);
 
+  const todayStats = statsByTime[statsByTime.length - 1];
+  const yesterdayStats = statsByTime[statsByTime.length - 2];
   const lineData = [
-    { name: t('monitoring.clips.active'), today: 6, yesterday: 5 },
-    { name: t('monitoring.clips.eat'), today: 2, yesterday: 1 },
-    { name: t('monitoring.clips.drink'), today: 1, yesterday: 2 },
+    {
+      name: t('monitoring.clips.active'),
+      today: todayStats?.activityCount ?? 0,
+      yesterday: yesterdayStats?.activityCount ?? 0,
+    },
+    {
+      name: t('monitoring.clips.eat'),
+      today: todayStats?.eatingCount ?? 0,
+      yesterday: yesterdayStats?.eatingCount ?? 0,
+    },
+    {
+      name: t('monitoring.clips.drink'),
+      today: todayStats?.drinkingCount ?? 0,
+      yesterday: yesterdayStats?.drinkingCount ?? 0,
+    },
   ];
 
   const lineChartConfig: ChartConfig = {
@@ -78,7 +94,9 @@ export default function BehaviorStats({
 
           <div className="p-3.5 bg-emerald-50/40 rounded-xl text-xs text-slate-600 flex gap-2">
             <span className="text-teal-600 font-bold shrink-0">*</span>
-            <span className="font-medium text-slate-600 leading-normal">{summary}</span>
+            <span className="font-medium text-slate-600 leading-normal">
+              {isLoading ? 'Loading behavior telemetry from PetMonitor...' : error ? error.message : summary}
+            </span>
           </div>
 
           {/* Bar Chart - Activity over 3 days */}
@@ -87,7 +105,7 @@ export default function BehaviorStats({
             <div className="bg-slate-50/50 p-4 rounded-2xl">
               <div className="flex items-center justify-between mb-4">
                 <div className="space-y-0.5">
-                  <span className="block text-2xl font-black text-slate-800 tracking-tight">{statsByTime[2]?.activityCount} <span className="text-[10px] text-slate-400 font-bold">{t('monitoring.stats.perDay')}</span></span>
+                  <span className="block text-2xl font-black text-slate-800 tracking-tight">{todayStats?.activityCount ?? 0} <span className="text-[10px] text-slate-400 font-bold">{t('monitoring.stats.perDay')}</span></span>
                   <span className="text-[10px] text-slate-400 font-bold">{t('monitoring.stats.yesterdayAvg')} {avgOver3Days}{t('monitoring.stats.perDay')}</span>
                 </div>
               </div>
