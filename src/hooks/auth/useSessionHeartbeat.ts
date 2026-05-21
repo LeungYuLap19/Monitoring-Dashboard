@@ -1,13 +1,7 @@
 import { useEffect } from 'react';
-import type { AuthUser } from '../../types';
+import type { UseSessionHeartbeatOptions } from '../../types';
 import { getStoredAccessToken, isAccessTokenExpired } from '../../lib/utils/auth';
 import { refreshAuthSession } from '../../lib/services/authService';
-
-interface UseSessionHeartbeatOptions {
-  onUnauthorized: () => void;
-  onUserRefresh?: (user: AuthUser) => void;
-  intervalMs?: number;
-}
 
 export function useSessionHeartbeat({
   onUnauthorized,

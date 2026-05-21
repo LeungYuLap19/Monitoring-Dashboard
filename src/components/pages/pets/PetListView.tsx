@@ -1,6 +1,6 @@
 import React from 'react';
 import type { PetListViewProps } from '../../../types';
-import { formatPetDate } from '../../../lib/utils/pet';
+import { formatPetDate } from '../../../lib/utils/services/pet-service';
 import { useTranslation } from '../../../lib/i18n';
 import { Button } from '../../ui/button';
 import { Badge } from '../../ui/badge';

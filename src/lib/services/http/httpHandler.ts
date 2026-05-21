@@ -1,8 +1,8 @@
 import { createTRPCClient, httpBatchLink, loggerLink, type Operation, type TRPCClient, type TRPCLink } from '@trpc/client';
 import type { AnyRouter } from '@trpc/server';
 import { observable } from '@trpc/server/observable';
-import { TrpcRequestError, type TrpcClientConfig, type TrpcErrorContext, type TrpcErrorHandler } from '../../types/lib/trpc';
-import { createLocalStorageTokenResolver, normalizeTrpcError, normalizeUrl, resolveFetch, resolveHeaders, toTrpcRequestError } from '../utils/trpc';
+import { TrpcRequestError, type TrpcClientConfig, type TrpcErrorContext, type TrpcErrorHandler } from '../../../types/lib/trpc';
+import { createLocalStorageTokenResolver, normalizeTrpcError, normalizeUrl, resolveFetch, resolveHeaders, toTrpcRequestError } from '../../utils/http/trpc-service';
 
 let globalTrpcErrorHandler: TrpcErrorHandler | undefined;
 

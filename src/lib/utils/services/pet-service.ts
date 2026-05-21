@@ -8,7 +8,7 @@ import type {
   PetProfileSummary,
   PetProfileUpdatePayload,
   PetProfileView,
-} from '../../types/lib/pet';
+} from '../../../types/lib/pet';
 
 const PET_PROFILE_UPDATE_STRING_FIELDS = [
   'name',

@@ -8,7 +8,7 @@ import {
   Heart,
 } from 'lucide-react';
 import type { PetCardGridProps } from '../../../types';
-import { formatPetDate } from '../../../lib/utils/pet';
+import { formatPetDate } from '../../../lib/utils/services/pet-service';
 import { useTranslation } from '../../../lib/i18n';
 import { Card, CardContent } from '../../ui/card';
 import { Badge } from '../../ui/badge';

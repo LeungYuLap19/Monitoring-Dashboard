@@ -1,4 +1,5 @@
 import type { LoginMethod, AuthApiErrorInfo, AuthUser, UserMeResponseData } from '../../types/lib/auth';
+import { readStorageJson, writeStorageJson } from './storage';
 
 export const AUTH_STORAGE_KEYS = {
   authUser: 'hkbr_auth_user',
@@ -28,15 +29,6 @@ export function isAuthApiError(error: unknown): error is AuthApiError {
   return error instanceof AuthApiError;
 }
 
-function safeParseJson<T>(value: string | null): T | null {
-  if (!value) return null;
-  try {
-    return JSON.parse(value) as T;
-  } catch {
-    return null;
-  }
-}
-
 export function getStoredAccessToken(): string | null {
   return inMemoryAccessToken;
 }
@@ -46,13 +38,19 @@ export function setStoredAccessToken(token: string): void {
 }
 
 export function getStoredAuthUser(): AuthUser | null {
-  if (typeof window === 'undefined') return null;
-  return safeParseJson<AuthUser>(window.sessionStorage.getItem(AUTH_STORAGE_KEYS.authUser));
+  return readStorageJson<AuthUser | null>(
+    typeof window === 'undefined' ? undefined : window.sessionStorage,
+    AUTH_STORAGE_KEYS.authUser,
+    null,
+  );
 }
 
 export function setStoredAuthUser(user: AuthUser): void {
-  if (typeof window === 'undefined') return;
-  window.sessionStorage.setItem(AUTH_STORAGE_KEYS.authUser, JSON.stringify(user));
+  writeStorageJson(
+    typeof window === 'undefined' ? undefined : window.sessionStorage,
+    AUTH_STORAGE_KEYS.authUser,
+    user,
+  );
 }
 
 export function clearStoredAuthSession(): void {

@@ -1,6 +1,6 @@
 import { createContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import { Locale } from './types';
-import { getFromLocalStorage, setToLocalStorage } from '../utils/utils';
+import { readStorageJson, writeStorageJson } from '../utils/storage';
 
 interface I18nContextValue {
   locale: Locale;
@@ -16,7 +16,7 @@ function getInitialLocale(): Locale {
   const params = new URLSearchParams(window.location.search);
   const urlLang = params.get('lang');
   if (urlLang === 'en' || urlLang === 'zh-TW') return urlLang;
-  return getFromLocalStorage<Locale>('hkbr_locale', 'zh-TW');
+  return readStorageJson<Locale>(window.localStorage, 'hkbr_locale', 'zh-TW');
 }
 
 function syncUrlParam(locale: Locale) {
@@ -34,7 +34,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);
-    setToLocalStorage('hkbr_locale', newLocale);
+    writeStorageJson(window.localStorage, 'hkbr_locale', newLocale);
     syncUrlParam(newLocale);
   }, []);
 

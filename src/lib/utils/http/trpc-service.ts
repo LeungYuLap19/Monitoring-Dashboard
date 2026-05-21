@@ -1,14 +1,7 @@
 import { TRPCClientError, type HTTPHeaders, type Operation } from '@trpc/client';
-import type { TrpcClientConfig } from '../../types/lib/trpc';
-import { TrpcRequestError, type OperationWithFlags } from '../../types/lib/trpc';
-
-export function asString(value: unknown): string | undefined {
-  return typeof value === 'string' && value.trim() ? value : undefined;
-}
-
-export function isObjectRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
+import type { TrpcClientConfig } from '../../../types/lib/trpc';
+import { TrpcRequestError, type OperationWithFlags } from '../../../types/lib/trpc';
+import { asString, isObjectRecord } from './http';
 
 export function normalizeUrl(url?: string, trpcPath: string = '/trpc'): string {
   const baseUrl = url ?? import.meta.env.VITE_TRPC_URL ?? import.meta.env.VITE_API_BASE_URL ?? '';

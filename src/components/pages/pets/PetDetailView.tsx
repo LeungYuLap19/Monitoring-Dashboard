@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowLeft, Heart, Info, Tag } from 'lucide-react';
 import type { PetDetailViewProps } from '../../../types';
-import { formatPetDate } from '../../../lib/utils/pet';
+import { formatPetDate } from '../../../lib/utils/services/pet-service';
 import { useTranslation } from '../../../lib/i18n';
 import { Badge } from '../../ui/badge';
 

@@ -15,7 +15,7 @@ import {
   buildPetProfileUpdateFormData,
   normalizePetProfileView,
   toPetProfileListQueryParams,
-} from '../utils/pet';
+} from '../utils/services/pet-service';
 import {
   requestProtectedApi,
   requestProtectedApiResult,

@@ -6,7 +6,7 @@ import type {
   PetProfileSortOrder,
   UsePetManagementResult,
 } from '../../types';
-import { toPetManagementDetail, toPetManagementListItem } from '../../lib/utils/pet';
+import { toPetManagementDetail, toPetManagementListItem } from '../../lib/utils/services/pet-service';
 import { usePetProfile } from './usePetProfile';
 import { useUserPets } from './useUserPets';
 

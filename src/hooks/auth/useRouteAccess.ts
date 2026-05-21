@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
 import { ensureAuthenticatedSession } from '../../lib/services/authService';
+import type { RouteGuardMode, RouteGuardStatus } from '../../types';
 
-type GuardStatus = 'checking' | 'authed' | 'unauth';
-type GuardMode = 'auth-only' | 'guest-only';
-
-export function useRouteAccess(mode: GuardMode) {
-  const [status, setStatus] = useState<GuardStatus>('checking');
+export function useRouteAccess(mode: RouteGuardMode) {
+  const [status, setStatus] = useState<RouteGuardStatus>('checking');
 
   useEffect(() => {
     let mounted = true;

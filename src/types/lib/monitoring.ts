@@ -1,0 +1,197 @@
+export type PetMonitorCameraIndex = number;
+export type PetMonitorRecordCameraId = number;
+export type PetMonitorStreamSubtype = 'hd' | 'sd';
+export type PetMonitorBehaviorTimelineBucket = '5m' | '1h' | '1d';
+
+export interface PetMonitorXiaomiLoginPayload {
+  username: string;
+  password: string;
+  region: string;
+  captcha?: string;
+  verify?: string;
+}
+
+export interface PetMonitorTrackState {
+  id: number;
+  time: string;
+  bowl: string;
+  probs: Record<string, number>;
+  state?: string;
+}
+
+export interface PetMonitorCameraStats {
+  fps: number;
+  yoloMs: number;
+  ruleMs: number;
+  actionMs: number;
+  decodeMs: number;
+  status: string;
+  camId: PetMonitorCameraIndex;
+  imgsz?: number;
+  isRecording?: boolean;
+  name?: string;
+  yoloFpsMode?: string;
+  yoloTargetIntervalMs?: number;
+  yoloSkipped?: boolean;
+}
+
+export interface PetMonitorCameraSnapshot {
+  stats: PetMonitorCameraStats;
+  logs: PetMonitorTrackState[];
+  active_states: Record<string, PetMonitorTrackState>;
+}
+
+export interface PetMonitorBackendStatsResponse {
+  [cameraKey: string]: PetMonitorCameraSnapshot;
+}
+
+export interface PetMonitorXiaomiCamera {
+  name: string;
+  url?: string;
+  did?: string;
+  model?: string;
+  host?: string;
+  raw?: unknown;
+}
+
+export interface PetMonitorSelectedCamera extends PetMonitorXiaomiCamera {
+  url: string;
+  subtype?: PetMonitorStreamSubtype;
+}
+
+export interface PetMonitorSetupStatus {
+  setup_complete: boolean;
+  stream_runtime_running: boolean;
+  stream_name: string;
+  stream_url: string;
+  selected_camera?: PetMonitorSelectedCamera | null;
+  account_id?: string | null;
+  region?: string | null;
+  has_xiaomi_token: boolean;
+}
+
+export interface PetMonitorXiaomiLoginResponse {
+  success: boolean;
+  result?: unknown;
+  accounts?: string[];
+  requires_verification?: boolean;
+  requires_captcha?: boolean;
+  error?: string;
+}
+
+export interface PetMonitorXiaomiCameraListResponse {
+  success: boolean;
+  account_id: string;
+  region: string;
+  cameras: PetMonitorXiaomiCamera[];
+  raw?: unknown;
+  error?: unknown;
+}
+
+export interface PetMonitorSelectedCameraSetup {
+  setup_complete: boolean;
+  account_id: string;
+  region: string;
+  stream_name: string;
+  stream_url: string;
+  selected_camera: PetMonitorSelectedCamera;
+}
+
+export interface PetMonitorSelectXiaomiCameraPayload {
+  account_id: string;
+  region: string;
+  camera: PetMonitorXiaomiCamera;
+  subtype?: PetMonitorStreamSubtype;
+}
+
+export interface PetMonitorSelectXiaomiCameraResponse {
+  success: boolean;
+  setup?: PetMonitorSelectedCameraSetup;
+  status?: PetMonitorSetupStatus;
+  stream_runtime_synced?: boolean;
+  stream_runtime_sync_result?: unknown;
+  error?: string;
+}
+
+export interface PetMonitorActiveCamerasResponse {
+  active_cams: PetMonitorCameraIndex[];
+  success?: boolean;
+}
+
+export interface PetMonitorCameraRuntimeConfig {
+  imgsz: number;
+  record_labels: string[];
+  record_threshold: number;
+  yolo_fps_mode: string;
+  name: string;
+}
+
+export interface PetMonitorCameraRuntimeConfigUpdate {
+  imgsz?: number;
+  record_labels?: string[];
+  record_threshold?: number;
+  yolo_fps_mode?: string;
+  name?: string;
+}
+
+export interface PetMonitorCameraConfigUpdateResponse {
+  success: boolean;
+  config?: PetMonitorCameraRuntimeConfig;
+  error?: string;
+}
+
+export interface PetMonitorBehaviorLogsQuery {
+  cam_id: PetMonitorCameraIndex;
+  start?: string;
+  end?: string;
+}
+
+export interface PetMonitorBehaviorLogStatsResponse {
+  success: boolean;
+  stats: Record<string, number>;
+  error?: string;
+}
+
+export interface PetMonitorBehaviorTimelinePoint {
+  label: string;
+  counts: Record<string, number>;
+}
+
+export interface PetMonitorBehaviorTimelineQuery extends PetMonitorBehaviorLogsQuery {
+  bucket: PetMonitorBehaviorTimelineBucket;
+}
+
+export interface PetMonitorBehaviorTimelineResponse {
+  success: boolean;
+  cam_id: PetMonitorCameraIndex;
+  bucket: PetMonitorBehaviorTimelineBucket;
+  points: PetMonitorBehaviorTimelinePoint[];
+  error?: string;
+}
+
+export interface PetMonitorVideoRecord {
+  id: number;
+  cam_id: PetMonitorRecordCameraId;
+  filename: string;
+  start_time: string;
+  end_time: string;
+  trigger_action: string;
+  max_confidence: number;
+}
+
+export interface PetMonitorVideoRecordsQuery {
+  cam_id?: string | number;
+  action?: string;
+  date?: string;
+}
+
+export interface PetMonitorVideoRecordsResponse {
+  success: boolean;
+  records: PetMonitorVideoRecord[];
+  error?: string;
+}
+
+export interface PetMonitorDeleteVideoRecordResponse {
+  success: boolean;
+  error?: string;
+}

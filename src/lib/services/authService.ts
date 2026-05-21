@@ -1,6 +1,4 @@
 import axios, {
-  AxiosError,
-  type AxiosInstance,
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
 } from 'axios';
@@ -37,121 +35,31 @@ import {
   setStoredAuthUser,
   toAuthUser,
 } from '../utils/auth';
+import {
+  createAuthApiClient,
+  getAuthApiHeaders,
+  shouldClearSessionForRefreshError,
+  toAuthApiError,
+  unwrapAuthData,
+  unwrapAuthEnvelope,
+} from '../utils/services/auth-service';
+import {
+  asString,
+  clearContentTypeHeader,
+  isFormDataPayload,
+  isObjectRecord,
+  readErrorMessage,
+} from '../utils/http/http';
 
 type RetryableConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/+$/, '');
 const API_KEY = import.meta.env.VITE_API_KEY;
 
-function asString(value: unknown): string | undefined {
-  return typeof value === 'string' && value.trim() ? value : undefined;
-}
-
-function isObjectRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
-
-function getHeaders(): Record<string, string> {
-  return {
-    'Content-Type': 'application/json',
-    ...(API_KEY ? { 'x-api-key': API_KEY } : {}),
-  };
-}
-
-function createClient(withCredentials: boolean): AxiosInstance {
-  return axios.create({
-    baseURL: API_BASE_URL,
-    withCredentials,
-    headers: getHeaders(),
-    timeout: 15000,
-  });
-}
-
-const publicAuthClient = createClient(false);
-const cookieAuthClient = createClient(true);
-const protectedApiClient = createClient(false);
+const publicAuthClient = createAuthApiClient(API_BASE_URL, API_KEY, false);
+const cookieAuthClient = createAuthApiClient(API_BASE_URL, API_KEY, true);
+const protectedApiClient = createAuthApiClient(API_BASE_URL, API_KEY, false);
 let authClearEpoch = 0;
-
-function isFormDataPayload(value: unknown): value is FormData {
-  return typeof FormData !== 'undefined' && value instanceof FormData;
-}
-
-function clearContentTypeHeader(config: InternalAxiosRequestConfig): void {
-  if (!config.headers) return;
-
-  const headers = config.headers as InternalAxiosRequestConfig['headers'] & {
-    delete?: (name: string) => void;
-  } & Record<string, unknown>;
-
-  headers.delete?.('Content-Type');
-  headers.delete?.('content-type');
-  delete headers['Content-Type'];
-  delete headers['content-type'];
-}
-
-function toAuthApiError(error: unknown): AuthApiError {
-  if (isAuthApiError(error)) return error;
-
-  if (!axios.isAxiosError(error)) {
-    return new AuthApiError({
-      status: 0,
-      message: error instanceof Error ? error.message : 'Network error',
-      errorKey: 'network.error',
-      details: error,
-    });
-  }
-
-  const axiosError = error as AxiosError<unknown>;
-  const status = axiosError.response?.status ?? 0;
-  const responseData = axiosError.response?.data;
-
-  let message = axiosError.message || 'Request failed';
-  let errorKey = status ? mapStatusToErrorKey(status, message) : 'network.error';
-  let requestId: string | undefined;
-
-  if (isObjectRecord(responseData)) {
-    const responseMessage = asString(responseData.error) ?? asString(responseData.message);
-    const envelopeKey = asString(responseData.errorKey);
-    requestId = asString(responseData.requestId);
-    if (responseMessage) message = responseMessage;
-    errorKey = envelopeKey ?? mapStatusToErrorKey(status, responseMessage) ?? errorKey;
-  } else if (typeof responseData === 'string' && responseData.trim()) {
-    message = responseData;
-    errorKey = mapStatusToErrorKey(status, responseData) ?? errorKey;
-  }
-
-  return new AuthApiError({
-    status,
-    message,
-    errorKey,
-    requestId,
-    details: responseData ?? axiosError.toJSON(),
-  });
-}
-
-async function unwrapEnvelope<TData>(promise: Promise<{ data: ApiSuccessEnvelope<TData> | ApiErrorEnvelope }>): Promise<ApiSuccessEnvelope<TData>> {
-  try {
-    const response = await promise;
-    const payload = response.data;
-    if (isObjectRecord(payload) && payload.success === false) {
-      throw new AuthApiError({
-        status: 400,
-        message: asString(payload.error) ?? asString(payload.message) ?? 'Request failed',
-        errorKey: asString(payload.errorKey),
-        requestId: asString(payload.requestId),
-        details: payload,
-      });
-    }
-    return payload as ApiSuccessEnvelope<TData>;
-  } catch (error) {
-    throw toAuthApiError(error);
-  }
-}
-
-async function unwrapData<TData>(promise: Promise<{ data: ApiSuccessEnvelope<TData> | ApiErrorEnvelope }>): Promise<TData> {
-  const payload = await unwrapEnvelope(promise);
-  return (payload.data ?? {}) as TData;
-}
 
 protectedApiClient.interceptors.request.use((config) => {
   if (isFormDataPayload(config.data)) {
@@ -174,7 +82,7 @@ async function fetchCurrentUserWithToken(token: string): Promise<AuthUser> {
   try {
     const response = await publicAuthClient.get<ApiSuccessEnvelope<UserMeResponseData>>('/user/me', {
       headers: {
-        ...getHeaders(),
+        ...getAuthApiHeaders(API_KEY),
         Authorization: `Bearer ${token}`,
       },
     });
@@ -219,13 +127,13 @@ protectedApiClient.interceptors.response.use(
 );
 
 export async function requestProtectedApi<TData>(config: AxiosRequestConfig): Promise<TData> {
-  return unwrapData(
+  return unwrapAuthData(
     protectedApiClient.request<ApiSuccessEnvelope<TData> | ApiErrorEnvelope>(config),
   );
 }
 
 export async function requestProtectedApiResult<TData>(config: AxiosRequestConfig): Promise<ProtectedApiResult<TData>> {
-  const payload = await unwrapEnvelope(
+  const payload = await unwrapAuthEnvelope(
     protectedApiClient.request<ApiSuccessEnvelope<TData> | ApiErrorEnvelope>(config),
   );
 
@@ -237,7 +145,7 @@ export async function requestProtectedApiResult<TData>(config: AxiosRequestConfi
 }
 
 export async function requestProtectedApiWithMeta<TData>(config: AxiosRequestConfig): Promise<ProtectedPaginatedApiResult<TData>> {
-  const payload = await unwrapEnvelope(
+  const payload = await unwrapAuthEnvelope(
     protectedApiClient.request<ApiSuccessEnvelope<TData> | ApiErrorEnvelope>(config),
   );
 
@@ -260,7 +168,7 @@ export async function createOtpChallenge(params: {
     ? { email: identifier.email, lang: params.locale }
     : { phoneNumber: identifier.phoneNumber };
 
-  await unwrapData(
+  await unwrapAuthData(
     publicAuthClient.post<ApiSuccessEnvelope<unknown> | ApiErrorEnvelope>('/auth/challenges', body),
   );
 }
@@ -278,7 +186,7 @@ export async function verifyOtpChallenge(params: {
     ? { email: identifier.email, code: params.code, lang: params.locale }
     : { phoneNumber: identifier.phoneNumber, code: params.code };
 
-  return unwrapData(
+  return unwrapAuthData(
     cookieAuthClient.post<ApiSuccessEnvelope<AuthVerifyResponseData> | ApiErrorEnvelope>(
       '/auth/challenges/verify',
       body,
@@ -306,7 +214,7 @@ export async function registerUserFromOtp(params: {
     phoneNumber: identifier.phoneNumber,
   };
 
-  return unwrapData(
+  return unwrapAuthData(
     cookieAuthClient.post<ApiSuccessEnvelope<AuthRegisterUserResponseData> | ApiErrorEnvelope>(
       '/auth/registrations/user',
       body,
@@ -315,7 +223,7 @@ export async function registerUserFromOtp(params: {
 }
 
 export async function refreshAccessToken(): Promise<AuthRefreshResponseData> {
-  return unwrapData(
+  return unwrapAuthData(
     cookieAuthClient.post<ApiSuccessEnvelope<AuthRefreshResponseData> | ApiErrorEnvelope>(
       '/auth/tokens/refresh',
       {},
@@ -331,7 +239,7 @@ export async function fetchCurrentUser(): Promise<AuthUser> {
     if (isObjectRecord(response.data) && response.data.success === false) {
       throw new AuthApiError({
         status: 400,
-        message: asString(response.data.error) ?? asString(response.data.message) ?? 'Request failed',
+        message: readErrorMessage(response.data, 'Request failed'),
         errorKey: asString(response.data.errorKey),
         requestId: asString(response.data.requestId),
         details: response.data,
@@ -351,15 +259,6 @@ export function clearAuthSession(): void {
 export function logoutAuthSession(): void {
   markManualSignOut();
   clearAuthSession();
-}
-
-function shouldClearSessionForRefreshError(error: unknown): boolean {
-  return isAuthApiError(error) && [
-    'auth.refresh.missingRefreshToken',
-    'auth.refresh.invalidRefreshTokenCookie',
-    'auth.refresh.invalidSession',
-    'auth.refresh.ngoApprovalRequired',
-  ].includes(error.errorKey ?? '');
 }
 
 export async function bootstrapSessionWithToken(token: string, fallbackRole?: string): Promise<AuthUser> {

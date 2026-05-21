@@ -1,13 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../lib/i18n';
 import { createOtpChallenge, registerUserFromOtp, verifyOtpChallenge, bootstrapSessionWithToken } from '../../lib/services/authService';
 import { isAuthApiError } from '../../lib/utils/auth';
-import { validateEmail, validatePhone } from '../../lib/utils/utils';
+import { validateEmail, validatePhone } from '../../lib/utils/validation';
 import type { LoginMethod } from '../../types/lib/auth';
-
-type AuthStep = 'input' | 'otp' | 'register';
-type AuthAction = 'challenge' | 'verify' | 'register';
+import type { AuthAction, AuthStep } from '../../types';
 
 export function useAuth(showToast: (msg: string) => void) {
   const { t, locale } = useTranslation();
@@ -67,7 +65,7 @@ export function useAuth(showToast: (msg: string) => void) {
     }
   };
 
-  const handleSendOtp = async (e?: React.FormEvent) => {
+  const handleSendOtp = async (e?: FormEvent) => {
     e?.preventDefault();
 
     if (!inputValue.trim()) {
@@ -102,7 +100,7 @@ export function useAuth(showToast: (msg: string) => void) {
     }
   };
 
-  const handleVerifyOtp = async (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!enteredOtp.trim()) {
@@ -149,7 +147,7 @@ export function useAuth(showToast: (msg: string) => void) {
     }
   };
 
-  const handleRegisterAndLogin = async (e: React.FormEvent) => {
+  const handleRegisterAndLogin = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!firstName.trim() || !lastName.trim()) {
