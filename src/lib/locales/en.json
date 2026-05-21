@@ -81,9 +81,11 @@
     "heading": "Pet Management",
     "badge": "BUNNY PET DATABASE",
     "description": "Browse the current pet profile records returned by the pet profile API.",
-    "searchPlaceholder": "Search by name, breed, animal, location, or ID...",
+    "searchPlaceholder": "Search by name, breed, animal, owner, or location...",
     "gridView": "Grid view",
     "listView": "List view",
+    "sortByLabel": "Sort by",
+    "sortOrderLabel": "Order",
     "emptyState": "No pets match your search.",
     "clearFilter": "Clear filter",
     "viewDetails": "View Details",
@@ -129,6 +131,7 @@
     "transferCountLabel": "Transfer records",
     "transferNgoCountLabel": "NGO transfer records",
     "loadingList": "Loading pet profiles...",
+    "refreshingList": "Updating pet profiles...",
     "loadingDetail": "Loading pet details...",
     "loadError": "Unable to load pet data right now.",
     "retryLoad": "Retry",
@@ -157,6 +160,17 @@
       "previous": "Previous page",
       "next": "Next page",
       "summary": "Page {{page}} of {{totalPages}} · {{total}} pets"
+    },
+    "sort": {
+      "updatedAt": "Last updated",
+      "createdAt": "Created date",
+      "name": "Name",
+      "animal": "Animal",
+      "breed": "Breed",
+      "birthday": "Birthday",
+      "receivedDate": "Received date",
+      "asc": "Ascending",
+      "desc": "Descending"
     },
     "form": {
       "addTitle": "Add New Pet Profile",

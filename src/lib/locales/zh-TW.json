@@ -81,9 +81,11 @@
     "heading": "寵物數據管理",
     "badge": "BUNNY PET DATABASE",
     "description": "瀏覽目前由寵物檔案 API 返回的寵物資料。",
-    "searchPlaceholder": "搜尋寵物姓名、品種、動物類型、位置或 ID...",
+    "searchPlaceholder": "搜尋寵物姓名、品種、動物類型、飼主或位置...",
     "gridView": "網格視圖",
     "listView": "列表視圖",
+    "sortByLabel": "排序欄位",
+    "sortOrderLabel": "排序方向",
     "emptyState": "無匹配搜尋關鍵字的寵物。",
     "clearFilter": "清除過濾項目",
     "viewDetails": "查看詳情",
@@ -129,6 +131,7 @@
     "transferCountLabel": "轉移紀錄數",
     "transferNgoCountLabel": "NGO 轉移紀錄數",
     "loadingList": "載入寵物檔案中...",
+    "refreshingList": "更新寵物檔案中...",
     "loadingDetail": "載入寵物詳情中...",
     "loadError": "目前無法載入寵物資料。",
     "retryLoad": "重新載入",
@@ -157,6 +160,17 @@
       "previous": "上一頁",
       "next": "下一頁",
       "summary": "第 {{page}} / {{totalPages}} 頁 · 共 {{total}} 筆寵物資料"
+    },
+    "sort": {
+      "updatedAt": "最近更新",
+      "createdAt": "建立時間",
+      "name": "名稱",
+      "animal": "動物類型",
+      "breed": "品種",
+      "birthday": "出生日期",
+      "receivedDate": "接收日期",
+      "asc": "升序",
+      "desc": "降序"
     },
     "form": {
       "addTitle": "添加新兔寶寵物數據檔案",

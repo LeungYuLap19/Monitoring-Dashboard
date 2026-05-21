@@ -1,28 +1,23 @@
-import { useCallback, useMemo, useState } from 'react';
-import type { PetManagementListItem, PetProfileFull, UsePetManagementResult } from '../../types';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type {
+  PetManagementListItem,
+  PetProfileFull,
+  PetProfileListSortBy,
+  PetProfileSortOrder,
+  UsePetManagementResult,
+} from '../../types';
 import { toPetManagementDetail, toPetManagementListItem } from '../../lib/utils/pet';
 import { usePetProfile } from './usePetProfile';
 import { useUserPets } from './useUserPets';
 
-function matchesSearch(pet: PetManagementListItem, searchTerm: string): boolean {
-  const normalizedSearch = searchTerm.trim().toLowerCase();
-  if (!normalizedSearch) return true;
-
-  return [
-    pet.name,
-    pet.breed,
-    pet.animal,
-    pet.id,
-    pet.ngoPetId,
-    pet.location,
-    pet.position,
-  ]
-    .filter((value): value is string => typeof value === 'string' && value.length > 0)
-    .some((value) => value.toLowerCase().includes(normalizedSearch));
-}
+const PETS_PAGE_SIZE = 12;
+const DEFAULT_SORT_BY: PetProfileListSortBy = 'updatedAt';
+const DEFAULT_SORT_ORDER: PetProfileSortOrder = 'desc';
 
 export function usePetManagement(): UsePetManagementResult {
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<PetProfileListSortBy>(DEFAULT_SORT_BY);
+  const [sortOrder, setSortOrder] = useState<PetProfileSortOrder>(DEFAULT_SORT_ORDER);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [activeDetailTab, setActiveDetailTab] = useState<'info' | 'photos' | 'lineage'>('info');
 
@@ -38,7 +33,9 @@ export function usePetManagement(): UsePetManagementResult {
   } = useUserPets({
     initialQuery: {
       page: 1,
-      limit: 12,
+      limit: PETS_PAGE_SIZE,
+      sortBy: DEFAULT_SORT_BY,
+      sortOrder: DEFAULT_SORT_ORDER,
     },
   });
   const {
@@ -55,12 +52,38 @@ export function usePetManagement(): UsePetManagementResult {
     initialView: 'full',
   });
 
+  const hasInitializedFiltersRef = useRef(false);
+
+  useEffect(() => {
+    const normalizedSearch = searchTerm.trim();
+
+    if (!hasInitializedFiltersRef.current) {
+      hasInitializedFiltersRef.current = true;
+      if (!normalizedSearch && sortBy === DEFAULT_SORT_BY && sortOrder === DEFAULT_SORT_ORDER) {
+        return;
+      }
+    }
+
+    const timer = window.setTimeout(() => {
+      void loadPets({
+        page: 1,
+        limit: PETS_PAGE_SIZE,
+        search: normalizedSearch || undefined,
+        sortBy,
+        sortOrder,
+      });
+    }, 350);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [loadPets, searchTerm, sortBy, sortOrder]);
+
   const pets = useMemo(
     () => userPets
       .map(toPetManagementListItem)
-      .filter((pet): pet is PetManagementListItem => pet !== null)
-      .filter((pet) => matchesSearch(pet, searchTerm)),
-    [searchTerm, userPets],
+      .filter((pet): pet is PetManagementListItem => pet !== null),
+    [userPets],
   );
 
   const selectedPet = useMemo(
@@ -81,10 +104,13 @@ export function usePetManagement(): UsePetManagementResult {
   const goToPage = useCallback<UsePetManagementResult['goToPage']>(async (page) => {
     const safePage = Number.isFinite(page) ? Math.max(1, Math.trunc(page)) : 1;
     return loadPets({
-      ...query,
       page: safePage,
+      limit: query.limit ?? PETS_PAGE_SIZE,
+      search: searchTerm.trim() || undefined,
+      sortBy,
+      sortOrder,
     });
-  }, [loadPets, query]);
+  }, [loadPets, query.limit, searchTerm, sortBy, sortOrder]);
 
   const goToNextPage = useCallback<UsePetManagementResult['goToNextPage']>(async () => {
     if (!pagination || pagination.page >= pagination.totalPages) {
@@ -113,6 +139,8 @@ export function usePetManagement(): UsePetManagementResult {
     selectedPetId,
     pagination,
     searchTerm,
+    sortBy,
+    sortOrder,
     viewMode,
     activeDetailTab,
     isPetsLoading,
@@ -122,6 +150,8 @@ export function usePetManagement(): UsePetManagementResult {
     hasLoadedPet,
     petError,
     setSearchTerm,
+    setSortBy,
+    setSortOrder,
     setViewMode,
     setActiveDetailTab,
     openPetDetails,

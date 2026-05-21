@@ -1,4 +1,10 @@
-import type { PetManagementDetail, PetManagementDetailTab, PetManagementListItem } from '../lib/pet';
+import type {
+  PetManagementDetail,
+  PetManagementDetailTab,
+  PetManagementListItem,
+  PetProfileListSortBy,
+  PetProfileSortOrder,
+} from '../lib/pet';
 import type { ApiPagination } from '../lib/api';
 
 export interface PetFormState {
@@ -27,6 +33,10 @@ export interface PetFormModalProps {
 export interface PetSearchBarProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
+  sortBy: PetProfileListSortBy;
+  sortOrder: PetProfileSortOrder;
+  onSortByChange: (value: PetProfileListSortBy) => void;
+  onSortOrderChange: (value: PetProfileSortOrder) => void;
   viewMode: 'grid' | 'list';
   onSetViewMode: (mode: 'grid' | 'list') => void;
 }

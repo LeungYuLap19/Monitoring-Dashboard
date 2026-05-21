@@ -3,10 +3,12 @@ import type { PetManagementDetail, PetManagementDetailTab, PetManagementListItem
 import type { ApiPagination } from '../lib/api';
 import type {
   PetProfileListQuery,
+  PetProfileListSortBy,
   PetProfileFull,
   PetProfileMultipartOptions,
   PetProfileMutationResult,
   PetProfileSummary,
+  PetProfileSortOrder,
   PetProfileUpdatePayload,
   PetProfileView,
   PetProfileViewMap,
@@ -80,6 +82,8 @@ export interface UsePetManagementResult {
   selectedPetId: string | null;
   pagination: ApiPagination | null;
   searchTerm: string;
+  sortBy: PetProfileListSortBy;
+  sortOrder: PetProfileSortOrder;
   viewMode: 'grid' | 'list';
   activeDetailTab: PetManagementDetailTab;
   isPetsLoading: boolean;
@@ -89,6 +93,8 @@ export interface UsePetManagementResult {
   hasLoadedPet: boolean;
   petError: Error | null;
   setSearchTerm: Dispatch<SetStateAction<string>>;
+  setSortBy: Dispatch<SetStateAction<PetProfileListSortBy>>;
+  setSortOrder: Dispatch<SetStateAction<PetProfileSortOrder>>;
   setViewMode: Dispatch<SetStateAction<'grid' | 'list'>>;
   setActiveDetailTab: Dispatch<SetStateAction<PetManagementDetailTab>>;
   openPetDetails: (petId: string) => Promise<void>;

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { I18nProvider } from './lib/i18n';
 import { AuthGuard, GuestGuard } from './components/global/AuthGuard';
 import AuthenticatedLayout from './components/global/AuthenticatedLayout';
+import RouteScrollReset from './components/global/RouteScrollReset';
 import LoginPage from './pages/LoginPage';
 import OverviewPage from './pages/OverviewPage';
 import MonitoringPage from './pages/MonitoringPage';
@@ -13,6 +14,7 @@ export default function App() {
   return (
     <I18nProvider>
       <BrowserRouter>
+        <RouteScrollReset />
         <Routes>
           <Route path="/login" element={<GuestGuard><LoginPage /></GuestGuard>} />
           <Route element={<AuthGuard><AuthenticatedLayout /></AuthGuard>}>

@@ -17,6 +17,17 @@ function LoadingState({ label }: { label: string }) {
   );
 }
 
+function InlineLoadingState({ label }: { label: string }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-10 flex items-start justify-end rounded-3xl bg-white/45 p-4 backdrop-blur-[1px]">
+      <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm">
+        <LoaderCircle className="size-4 animate-spin text-teal-600" />
+        <span>{label}</span>
+      </div>
+    </div>
+  );
+}
+
 function ErrorState({
   label,
   actionLabel,
@@ -45,6 +56,8 @@ export default function PetsPage() {
     selectedPetId,
     pagination,
     searchTerm,
+    sortBy,
+    sortOrder,
     viewMode,
     activeDetailTab,
     isPetsLoading,
@@ -53,6 +66,8 @@ export default function PetsPage() {
     isPetLoading,
     petError,
     setSearchTerm,
+    setSortBy,
+    setSortOrder,
     setViewMode,
     setActiveDetailTab,
     openPetDetails,
@@ -63,6 +78,8 @@ export default function PetsPage() {
     refreshPets,
     refreshSelectedPet,
   } = usePetManagement();
+
+  const isRefreshingPets = isPetsLoading && hasLoadedPets;
 
   return (
     <div id="page-pets" className="space-y-6 p-4 select-none md:space-y-8 md:p-8">
@@ -90,6 +107,10 @@ export default function PetsPage() {
           <PetSearchBar
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSortByChange={setSortBy}
+            onSortOrderChange={setSortOrder}
             viewMode={viewMode}
             onSetViewMode={setViewMode}
           />
@@ -105,27 +126,31 @@ export default function PetsPage() {
               }}
             />
           ) : pets.length > 0 ? (
-            <>
-              {viewMode === 'grid' ? (
-                <PetCardGrid pets={pets} onSelectPet={(petId) => { void openPetDetails(petId); }} />
-              ) : (
-                <PetListView pets={pets} onSelectPet={(petId) => { void openPetDetails(petId); }} />
-              )}
+            <div className="relative" aria-busy={isRefreshingPets}>
+              <div className={isRefreshingPets ? 'opacity-60 transition-opacity' : 'transition-opacity'}>
+                {viewMode === 'grid' ? (
+                  <PetCardGrid pets={pets} onSelectPet={(petId) => { void openPetDetails(petId); }} />
+                ) : (
+                  <PetListView pets={pets} onSelectPet={(petId) => { void openPetDetails(petId); }} />
+                )}
 
-              <PetPagination
-                pagination={pagination}
-                isLoading={isPetsLoading}
-                onPreviousPage={() => {
-                  void goToPreviousPage();
-                }}
-                onNextPage={() => {
-                  void goToNextPage();
-                }}
-                onPageSelect={(page) => {
-                  void goToPage(page);
-                }}
-              />
-            </>
+                <PetPagination
+                  pagination={pagination}
+                  isLoading={isPetsLoading}
+                  onPreviousPage={() => {
+                    void goToPreviousPage();
+                  }}
+                  onNextPage={() => {
+                    void goToNextPage();
+                  }}
+                  onPageSelect={(page) => {
+                    void goToPage(page);
+                  }}
+                />
+              </div>
+
+              {isRefreshingPets ? <InlineLoadingState label={t('pets.refreshingList')} /> : null}
+            </div>
           ) : (
             <div className="space-y-2 rounded-3xl border border-slate-100 bg-white py-16 text-center text-xs font-semibold text-slate-400 shadow-sm">
               <p>{t('pets.emptyState')}</p>
