@@ -5,6 +5,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Mail, Phone, ShieldCheck, ArrowRight, Heart, Sparkles, User, Key, KeyRound, Smartphone, LogIn } from 'lucide-react';
+import PHealthIcon from './PHealthIcon';
+import HKBRIcon from './HKBRIcon';
 
 interface UserProfile {
   emailOrPhone: string;
@@ -191,26 +193,22 @@ export default function LoginView({ onLoginSuccess, onToast }: LoginViewProps) {
       <div className="absolute bottom-[-10%] right-[-10%] w-[35vw] h-[35vw] bg-amber-50/50 rounded-full blur-3xl -z-10 pointer-events-none" />
 
       {/* Main card box container (Un-blocked layout on mobile view) */}
-      <div id="login-card" className="w-full max-w-md bg-transparent sm:bg-white rounded-none sm:rounded-3xl border-0 sm:border border-slate-100 shadow-none sm:shadow-2xl p-0 sm:p-10 space-y-8 relative">
+      <div id="login-card" className="w-full max-w-md bg-transparent sm:bg-white rounded-none sm:rounded-3xl border-0 sm:border border-slate-100 shadow-none sm:shadow-2xl p-0 sm:p-10 space-y-5 relative">
         
         {/* Top Header Section */}
-        <div className="text-center space-y-2">
-          {/* Brand Icon Badge */}
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-600 shadow-sm">
-            <Heart className="w-7 h-7 text-[#0d9488] fill-[#0d9488]/10 animate-pulse" />
-          </div>
+        <div className="flex space-x-1 mb-16">
+          <HKBRIcon />
 
-          <div className="space-y-1 pt-1">
-            <h1 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">
-              救兔之家觀察系統
-            </h1>
-            <span className="inline-block text-[10px] font-black tracking-widest text-[#0d9488] bg-teal-50 px-2.5 py-0.5 rounded-full uppercase">
-              HKBR Bunny Portal
-            </span>
-          </div>
-          <p className="text-xs text-slate-400 font-medium">
-            使用一次性驗證碼 (OTP) 安全、快速地登入及觀察兔寶
-          </p>
+          <h1 className="font-medium text-sm">
+            救兔之家<br/>觀察系統
+          </h1>
+        </div>
+
+        <div className="flex-row space-y-1">
+          <h1 className="text-center text-2xl font-semibold text-slate-800">
+            Sign in with OTP
+          </h1>
+          <p className="text-center text-xs text-slate-400">使用一次性驗證碼 (OTP) 安全、快速地登入及觀察兔寶</p>
         </div>
 
         {/* Dynamic State Step Viewports */}
@@ -254,9 +252,9 @@ export default function LoginView({ onLoginSuccess, onToast }: LoginViewProps) {
 
             {/* Core Address / Number input */}
             <div className="space-y-1.5">
-              <label className="text-xs font-extrabold text-slate-500 uppercase tracking-wider block">
+              {/* <label className="text-xs font-extrabold text-slate-500 uppercase tracking-wider block">
                 {loginMethod === 'email' ? '電子信箱 Email Address' : '手機號碼 Phone Number'}
-              </label>
+              </label> */}
               
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -269,21 +267,13 @@ export default function LoginView({ onLoginSuccess, onToast }: LoginViewProps) {
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder={
                     loginMethod === 'email' 
-                      ? '例如: guardian@example.com' 
-                      : '例如: 91234567 (免加國碼)'
+                      ? 'guardian@example.com' 
+                      : '+85291234567'
                   }
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-150 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-450 focus:outline-none focus:ring-2 focus:ring-teal-500/15 focus:bg-white transition-all shadow-inner"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-450 focus:outline-none focus:ring-2 focus:ring-teal-500/15 focus:bg-white transition-all shadow-inner"
                 />
               </div>
-
-              {/* Informative description below */}
-              <p className="text-[10px] text-slate-400 font-semibold leading-relaxed">
-                {loginMethod === 'email' 
-                  ? '輸入註冊電子郵件以發送六位數 OTP 信箱。新用戶亦可使用此方式。' 
-                  : '支援各大通訊商。新用戶輸入後可在稍後步驟填寫基本家長名稱完成註冊。'
-                }
-              </p>
             </div>
 
             {/* Action Submit */}
@@ -368,7 +358,7 @@ export default function LoginView({ onLoginSuccess, onToast }: LoginViewProps) {
                   placeholder="輸入六位數字 (預設: 888888)"
                   required
                   autoFocus
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-150 rounded-xl text-start font-mono text-xs sm:text-sm font-bold tracking-wider text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/15 focus:bg-white transition-all shadow-inner placeholder:font-sans placeholder:tracking-normal placeholder:text-slate-400 placeholder:text-xs"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 rounded-xl text-start font-mono text-xs sm:text-sm font-bold tracking-wider text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/15 focus:bg-white transition-all shadow-inner placeholder:font-sans placeholder:tracking-normal placeholder:text-slate-400 placeholder:text-xs"
                 />
               </div>
 
@@ -437,7 +427,7 @@ export default function LoginView({ onLoginSuccess, onToast }: LoginViewProps) {
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="例如: 陳"
-                    className="w-full px-3.5 py-3 bg-slate-50 border border-slate-150 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/15 focus:bg-white transition-all shadow-inner"
+                    className="w-full px-3.5 py-3 bg-slate-50 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/15 focus:bg-white transition-all shadow-inner"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -448,7 +438,7 @@ export default function LoginView({ onLoginSuccess, onToast }: LoginViewProps) {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="例如: 大華"
-                    className="w-full px-3.5 py-3 bg-slate-50 border border-slate-150 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/15 focus:bg-white transition-all shadow-inner"
+                    className="w-full px-3.5 py-3 bg-slate-50 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/15 focus:bg-white transition-all shadow-inner"
                   />
                 </div>
               </div>
@@ -476,13 +466,9 @@ export default function LoginView({ onLoginSuccess, onToast }: LoginViewProps) {
           </form>
         )}
 
-        {/* Footer Disclaimer */}
-        <div className="text-center">
-          <p className="text-[10px] text-slate-400 font-medium">
-            安防監控協定保護中 • 救兔之家 HKBR 專用系統
-          </p>
+        <div className="w-full flex justify-center">
+          <PHealthIcon size='small' />
         </div>
-
       </div>
     </div>
   );

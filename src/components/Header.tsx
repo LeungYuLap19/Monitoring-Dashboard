@@ -41,7 +41,7 @@ export default function Header({ userEmail, adminName = 'admin user', onMenuClic
         </button>
         <div>
           <h2 id="header-org-title" className="text-base sm:text-lg md:text-xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
-            救兔之家 <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-mono hidden sm:inline-block">HKBR Bunny Hotel</span>
+            救兔之家 
           </h2>
           <p id="header-subtitle" className="text-[10px] sm:text-xs text-slate-400 font-medium mt-0.5 hidden md:block">
             安穩、健康的兔子臨時看護與智能觀察日誌系統
@@ -51,11 +51,6 @@ export default function Header({ userEmail, adminName = 'admin user', onMenuClic
 
       {/* Action / User controls */}
       <div id="header-actions" className="flex items-center gap-4">
-        {/* Animated Active OS badge */}
-        <div id="os-status-badge" className="hidden md:flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-100">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>觀察模組運作中 (AI Live)</span>
-        </div>
 
         {/* Stateful Dynamic Notifications Popover */}
         <div id="notification-bell-group" className="relative">

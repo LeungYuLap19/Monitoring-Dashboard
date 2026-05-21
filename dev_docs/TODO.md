@@ -1,0 +1,7 @@
+- [ ] SoC
+- [ ] locales
+- [ ] bright and dark mode
+- [ ] wire apis
+- [ ] standardize style inventories
+- [ ] middleware
+- [ ] routing

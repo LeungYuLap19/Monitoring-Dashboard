@@ -6,6 +6,8 @@
 import React from 'react';
 import { LayoutDashboard, Users, HeartPulse, Video, LogOut, FileText, ClipboardCheck, Heart } from 'lucide-react';
 import { TabId } from '../types';
+import HKBRIcon from './HKBRIcon';
+import PHealthIcon from './PHealthIcon';
 
 interface SidebarProps {
   activeTab: TabId;
@@ -40,21 +42,12 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, hasUnsentLo
         }`}
       >
         {/* Upper Brand Info */}
-        <div id="sidebar-upper" className="flex flex-col p-6">
+        <div id="sidebar-upper" className="flex flex-col p-6 space-y-8">
           {/* HKBR Logo Emblem */}
-          <div id="sidebar-logo-group" className="flex items-center gap-3 mb-8">
-            <div id="hkbr-svg-badge" className="flex-shrink-0 w-12 h-12 bg-[#097939] rounded-xl flex items-center justify-center border-2 border-yellow-400 shadow-sm relative overflow-hidden">
-              {/* Minimalist bunny ears silhouette inside green badge */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                <span className="text-[11px] font-extrabold text-yellow-400 tracking-tighter leading-none">HKBR</span>
-                <span className="text-[7px] font-bold text-white tracking-widest leading-none mt-0.5">BUNNY</span>
-              </div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h1 id="brand-title" className="font-extrabold text-slate-800 text-sm tracking-tight leading-4">救兔之家</h1>
-              <p id="brand-subtitle" className="text-xs text-slate-400 font-medium whitespace-nowrap overflow-hidden text-ellipsis">HKBR Bunny Hotel</p>
-            </div>
+          <div>
+            <HKBRIcon />
           </div>
+          
 
           {/* Menu Guide Title */}
           <span id="menu-section-label" className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-4 px-2">功能欄 MENU</span>
@@ -126,14 +119,8 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, hasUnsentLo
           </nav>
         </div>
 
-      {/* Footer Branding OS & Log out */}
-      <div id="sidebar-footer" className="p-6 border-t border-slate-50 flex flex-col gap-6">
-        <div id="phealth-badge-group" className="flex flex-col gap-0.5 px-2">
-          <span id="phealth-text" className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">POWERED BY</span>
-          <span id="phealth-brand" className="text-xs font-black text-rose-500 tracking-tighter flex items-center gap-1">
-            <span id="phealth-phi" className="text-rose-600 font-extrabold">𝜑</span>Health OS
-          </span>
-        </div>
+      <div id="sidebar-footer" className="p-6 flex flex-col items-center justify-center w-full">
+        <PHealthIcon size={'small'} />
 
         <button
           id="logout-btn"

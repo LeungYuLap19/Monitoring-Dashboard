@@ -111,7 +111,7 @@ export default function App() {
   }
 
   return (
-    <div id="hotel-app-root" className="flex bg-[#f8fafc] w-full min-h-screen text-slate-800 font-sans leading-relaxed text-sm antialiased overflow-x-hidden">
+    <div id="hotel-app-root" className="flex bg-[#f8fafc] w-full h-screen text-slate-800 font-sans leading-relaxed text-sm antialiased overflow-x-hidden">
       
       {/* 1. Sidebar Left */}
       <Sidebar
