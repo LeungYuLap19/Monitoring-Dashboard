@@ -1,0 +1,11 @@
+{
+  "name": "HKBR Bunny Hotel Dashboard",
+  "description": "An interactive, responsive dashboard for managing rabbit guests, live camera streams, real-time AI-assisted behavior logs, and automated client activity reports.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
