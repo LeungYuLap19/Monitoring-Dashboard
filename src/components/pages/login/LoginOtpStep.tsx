@@ -1,5 +1,5 @@
-import React from 'react';
-import { KeyRound, LogIn } from 'lucide-react';
+import { useRef, KeyboardEvent, ClipboardEvent } from 'react';
+import { LogIn } from 'lucide-react';
 import { LoginOtpStepProps } from '../../../types';
 import { useTranslation } from '../../../lib/i18n';
 
@@ -13,9 +13,53 @@ export default function LoginOtpStep({
   onBack,
 }: LoginOtpStepProps) {
   const { t } = useTranslation();
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const digits = Array.from({ length: 6 }, (_, i) => enteredOtp[i] || '');
+
+  const focusInput = (index: number) => {
+    if (index >= 0 && index < 6) inputRefs.current[index]?.focus();
+  };
+
+  const updateDigit = (index: number, value: string) => {
+    const newDigits = [...digits];
+    newDigits[index] = value;
+    onOtpChange(newDigits.join('').replace(/[^0-9]/g, ''));
+  };
+
+  const handleInput = (index: number, value: string) => {
+    const digit = value.replace(/[^0-9]/g, '');
+    if (!digit) return;
+    updateDigit(index, digit[0]);
+    if (index < 5) focusInput(index + 1);
+  };
+
+  const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      if (digits[index]) {
+        updateDigit(index, '');
+      } else if (index > 0) {
+        updateDigit(index - 1, '');
+        focusInput(index - 1);
+      }
+    } else if (e.key === 'ArrowLeft' && index > 0) {
+      focusInput(index - 1);
+    } else if (e.key === 'ArrowRight' && index < 5) {
+      focusInput(index + 1);
+    }
+  };
+
+  const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+    if (pasted) {
+      onOtpChange(pasted);
+      focusInput(Math.min(pasted.length, 5));
+    }
+  };
+
   return (
     <form onSubmit={onVerify} className="space-y-6">
-      {/* Address Confirmation Banner */}
       <div className="bg-teal-50/50 rounded-2xl border border-teal-100 p-4 space-y-1">
         <div className="flex justify-between items-center">
           <span className="text-[10px] font-black uppercase text-teal-700 tracking-wider">
@@ -34,29 +78,29 @@ export default function LoginOtpStep({
         </p>
       </div>
 
-      {/* OTP Input Field */}
       <div className="space-y-2">
         <label className="text-xs font-extrabold text-slate-500 uppercase tracking-wider block">
           {t('auth.otpLabel')}
         </label>
 
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-            <KeyRound className="w-4 h-4 text-slate-400" />
-          </div>
-          <input
-            type="text"
-            maxLength={6}
-            value={enteredOtp}
-            onChange={(e) => onOtpChange(e.target.value.replace(/[^0-9]/g, ''))}
-            placeholder={t('auth.otpPlaceholder')}
-            required
-            autoFocus
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 rounded-xl text-start font-mono text-xs sm:text-sm font-bold tracking-wider text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/15 focus:bg-white transition-all shadow-inner placeholder:font-sans placeholder:tracking-normal placeholder:text-slate-400 placeholder:text-xs"
-          />
+        <div className="grid grid-cols-6 gap-2">
+          {digits.map((digit, i) => (
+            <input
+              key={i}
+              ref={(el) => { inputRefs.current[i] = el; }}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
+              value={digit}
+              autoFocus={i === 0}
+              onChange={(e) => handleInput(i, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(i, e)}
+              onPaste={handlePaste}
+              className="h-16 bg-slate-50 border border-slate-200 rounded-xl text-center font-mono text-lg font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 focus:bg-white transition-all"
+            />
+          ))}
         </div>
 
-        {/* Countdown counter or resend button */}
         <div className="flex justify-between items-center text-[10px] font-semibold text-slate-400 px-1">
           <span>{t('auth.otpHint')}</span>
           {timer > 0 ? (
@@ -73,7 +117,6 @@ export default function LoginOtpStep({
         </div>
       </div>
 
-      {/* Action verify */}
       <div className="space-y-2">
         <button
           type="submit"

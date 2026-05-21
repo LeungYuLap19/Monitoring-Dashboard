@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { I18nProvider } from './lib/i18n';
+import { AuthGuard, GuestGuard } from './components/global/AuthGuard';
 import AuthenticatedLayout from './components/global/AuthenticatedLayout';
 import LoginPage from './pages/LoginPage';
 import OverviewPage from './pages/OverviewPage';
@@ -12,8 +13,8 @@ export default function App() {
     <I18nProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route element={<AuthenticatedLayout />}>
+          <Route path="/login" element={<GuestGuard><LoginPage /></GuestGuard>} />
+          <Route element={<AuthGuard><AuthenticatedLayout /></AuthGuard>}>
             <Route index element={<OverviewPage />} />
             <Route path="overview" element={<Navigate to="/" replace />} />
             <Route path="monitoring" element={<MonitoringPage />} />
