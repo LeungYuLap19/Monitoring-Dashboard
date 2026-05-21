@@ -8,3 +8,4 @@ export * from './components/pets';
 export * from './components/client-view';
 export * from './components/login';
 export * from './lib/i18n';
+export * from './lib/trpc';
