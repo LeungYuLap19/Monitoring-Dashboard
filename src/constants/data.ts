@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BunnyGuest, CameraFeed, BehaviorStats, ActivityClip } from './types';
+import { BunnyGuest, CameraFeed, BehaviorStats, ActivityClip } from '../types';
 
 export const BUNNY_GUESTS: BunnyGuest[] = [
   {

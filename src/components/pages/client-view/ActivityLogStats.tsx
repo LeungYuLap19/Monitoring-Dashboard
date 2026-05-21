@@ -1,17 +1,11 @@
-interface ActivityCount {
-  label: string;
-  value: number;
-  color: string;
-}
-
-interface ActivityLogStatsProps {
-  activityCounts: ActivityCount[];
-}
+import { ActivityCount, ActivityLogStatsProps } from '../../../types';
+import { useTranslation } from '../../../lib/i18n';
 
 export default function ActivityLogStats({ activityCounts }: ActivityLogStatsProps) {
+  const { t } = useTranslation();
   return (
     <div className="bg-slate-50/20 p-6 rounded-2xl border border-slate-100/50 space-y-4">
-      <span className="block text-[11px] font-black text-slate-400 uppercase tracking-widest">今日捕捉行為明細 Stats</span>
+      <span className="block text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('clientView.statsLabel')}</span>
 
       <div className="space-y-3">
         {activityCounts.map((item, idx) => (

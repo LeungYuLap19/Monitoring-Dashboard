@@ -1,0 +1,168 @@
+{
+  "common": {
+    "cancel": "取消",
+    "confirm": "確認",
+    "back": "返回",
+    "close": "關閉",
+    "clear": "清除",
+    "save": "儲存",
+    "delete": "刪除",
+    "edit": "編輯",
+    "add": "添加",
+    "search": "搜尋"
+  },
+  "nav": {
+    "menu": "功能欄",
+    "overview": "數據看板",
+    "monitoring": "快速監控",
+    "pets": "寵物數據",
+    "clientLog": "活動日誌",
+    "logout": "登出"
+  },
+  "header": {
+    "orgName": "救兔之家",
+    "subtitle": "安穩、健康的兔子臨時看護與智能觀察日誌系統",
+    "notifications": "最新通知",
+    "markAllRead": "全部已讀"
+  },
+  "toast": {
+    "systemLabel": "系統通知"
+  },
+  "auth": {
+    "signInTitle": "OTP 驗證碼登入",
+    "signInSubtitle": "使用一次性驗證碼安全、快速地登入及觀察兔寶",
+    "emailTab": "電子信箱",
+    "phoneTab": "手機號碼",
+    "emailPlaceholder": "guardian@example.com",
+    "phonePlaceholder": "+85291234567",
+    "getOtp": "獲取一次性安全驗證碼",
+    "testAccounts": "專用測試帳戶（可直接使用）",
+    "otpSentTo": "驗證碼已寄送至",
+    "changeInput": "修改",
+    "otpLabel": "輸入 6 位數安全驗證碼",
+    "otpPlaceholder": "輸入六位數字（預設: 888888）",
+    "otpHint": "預設萬能驗證碼為: 888888",
+    "resendOtp": "重新發送驗證碼",
+    "verifyOtp": "立即驗證驗證碼",
+    "backToInput": "返回變更登入資料",
+    "registerTitle": "填寫基本家長資訊",
+    "registerWelcome": "歡迎加入！這是您第一次使用該帳號登入，請填寫以下基本資料以完成註冊。",
+    "lastNameLabel": "姓氏",
+    "firstNameLabel": "名字",
+    "lastNamePlaceholder": "例如: 陳",
+    "firstNamePlaceholder": "例如: 大華",
+    "registerSubmit": "完成註冊並登入",
+    "registerCancel": "取消並返回首頁",
+    "errors": {
+      "emptyEmail": "請輸入您的電子信箱！",
+      "emptyPhone": "請輸入您的電話號碼！",
+      "invalidEmail": "請輸入有效的電子郵件格式！",
+      "invalidPhone": "請輸入正確的手機號碼！",
+      "emptyOtp": "請輸入驗證碼！",
+      "wrongOtp": "驗證碼錯誤，請重新確認！",
+      "emptyName": "請填寫您的姓氏與名字！"
+    },
+    "toasts": {
+      "otpSent": "OTP 驗證碼發送成功！您的專屬測試驗證碼是 [ {{otp}} ]",
+      "welcomeBack": "歡迎回來，{{name}}！您已成功登入系統。",
+      "otpVerified": "驗證通過！系統未偵測到此帳號，請在此填寫基本家長姓名以完成註冊。",
+      "registered": "註冊成功！親愛的 {{name}}，歡迎加入救兔之家。",
+      "loggedOut": "已成功登出觀察管理系統"
+    }
+  },
+  "pets": {
+    "heading": "寵物數據管理",
+    "badge": "BUNNY PET DATABASE",
+    "description": "點擊各寵物查看詳細健康特徵、出生日期與歷史檢疫，或直接跳轉至監控站。",
+    "addPet": "添加寵物",
+    "searchPlaceholder": "搜索寵物姓名、品種或ID代碼...",
+    "gridView": "網格視圖",
+    "listView": "列表視圖",
+    "emptyState": "無匹配搜尋關鍵字的寵物。",
+    "clearFilter": "清除過濾項目",
+    "form": {
+      "addTitle": "添加新兔寶寵物數據檔案",
+      "editTitle": "編輯 {{name}} 的健康數據檔案",
+      "nameLabel": "寵物姓名 *",
+      "namePlaceholder": "例如: MOCO",
+      "breedLabel": "品種 *",
+      "breedPlaceholder": "例如: 法國垂耳兔",
+      "genderLabel": "性別",
+      "genderMale": "雄性（公）",
+      "genderFemale": "雌性（母）",
+      "ageLabel": "年齡（歲）",
+      "weightLabel": "體重（kg）",
+      "colorLabel": "花色 / 顏色說明",
+      "colorPlaceholder": "例如: 漸層咖啡色",
+      "birthdayLabel": "出生日期",
+      "vaccinatedLabel": "核心疫苗接種",
+      "vaccinatedYes": "已接種兔病核心疫苗",
+      "statusLabel": "當前狀態",
+      "statusHealthy": "健康",
+      "statusMonitoring": "觀察監測中",
+      "statusResting": "休整中",
+      "notesLabel": "備註/護理說明",
+      "notesPlaceholder": "請填寫兔子入住的注意事項...",
+      "servicesLabel": "附加照護客房要求",
+      "servicesPlaceholder": "例如: 每日下午需要人工梳毛一次",
+      "submitAdd": "確認添加",
+      "submitEdit": "確認修改"
+    },
+    "toasts": {
+      "emptyName": "請填寫寵物姓名！",
+      "added": "成功新增寵物 {{name}} 檔案！",
+      "updated": "已成功更新 {{name}} 的健康數據！",
+      "deleted": "已刪除 {{name}} 寵物監控紀錄。",
+      "redirected": "已成功切換！正在加載 {{name}} 籠位之智慧觀測影像相機。"
+    },
+    "deleteConfirm": "確定要刪除寵物 {{name}} 的存檔紀錄嗎？此動作無法復原。"
+  },
+  "monitoring": {
+    "breadcrumb": "快速監控",
+    "selectBunny": "選擇兔兔",
+    "clips": {
+      "title": "{{name}} - 活動片段監控",
+      "description": "點擊各類型行為篩選特定活動節選片段，或選擇下載存檔。",
+      "all": "全天候片段",
+      "active": "活動行為",
+      "eat": "進食片段",
+      "drink": "飲水監控",
+      "abnormal": "異常警報",
+      "searchPlaceholder": "搜尋特定備註或時刻..."
+    },
+    "logPreview": {
+      "title": "活動日誌預覽",
+      "description": "請審查或編輯即將發給兔寶家長的活動觀察日誌",
+      "includeClips": "在日誌中隨附相機短片剪輯（附帶動態 AI 節選篩選器）",
+      "remarksLabel": "備註修改:",
+      "remarksPlaceholder": "在此編輯說明事項...",
+      "sendSuccess": "發送成功！已將對 {{name}} 的今日智慧活動日誌成功推播予家長。"
+    },
+    "toasts": {
+      "cameraSwitch": "已自動打開監測鏡頭並載入對應兔兔住客數據"
+    }
+  },
+  "clientView": {
+    "bannerBadge": "家長觀看視角模擬",
+    "bannerTitle": "家長端手機/平板查閱體驗",
+    "bannerDescription": "這是兔寶家長在手機上點擊日誌連結後，所呈現的精心排版頁面。",
+    "heroBadge": "每日活動日誌",
+    "heroTitle": "{{name}} 今天的住店小札",
+    "summaryLabel": "整體行為分析",
+    "statsLabel": "今日捕捉行為明細",
+    "tipTitle": "溫馨叮嚀:",
+    "tipContent": "兔子通常在傍晚與清晨氣候溫和時活動能力較大。如您對日誌內容有任何疑問，或想瞭解更多寶貝照拂狀況，請隨時使用右下角聯絡工作人員，我們會在第一時間爲您解答！祝兔寶入住愉快！"
+  },
+  "overview": {
+    "searchPlaceholder": "搜索攝像頭...",
+    "filters": {
+      "all": "全部",
+      "online": "在線",
+      "offline": "離線",
+      "resting": "休息中",
+      "active": "活動中"
+    },
+    "emptyState": "目前條件下沒有相機。",
+    "clearFilter": "重設過濾"
+  }
+}

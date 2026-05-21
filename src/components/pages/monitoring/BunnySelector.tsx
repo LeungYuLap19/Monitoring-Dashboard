@@ -5,23 +5,19 @@
 
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
-import { BunnyGuest } from '../../../types';
-
-interface BunnySelectorProps {
-  selectedBunnyId: string;
-  setSelectedBunnyId: (id: string) => void;
-  bunnyGuests: BunnyGuest[];
-}
+import { BunnyGuest, BunnySelectorProps } from '../../../types';
+import { useTranslation } from '../../../lib/i18n';
 
 export default function BunnySelector({
   selectedBunnyId,
   setSelectedBunnyId,
   bunnyGuests
 }: BunnySelectorProps) {
+  const { t } = useTranslation();
   return (
     <div id="monitoring-breadcrumb" className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 sm:px-6 sm:py-4 rounded-2xl border border-slate-50 shadow-sm gap-4">
       <div className="flex items-center gap-2 text-xs">
-        <span className="text-slate-400 font-bold">快速監控 Monitoring</span>
+        <span className="text-slate-400 font-bold">{t('monitoring.breadcrumb')}</span>
         <span className="text-slate-300">/</span>
         <span className="text-teal-600 font-extrabold uppercase">籠內詳情 Details</span>
       </div>

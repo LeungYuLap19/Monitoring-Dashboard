@@ -5,13 +5,7 @@
 
 import React from 'react';
 import { Video, PlayCircle } from 'lucide-react';
-import { BunnyGuest } from '../../../types';
-
-interface LiveStreamViewProps {
-  activeBunny: BunnyGuest;
-  streamActive: boolean;
-  setStreamActive: (active: boolean) => void;
-}
+import { BunnyGuest, LiveStreamViewProps } from '../../../types';
 
 export default function LiveStreamView({
   activeBunny,

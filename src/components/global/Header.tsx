@@ -4,16 +4,13 @@
  */
 
 import React, { useState } from 'react';
-import { Bell, User, Sparkles, Moon, Sun, Menu } from 'lucide-react';
-
-interface HeaderProps {
-  userEmail?: string;
-  adminName?: string;
-  onNotificationClick?: () => void;
-  onMenuClick?: () => void;
-}
+import { Bell, User, Sparkles, Moon, Sun, Menu, Globe } from 'lucide-react';
+import { HeaderProps } from '../../types';
+import { useTranslation } from '../../lib/i18n';
+import { Locale } from '../../lib/i18n';
 
 export default function Header({ userEmail, adminName = 'admin user', onMenuClick }: HeaderProps) {
+  const { t, locale, setLocale } = useTranslation();
   const [notifications, setNotifications] = useState([
     { id: 1, text: 'MOMO剛剛完成了15分鐘放風！', read: false, time: '剛才' },
     { id: 2, text: '注意：MOMO感冒餵藥時間到了（18:00）', read: false, time: '1小時前' },
@@ -41,10 +38,10 @@ export default function Header({ userEmail, adminName = 'admin user', onMenuClic
         </button>
         <div>
           <h2 id="header-org-title" className="text-base sm:text-lg md:text-xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
-            救兔之家 
+            {t('header.orgName')}
           </h2>
           <p id="header-subtitle" className="text-[10px] sm:text-xs text-slate-400 font-medium mt-0.5 hidden md:block">
-            安穩、健康的兔子臨時看護與智能觀察日誌系統
+            {t('header.subtitle')}
           </p>
         </div>
       </div>
@@ -70,13 +67,13 @@ export default function Header({ userEmail, adminName = 'admin user', onMenuClic
           {openNotifications && (
             <div id="notifications-dropdown" className="absolute right-0 mt-2.5 w-80 bg-white rounded-2xl border border-slate-100 shadow-xl overflow-hidden z-50">
               <div id="notif-dropdown-header" className="p-4 border-b border-slate-50 flex justify-between items-center">
-                <span className="font-bold text-sm text-slate-700">最新通知</span>
+                <span className="font-bold text-sm text-slate-700">{t('header.notifications')}</span>
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllAsRead}
                     className="text-xs text-[#0d9488] font-semibold hover:underline"
                   >
-                    全部已讀
+                    {t('header.markAllRead')}
                   </button>
                 )}
               </div>
@@ -101,6 +98,17 @@ export default function Header({ userEmail, adminName = 'admin user', onMenuClic
             </div>
           )}
         </div>
+
+        {/* Language Switcher */}
+        <select
+          id="lang-switcher"
+          value={locale}
+          onChange={(e) => setLocale(e.target.value as Locale)}
+          className="text-xs font-bold text-slate-500 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 hover:bg-slate-100 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+        >
+          <option value="zh-TW">繁中</option>
+          <option value="en">EN</option>
+        </select>
 
         {/* User admin Profile badge */}
         <div id="admin-user-badge" className="flex items-center gap-2 px-4 py-2 bg-[#0d9488]/10 hover:bg-[#0d9488]/15 border border-[#0d9488]/10 text-[#0d9488] rounded-xl transition-all cursor-pointer">

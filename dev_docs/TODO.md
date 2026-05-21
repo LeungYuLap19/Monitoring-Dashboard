@@ -1,5 +1,5 @@
-- [ ] SoC
-- [ ] locales
+- [x] SoC
+- [x] locales
 - [ ] bright and dark mode
 - [ ] wire apis
 - [ ] standardize style inventories

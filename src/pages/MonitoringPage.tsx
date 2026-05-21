@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useLayoutContext } from '../hooks/useLayoutContext';
-import { BUNNY_GUESTS, BEHAVIOR_STATS } from '../data';
+import { BUNNY_GUESTS, BEHAVIOR_STATS } from '../constants';
 import BunnySelector from '../components/pages/monitoring/BunnySelector';
 import BunnyProfileCard from '../components/pages/monitoring/BunnyProfileCard';
 import LiveStreamView from '../components/pages/monitoring/LiveStreamView';

@@ -1,13 +1,7 @@
 import React from 'react';
 import { Mail, Phone, ArrowRight } from 'lucide-react';
-
-interface LoginInputStepProps {
-  loginMethod: 'email' | 'phone';
-  inputValue: string;
-  onInputChange: (value: string) => void;
-  onMethodChange: (method: 'email' | 'phone') => void;
-  onSubmit: (e: React.FormEvent) => void;
-}
+import { LoginInputStepProps } from '../../../types';
+import { useTranslation } from '../../../lib/i18n';
 
 export default function LoginInputStep({
   loginMethod,
@@ -16,6 +10,7 @@ export default function LoginInputStep({
   onMethodChange,
   onSubmit,
 }: LoginInputStepProps) {
+  const { t } = useTranslation();
   return (
     <form onSubmit={onSubmit} className="space-y-5">
       {/* TABS Selection */}
@@ -30,7 +25,7 @@ export default function LoginInputStep({
           }`}
         >
           <Mail className="w-3.5 h-3.5" />
-          <span>電子信箱</span>
+          <span>{t('auth.emailTab')}</span>
         </button>
         <button
           type="button"
@@ -42,7 +37,7 @@ export default function LoginInputStep({
           }`}
         >
           <Phone className="w-3.5 h-3.5" />
-          <span>手機號碼</span>
+          <span>{t('auth.phoneTab')}</span>
         </button>
       </div>
 
@@ -56,7 +51,7 @@ export default function LoginInputStep({
             type={loginMethod === 'email' ? 'email' : 'tel'}
             value={inputValue}
             onChange={(e) => onInputChange(e.target.value)}
-            placeholder={loginMethod === 'email' ? 'guardian@example.com' : '+85291234567'}
+            placeholder={loginMethod === 'email' ? t('auth.emailPlaceholder') : t('auth.phonePlaceholder')}
             required
             className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-450 focus:outline-none focus:ring-2 focus:ring-teal-500/15 focus:bg-white transition-all shadow-inner"
           />
@@ -68,14 +63,14 @@ export default function LoginInputStep({
         type="submit"
         className="w-full bg-[#0d9488] hover:bg-[#0c857a] text-white font-black py-3.5 rounded-xl shadow-lg shadow-teal-900/10 flex items-center justify-center gap-2 transition-all cursor-pointer text-xs sm:text-sm tracking-wide uppercase"
       >
-        <span>獲取一次性安全驗證碼 (Get OTP)</span>
+        <span>{t('auth.getOtp')}</span>
         <ArrowRight className="w-4 h-4" />
       </button>
 
       {/* Quick Testing accounts tip */}
       <div className="pt-2 border-t border-slate-100/60">
         <span className="block text-[10px] font-black text-slate-400 uppercase tracking-widest text-center mb-1">
-          ⚙️ 專用測試帳戶 (可直接使用)
+          {t('auth.testAccounts')}
         </span>
         <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
           <button

@@ -1,11 +1,5 @@
 import React from 'react';
-import { BunnyGuest } from '../../../types';
-
-interface PetListViewProps {
-  pets: BunnyGuest[];
-  onSelectPet: (petId: string) => void;
-  onRedirectToMonitoring: (petId: string) => void;
-}
+import { BunnyGuest, PetListViewProps } from '../../../types';
 
 export default function PetListView({ pets, onSelectPet, onRedirectToMonitoring }: PetListViewProps) {
   return (

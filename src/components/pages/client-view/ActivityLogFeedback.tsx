@@ -1,14 +1,6 @@
 import React from 'react';
 import { Heart } from 'lucide-react';
-
-interface ActivityLogFeedbackProps {
-  liked: boolean;
-  onToggleLike: () => void;
-  comments: string[];
-  commentText: string;
-  onCommentTextChange: (text: string) => void;
-  onAddComment: (e: React.FormEvent) => void;
-}
+import { ActivityLogFeedbackProps } from '../../../types';
 
 export default function ActivityLogFeedback({
   liked,

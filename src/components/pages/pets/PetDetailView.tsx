@@ -10,18 +10,7 @@ import {
   Image as ImageIcon,
   Info
 } from 'lucide-react';
-import { BunnyGuest } from '../../../types';
-
-interface PetDetailViewProps {
-  pet: BunnyGuest;
-  activeDetailTab: 'info' | 'photos' | 'videos' | 'health';
-  onSetActiveDetailTab: (tab: 'info' | 'photos' | 'videos' | 'health') => void;
-  onBack: () => void;
-  onEdit: (pet: BunnyGuest) => void;
-  onDelete: (id: string, name: string) => void;
-  onRedirectToMonitoring: (petId: string) => void;
-  onToast: (msg: string) => void;
-}
+import { BunnyGuest, PetDetailViewProps } from '../../../types';
 
 export default function PetDetailView({
   pet,

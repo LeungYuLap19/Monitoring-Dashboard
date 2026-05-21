@@ -5,17 +5,12 @@
 
 import React, { useState, useMemo } from 'react';
 import { X, Search, SlidersHorizontal, Download, Film, ShieldAlert, Check } from 'lucide-react';
-import { ActivityClip } from '../../../types';
-import { ACTIVITY_CLIPS } from '../../../data';
-
-interface ClipSelectorModalProps {
-  bunnyName: string;
-  onClose: () => void;
-}
-
-type FilterCategory = 'all' | 'active' | 'eat' | 'drink' | 'abnormal';
+import { ActivityClip, ClipSelectorModalProps, FilterCategory } from '../../../types';
+import { ACTIVITY_CLIPS } from '../../../constants';
+import { useTranslation } from '../../../lib/i18n';
 
 export default function ClipSelectorModal({ bunnyName, onClose }: ClipSelectorModalProps) {
+  const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState<FilterCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [downloadedClips, setDownloadedClips] = useState<string[]>([]);
@@ -55,16 +50,16 @@ export default function ClipSelectorModal({ bunnyName, onClose }: ClipSelectorMo
           <div>
             <h3 className="text-base font-black text-slate-800 flex items-center gap-2">
               <Film className="w-5 h-5 text-[#0d9488]" />
-              <span>{bunnyName} • 活動片段監控 Playbacks</span>
+              <span>{t('monitoring.clips.title', { name: bunnyName })}</span>
             </h3>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">點擊各類型行為篩選特定活動節選片段，或選擇下載存檔。</p>
+            <p className="text-xs text-slate-400 font-medium mt-0.5">{t('monitoring.clips.description')}</p>
           </div>
           <button
             onClick={onClose}
             className="p-1 px-2.5 text-xs text-slate-400 hover:text-slate-600 font-bold flex items-center gap-1 hover:bg-slate-100 rounded-lg transition-colors"
           >
             <X className="w-4 h-4" />
-            <span>關閉</span>
+            <span>{t('common.close')}</span>
           </button>
         </div>
 
@@ -79,7 +74,7 @@ export default function ClipSelectorModal({ bunnyName, onClose }: ClipSelectorMo
                 activeCategory === 'all' ? 'bg-[#0d9488] text-white shadow' : 'bg-white text-slate-500 hover:bg-slate-100/50'
               }`}
             >
-              全天候片段
+              {t('monitoring.clips.all')}
             </button>
             <button
               onClick={() => setActiveCategory('active')}
@@ -87,7 +82,7 @@ export default function ClipSelectorModal({ bunnyName, onClose }: ClipSelectorMo
                 activeCategory === 'active' ? 'bg-[#0d9488] text-white shadow' : 'bg-white text-slate-500 hover:bg-slate-100/50'
               }`}
             >
-              活動行為 (Play)
+              {t('monitoring.clips.active')}
             </button>
             <button
               onClick={() => setActiveCategory('eat')}
@@ -95,7 +90,7 @@ export default function ClipSelectorModal({ bunnyName, onClose }: ClipSelectorMo
                 activeCategory === 'eat' ? 'bg-[#0d9488] text-white shadow' : 'bg-white text-slate-500 hover:bg-slate-100/50'
               }`}
             >
-              進食片段 (Eat)
+              {t('monitoring.clips.eat')}
             </button>
             <button
               onClick={() => setActiveCategory('drink')}
@@ -103,7 +98,7 @@ export default function ClipSelectorModal({ bunnyName, onClose }: ClipSelectorMo
                 activeCategory === 'drink' ? 'bg-[#0d9488] text-white shadow' : 'bg-white text-slate-500 hover:bg-slate-100/50'
               }`}
             >
-              飲水監控 (Drinking)
+              {t('monitoring.clips.drink')}
             </button>
             <button
               onClick={() => setActiveCategory('abnormal')}
@@ -111,7 +106,7 @@ export default function ClipSelectorModal({ bunnyName, onClose }: ClipSelectorMo
                 activeCategory === 'abnormal' ? 'bg-rose-500 text-white shadow-md shadow-rose-200' : 'bg-white text-rose-500 hover:bg-rose-50'
               }`}
             >
-              ⚠️ 異常警報
+              {t('monitoring.clips.abnormal')}
             </button>
           </div>
 
@@ -122,7 +117,7 @@ export default function ClipSelectorModal({ bunnyName, onClose }: ClipSelectorMo
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="搜尋特定備註或時刻..."
+              placeholder={t('monitoring.clips.searchPlaceholder')}
               className="w-full text-xs font-medium pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/20"
             />
           </div>

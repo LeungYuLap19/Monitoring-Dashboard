@@ -5,12 +5,7 @@
 
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
-import { BunnyGuest } from '../../../types';
-
-interface BunnyProfileCardProps {
-  activeBunny: BunnyGuest;
-  onOpenClipsModal: () => void;
-}
+import { BunnyGuest, BunnyProfileCardProps } from '../../../types';
 
 export default function BunnyProfileCard({
   activeBunny,

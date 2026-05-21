@@ -5,30 +5,26 @@
 
 import React from 'react';
 import { VideoOff, Play, ArrowRight, Video } from 'lucide-react';
-import { CameraFeed } from '../../../types';
-
-export interface CameraFeedGridProps {
-  feeds: CameraFeed[];
-  onSelectCamera: (camId: string) => void;
-  onClearFilters: () => void;
-}
+import { CameraFeed, CameraFeedGridProps, CameraCardProps } from '../../../types';
+import { useTranslation } from '../../../lib/i18n';
 
 export default function CameraFeedGrid({
   feeds,
   onSelectCamera,
   onClearFilters,
 }: CameraFeedGridProps) {
+  const { t } = useTranslation();
   if (feeds.length === 0) {
     return (
       <div id="no-feeds-indicator" className="bg-white p-12 rounded-2xl border border-slate-100 text-center space-y-3">
         <VideoOff className="w-12 h-12 text-slate-300 mx-auto" />
-        <h4 className="text-sm font-bold text-slate-700">找不到符合條件的相機 feeds</h4>
+        <h4 className="text-sm font-bold text-slate-700">{t('overview.emptyState')}</h4>
         <p className="text-xs text-slate-400 max-w-sm mx-auto font-medium">請試著修改上方的搜尋關鍵字或調整篩選條件後再試一次。</p>
         <button
           onClick={onClearFilters}
           className="mt-2 text-xs font-bold text-teal-600 bg-teal-50 hover:bg-teal-100 px-4 py-2 rounded-xl transition-colors cursor-pointer"
         >
-          重設所有條件
+          {t('overview.clearFilter')}
         </button>
       </div>
     );
@@ -43,10 +39,6 @@ export default function CameraFeedGrid({
   );
 }
 
-interface CameraCardProps {
-  feed: CameraFeed;
-  onSelectCamera: (camId: string) => void;
-}
 
 function CameraCard({ feed, onSelectCamera }: CameraCardProps) {
   return (

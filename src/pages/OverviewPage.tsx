@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useLayoutContext } from '../hooks/useLayoutContext';
-import { CAMERA_FEEDS } from '../data';
+import { CAMERA_FEEDS } from '../constants';
 import MetricsGrid from '../components/pages/overview/MetricsGrid';
 import MonitoringHeader from '../components/pages/overview/MonitoringHeader';
 import CameraFeedGrid from '../components/pages/overview/CameraFeedGrid';

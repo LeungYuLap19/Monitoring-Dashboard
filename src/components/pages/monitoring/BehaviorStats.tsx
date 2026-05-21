@@ -5,32 +5,7 @@
 
 import React from 'react';
 import { ChevronDown, Sparkles, CheckCircle2, FileText } from 'lucide-react';
-
-interface ActivityCount {
-  label: string;
-  value: number;
-  color: string;
-}
-
-interface StatByTime {
-  date: string;
-  activityCount: number;
-  restingCount: number;
-  eatingCount: number;
-  drinkingCount: number;
-  averageOver3Days: number;
-}
-
-interface BehaviorStatsProps {
-  timeFilter: '1' | '3' | '7';
-  setTimeFilter: (value: '1' | '3' | '7') => void;
-  summary: string;
-  avgOver3Days: number;
-  statsByTime: StatByTime[];
-  activeCategory: ActivityCount[];
-  totalActivities: number;
-  onGenerateLog: () => void;
-}
+import { ActivityCount, StatByTime, BehaviorStatsProps } from '../../../types';
 
 export default function BehaviorStats({
   timeFilter,

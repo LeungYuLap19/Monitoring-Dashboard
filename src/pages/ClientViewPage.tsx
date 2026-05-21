@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLayoutContext } from '../hooks/useLayoutContext';
-import { BUNNY_GUESTS, BEHAVIOR_STATS } from '../data';
+import { BUNNY_GUESTS, BEHAVIOR_STATS } from '../constants';
+import { useTranslation } from '../lib/i18n';
 import ActivityLogBanner from '../components/pages/client-view/ActivityLogBanner';
 import ActivityLogHero from '../components/pages/client-view/ActivityLogHero';
 import ActivityLogSummary from '../components/pages/client-view/ActivityLogSummary';
@@ -11,6 +12,7 @@ import ActivityLogFeedback from '../components/pages/client-view/ActivityLogFeed
 
 export default function ClientViewPage() {
   const { selectedBunnyId } = useLayoutContext();
+  const { t } = useTranslation();
 
   const [liked, setLiked] = useState(false);
   const [commentText, setCommentText] = useState('');
@@ -43,8 +45,8 @@ export default function ClientViewPage() {
           </div>
           <ActivityLogClips />
           <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 mt-4 text-xs font-medium text-slate-500 leading-normal">
-            <span className="block font-bold text-slate-700 mb-0.5">🐾 溫馨叮嚀:</span>
-            兔子通常在傍晚與清晨氣候溫和時活動能力較大。如您對日誌內容有任何疑問，或想瞭解更多寶貝照拂狀況，請隨時使用右下角聯絡工作人員，我們會在第一時間爲您解答！祝兔寶入住愉快！
+            <span className="block font-bold text-slate-700 mb-0.5">{t('clientView.tipTitle')}</span>
+            {t('clientView.tipContent')}
           </div>
         </div>
         <ActivityLogFeedback

@@ -8,12 +8,7 @@ import {
   Image as ImageIcon,
   ChevronRight
 } from 'lucide-react';
-import { BunnyGuest } from '../../../types';
-
-interface PetCardGridProps {
-  pets: BunnyGuest[];
-  onSelectPet: (petId: string) => void;
-}
+import { BunnyGuest, PetCardGridProps } from '../../../types';
 
 export default function PetCardGrid({ pets, onSelectPet }: PetCardGridProps) {
   return (

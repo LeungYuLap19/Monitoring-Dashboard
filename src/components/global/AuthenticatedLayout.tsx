@@ -4,20 +4,15 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import ClipSelectorModal from '../pages/monitoring/ClipSelectorModal';
 import ActivityLogPreviewModal from '../pages/monitoring/ActivityLogPreviewModal';
-import { TabId } from '../../types';
-import { BUNNY_GUESTS } from '../../data';
+import { TabId, AuthUser } from '../../types';
+import { BUNNY_GUESTS } from '../../constants';
 import { CheckCircle } from 'lucide-react';
-
-interface AuthUser {
-  emailOrPhone: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-}
+import { useTranslation } from '../../lib/i18n';
 
 export default function AuthenticatedLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => {
     const saved = localStorage.getItem('hkbr_current_user');
@@ -63,7 +58,7 @@ export default function AuthenticatedLayout() {
       setSelectedBunnyId('pipi');
     }
     navigate('/monitoring');
-    showToast(`已自動打開監測鏡頭並載入對應兔兔住客數據`);
+    showToast(t('monitoring.toasts.cameraSwitch'));
   };
 
   const handleSelectBunnyFromOverview = (bunnyId: string) => {
@@ -74,7 +69,7 @@ export default function AuthenticatedLayout() {
   const handleLogSendSuccess = (_id: string) => {
     setIsLogPreviewOpen(false);
     setHasUnsentLogs(false);
-    showToast(`✨ 發送成功！已將對 ${activeBunnyObj.name} 的今日智慧活動日誌成功推播予家長。`);
+    showToast(t('monitoring.logPreview.sendSuccess', { name: activeBunnyObj.name }));
     setTimeout(() => navigate('/client-view'), 400);
   };
 
@@ -93,7 +88,7 @@ export default function AuthenticatedLayout() {
         onLogout={() => {
           setCurrentUser(null);
           localStorage.removeItem('hkbr_current_user');
-          showToast('已成功登出 HKBR 觀察管理系統');
+          showToast(t('auth.toasts.loggedOut'));
           setIsSidebarOpen(false);
           navigate('/login');
         }}

@@ -5,14 +5,8 @@
 
 import React from 'react';
 import { Search, SlidersHorizontal, RefreshCw, Video } from 'lucide-react';
-
-export interface MonitoringHeaderProps {
-  searchQuery: string;
-  onSearchChange: (value: string) => void;
-  filterType: 'all' | 'online' | 'offline' | 'resting' | 'active';
-  onFilterChange: (value: 'all' | 'online' | 'offline' | 'resting' | 'active') => void;
-  onClearFilters: () => void;
-}
+import { MonitoringHeaderProps } from '../../../types';
+import { useTranslation } from '../../../lib/i18n';
 
 export default function MonitoringHeader({
   searchQuery,
@@ -21,6 +15,7 @@ export default function MonitoringHeader({
   onFilterChange,
   onClearFilters,
 }: MonitoringHeaderProps) {
+  const { t } = useTranslation();
   return (
     <div id="monitoring-grid-header" className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-50 shadow-sm">
       <div>
@@ -44,7 +39,7 @@ export default function MonitoringHeader({
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="搜尋籠子或兔名..."
+            placeholder={t('overview.searchPlaceholder')}
             className="w-full text-xs font-medium pl-9 pr-3 py-2 bg-slate-50 border border-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0d9488]/20 focus:bg-white"
           />
         </div>
@@ -58,11 +53,11 @@ export default function MonitoringHeader({
             onChange={(e: any) => onFilterChange(e.target.value)}
             className="bg-transparent text-xs font-bold text-slate-600 focus:outline-none cursor-pointer"
           >
-            <option value="all">所有的狀態</option>
-            <option value="online">在線相機</option>
-            <option value="offline">離線相機</option>
-            <option value="resting">正在休息 (Resting)</option>
-            <option value="active">正在放風 / 活動</option>
+            <option value="all">{t('overview.filters.all')}</option>
+            <option value="online">{t('overview.filters.online')}</option>
+            <option value="offline">{t('overview.filters.offline')}</option>
+            <option value="resting">{t('overview.filters.resting')}</option>
+            <option value="active">{t('overview.filters.active')}</option>
           </select>
         </div>
 
@@ -74,7 +69,7 @@ export default function MonitoringHeader({
             className="flex items-center gap-1 text-xs text-rose-500 font-bold px-2.5 py-1.5 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
           >
             <RefreshCw className="w-3 h-3" />
-            <span>清除條件</span>
+            <span>{t('overview.clearFilter')}</span>
           </button>
         )}
       </div>

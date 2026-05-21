@@ -1,32 +1,12 @@
-import { LayoutDashboard, Video, Heart, ClipboardCheck, LogOut, LucideIcon } from 'lucide-react';
-import { TabId } from '../../types';
+import { LogOut } from 'lucide-react';
+import { TabId, SidebarProps } from '../../types';
+import { NAV_ITEMS } from '../../constants';
+import { useTranslation } from '../../lib/i18n';
 import HKBRIcon from './HKBRIcon';
 import PHealthIcon from './PHealthIcon';
 
-interface NavItem {
-  id: TabId;
-  label: string;
-  icon: LucideIcon;
-  badge?: 'pulse' | 'dot';
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { id: 'overview', label: '數據看板 Overview', icon: LayoutDashboard },
-  { id: 'monitoring', label: '快速監控 Monitoring', icon: Video, badge: 'pulse' },
-  { id: 'pets', label: '寵物數據 Pets', icon: Heart },
-  { id: 'client-view', label: '活動日誌 Client Log', icon: ClipboardCheck, badge: 'dot' },
-];
-
-interface SidebarProps {
-  activeTab: TabId;
-  setActiveTab: (tab: TabId) => void;
-  onLogout?: () => void;
-  hasUnsentLogs: boolean;
-  isOpen?: boolean;
-  onClose?: () => void;
-}
-
 export default function Sidebar({ activeTab, setActiveTab, onLogout, hasUnsentLogs, isOpen, onClose }: SidebarProps) {
+  const { t } = useTranslation();
   const handleTabClick = (tab: TabId) => {
     setActiveTab(tab);
     if (onClose) onClose();
@@ -50,7 +30,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, hasUnsentLo
       >
         <div id="sidebar-upper" className="flex flex-col p-6 space-y-8">
           <div><HKBRIcon /></div>
-          <span id="menu-section-label" className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-4 px-2">功能欄 MENU</span>
+          <span id="menu-section-label" className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-4 px-2">{t('nav.menu')}</span>
 
           <nav id="sidebar-nav" className="flex flex-col gap-1.5">
             {NAV_ITEMS.map(({ id, label, icon: Icon, badge }) => {
@@ -71,7 +51,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, hasUnsentLo
                 >
                   <div className="flex items-center gap-3">
                     <Icon className="w-4.5 h-4.5 shrink-0" />
-                    <span>{label}</span>
+                    <span>{t(label)}</span>
                   </div>
                   {showPulse && (
                     <span className="relative flex h-2 w-2">
@@ -96,7 +76,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, hasUnsentLo
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-rose-500 hover:bg-rose-50 transition-colors w-full text-left"
           >
             <LogOut className="w-4.5 h-4.5 shrink-0" />
-            <span>登出 Log out</span>
+            <span>{t('nav.logout')}</span>
           </button>
         </div>
       </aside>

@@ -5,20 +5,16 @@
 
 import React, { useState } from 'react';
 import { X, Check, Save, Share2, Eye, ShieldAlert, MonitorUp, EyeOff, Loader2, PlayCircle } from 'lucide-react';
-import { BunnyGuest, ActivityClip } from '../../../types';
-import { BUNNY_GUESTS, ACTIVITY_CLIPS, BEHAVIOR_STATS } from '../../../data';
-
-interface ActivityLogPreviewModalProps {
-  bunnyId: string;
-  onClose: () => void;
-  onSendSuccess: (logId: string) => void;
-}
+import { BunnyGuest, ActivityClip, ActivityLogPreviewModalProps } from '../../../types';
+import { BUNNY_GUESTS, ACTIVITY_CLIPS, BEHAVIOR_STATS } from '../../../constants';
+import { useTranslation } from '../../../lib/i18n';
 
 export default function ActivityLogPreviewModal({
   bunnyId,
   onClose,
   onSendSuccess
 }: ActivityLogPreviewModalProps) {
+  const { t } = useTranslation();
   const activeBunny = BUNNY_GUESTS.find(b => b.id === bunnyId) || BUNNY_GUESTS[0];
   const statsObj = BEHAVIOR_STATS[activeBunny.id] || BEHAVIOR_STATS.momo;
 
@@ -45,15 +41,15 @@ export default function ActivityLogPreviewModal({
         {/* Modal Header bar */}
         <div id="modal-header" className="px-4 sm:px-8 py-4 border-b border-slate-100 flex justify-between items-center select-none shrink-0 bg-slate-50/50">
           <div>
-            <h3 className="text-base font-black text-slate-800">活動日誌預覽 Preview Daily Journal</h3>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">請審查或編輯即將發給兔寶家長的活動觀察日誌</p>
+            <h3 className="text-base font-black text-slate-800">{t('monitoring.logPreview.title')}</h3>
+            <p className="text-xs text-slate-400 font-medium mt-0.5">{t('monitoring.logPreview.description')}</p>
           </div>
           <button
             onClick={onClose}
             className="p-1 px-2 text-xs text-slate-400 hover:text-slate-600 font-bold flex items-center gap-1 hover:bg-slate-100 rounded-lg transition-colors"
           >
             <X className="w-4 h-4" />
-            <span>關閉</span>
+            <span>{t('common.close')}</span>
           </button>
         </div>
 
@@ -71,18 +67,18 @@ export default function ActivityLogPreviewModal({
                 className="w-4.5 h-4.5 text-teal-600 border-slate-200 rounded focus:ring-teal-500 cursor-pointer"
               />
               <label htmlFor="checkbox-clips" className="text-xs font-bold text-slate-700 cursor-pointer">
-                在日誌中隨附相機短片剪輯 (附帶動態 AI 節選篩選器)
+                {t('monitoring.logPreview.includeClips')}
               </label>
             </div>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 justify-end text-xs text-slate-400 font-medium w-full md:w-auto">
-              <span>備註修改:</span>
+              <span>{t('monitoring.logPreview.remarksLabel')}</span>
               <input
                 type="text"
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
                 className="px-3 py-1.5 border border-slate-100 bg-slate-50 rounded-lg text-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/20 text-xs w-full sm:w-64"
-                placeholder="在此編輯說明事項..."
+                placeholder={t('monitoring.logPreview.remarksPlaceholder')}
               />
             </div>
           </div>
