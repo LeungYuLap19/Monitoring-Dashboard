@@ -34,7 +34,7 @@
     "emailTab": "電子信箱",
     "phoneTab": "手機號碼",
     "emailPlaceholder": "guardian@example.com",
-    "phonePlaceholder": "+85291234567",
+    "phonePlaceholder": "91234567",
     "getOtp": "獲取一次性安全驗證碼",
     "testAccounts": "專用測試帳戶（可直接使用）",
     "otpSentTo": "驗證碼已寄送至",

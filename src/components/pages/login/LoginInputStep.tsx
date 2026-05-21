@@ -1,7 +1,17 @@
-import React from 'react';
-import { Mail, Phone, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Mail, Phone, ArrowRight, ChevronDown } from 'lucide-react';
 import { LoginInputStepProps } from '../../../types';
 import { useTranslation } from '../../../lib/i18n';
+
+const REGION_CODES = [
+  { code: '+852', label: 'HK +852' },
+  { code: '+86', label: 'CN +86' },
+  { code: '+886', label: 'TW +886' },
+  { code: '+65', label: 'SG +65' },
+  { code: '+81', label: 'JP +81' },
+  { code: '+44', label: 'UK +44' },
+  { code: '+1', label: 'US +1' },
+];
 
 export default function LoginInputStep({
   loginMethod,
@@ -11,6 +21,7 @@ export default function LoginInputStep({
   onSubmit,
 }: LoginInputStepProps) {
   const { t } = useTranslation();
+  const [regionCode, setRegionCode] = useState('+852');
   return (
     <form onSubmit={onSubmit} className="space-y-5">
       {/* TABS Selection */}
@@ -43,19 +54,49 @@ export default function LoginInputStep({
 
       {/* Core Address / Number input */}
       <div className="space-y-1.5">
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-            {loginMethod === 'email' ? <Mail className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
+        {loginMethod === 'email' ? (
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <Mail className="w-4 h-4" />
+            </div>
+            <input
+              type="email"
+              value={inputValue}
+              onChange={(e) => onInputChange(e.target.value)}
+              placeholder={t('auth.emailPlaceholder')}
+              required
+              className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-450 focus:outline-none focus:ring-2 focus:ring-teal-500/15 focus:bg-white transition-all shadow-inner"
+            />
           </div>
-          <input
-            type={loginMethod === 'email' ? 'email' : 'tel'}
-            value={inputValue}
-            onChange={(e) => onInputChange(e.target.value)}
-            placeholder={loginMethod === 'email' ? t('auth.emailPlaceholder') : t('auth.phonePlaceholder')}
-            required
-            className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-450 focus:outline-none focus:ring-2 focus:ring-teal-500/15 focus:bg-white transition-all shadow-inner"
-          />
-        </div>
+        ) : (
+          <div className="flex gap-2">
+            <div className="relative shrink-0">
+              <select
+                value={regionCode}
+                onChange={(e) => setRegionCode(e.target.value)}
+                className="appearance-none h-full pl-3 pr-7 py-3 bg-slate-50 rounded-xl text-xs font-bold text-slate-700 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/15 cursor-pointer"
+              >
+                {REGION_CODES.map((r) => (
+                  <option key={r.code} value={r.code}>{r.label}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+            </div>
+            <div className="relative flex-1">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <Phone className="w-4 h-4" />
+              </div>
+              <input
+                type="tel"
+                value={inputValue}
+                onChange={(e) => onInputChange(e.target.value)}
+                placeholder={t('auth.phonePlaceholder')}
+                required
+                className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-450 focus:outline-none focus:ring-2 focus:ring-teal-500/15 focus:bg-white transition-all shadow-inner"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Action Submit */}

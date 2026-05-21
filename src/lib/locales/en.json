@@ -34,7 +34,7 @@
     "emailTab": "Email",
     "phoneTab": "Phone",
     "emailPlaceholder": "guardian@example.com",
-    "phonePlaceholder": "+85291234567",
+    "phonePlaceholder": "91234567",
     "getOtp": "Get OTP",
     "testAccounts": "Test accounts (ready to use)",
     "otpSentTo": "Code sent to",

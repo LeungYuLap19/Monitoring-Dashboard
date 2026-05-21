@@ -4,13 +4,13 @@
  */
 
 import React, { useState } from 'react';
-import { Bell, User, Sparkles, Moon, Sun, Menu, Globe } from 'lucide-react';
+import { Bell, User, Sparkles, Moon, Sun, Menu } from 'lucide-react';
 import { HeaderProps } from '../../types';
 import { useTranslation } from '../../lib/i18n';
-import { Locale } from '../../lib/i18n';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Header({ userEmail, adminName = 'admin user', onMenuClick }: HeaderProps) {
-  const { t, locale, setLocale } = useTranslation();
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([
     { id: 1, text: 'MOMO剛剛完成了15分鐘放風！', read: false, time: '剛才' },
     { id: 2, text: '注意：MOMO感冒餵藥時間到了（18:00）', read: false, time: '1小時前' },
@@ -36,7 +36,7 @@ export default function Header({ userEmail, adminName = 'admin user', onMenuClic
         >
           <Menu className="w-5 h-5" />
         </button>
-        <div>
+        <div className="max-sm:hidden">
           <h2 id="header-org-title" className="text-base sm:text-lg md:text-xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
             {t('header.orgName')}
           </h2>
@@ -100,15 +100,7 @@ export default function Header({ userEmail, adminName = 'admin user', onMenuClic
         </div>
 
         {/* Language Switcher */}
-        <select
-          id="lang-switcher"
-          value={locale}
-          onChange={(e) => setLocale(e.target.value as Locale)}
-          className="text-xs font-bold text-slate-500 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 hover:bg-slate-100 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500/20"
-        >
-          <option value="zh-TW">繁中</option>
-          <option value="en">EN</option>
-        </select>
+        <LanguageSwitcher />
 
         {/* User admin Profile badge */}
         <div id="admin-user-badge" className="flex items-center gap-2 px-4 py-2 bg-[#0d9488]/10 hover:bg-[#0d9488]/15 border border-[#0d9488]/10 text-[#0d9488] rounded-xl transition-all cursor-pointer">

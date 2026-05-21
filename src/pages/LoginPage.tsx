@@ -2,6 +2,7 @@ import React from 'react';
 import { CheckCircle } from 'lucide-react';
 import HKBRIcon from '../components/global/HKBRIcon';
 import PHealthIcon from '../components/global/PHealthIcon';
+import LanguageSwitcher from '../components/global/LanguageSwitcher';
 import LoginInputStep from '../components/pages/login/LoginInputStep';
 import LoginOtpStep from '../components/pages/login/LoginOtpStep';
 import LoginRegisterStep from '../components/pages/login/LoginRegisterStep';
@@ -29,11 +30,14 @@ export default function LoginPage() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[35vw] h-[35vw] bg-amber-50/50 rounded-full blur-3xl -z-10 pointer-events-none" />
 
         <div id="login-card" className="w-full max-w-md bg-transparent sm:bg-white rounded-none sm:rounded-3xl border-0 sm:border border-slate-100 shadow-none sm:shadow-2xl p-0 sm:p-10 space-y-5 relative">
-          <div className="flex space-x-1 mb-16">
-            <HKBRIcon />
-            <h1 className="font-medium text-sm">
-              救兔之家<br/>觀察系統
-            </h1>
+          <div className="flex justify-between items-start mb-16">
+            <div className="flex space-x-1">
+              <HKBRIcon />
+              <h1 className="font-medium text-sm">
+                救兔之家<br/>觀察系統
+              </h1>
+            </div>
+            <LanguageSwitcher />
           </div>
 
           <div className="flex-row space-y-1">
