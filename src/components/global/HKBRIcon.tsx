@@ -1,5 +1,5 @@
 import React from 'react'
-import icon from '../assets/icons/HKBR.png'
+import icon from '../../assets/icons/HKBR.png'
 
 export default function HKBRIcon() {
   return (

@@ -5,8 +5,8 @@
 
 import React, { useState, useMemo } from 'react';
 import { X, Search, SlidersHorizontal, Download, Film, ShieldAlert, Check } from 'lucide-react';
-import { ActivityClip } from '../types';
-import { ACTIVITY_CLIPS } from '../data';
+import { ActivityClip } from '../../../types';
+import { ACTIVITY_CLIPS } from '../../../data';
 
 interface ClipSelectorModalProps {
   bunnyName: string;

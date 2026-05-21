@@ -1,5 +1,5 @@
 import React from 'react'
-import icon from "../assets/icons/PHealth.png"
+import icon from "../../assets/icons/PHealth.png"
 
 export default function PHealthIcon({ size = 'base' }: { size?: 'base' | 'small' }) {
   return (

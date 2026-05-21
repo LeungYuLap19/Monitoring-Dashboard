@@ -5,8 +5,8 @@
 
 import React, { useState } from 'react';
 import { X, Check, Save, Share2, Eye, ShieldAlert, MonitorUp, EyeOff, Loader2, PlayCircle } from 'lucide-react';
-import { BunnyGuest, ActivityClip } from '../types';
-import { BUNNY_GUESTS, ACTIVITY_CLIPS, BEHAVIOR_STATS } from '../data';
+import { BunnyGuest, ActivityClip } from '../../../types';
+import { BUNNY_GUESTS, ACTIVITY_CLIPS, BEHAVIOR_STATS } from '../../../data';
 
 interface ActivityLogPreviewModalProps {
   bunnyId: string;

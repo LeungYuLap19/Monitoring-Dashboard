@@ -4,4 +4,4 @@
 - [ ] wire apis
 - [ ] standardize style inventories
 - [ ] middleware
-- [ ] routing
+- [x] routing
