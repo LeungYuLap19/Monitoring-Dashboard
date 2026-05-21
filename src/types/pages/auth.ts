@@ -1,8 +1,1 @@
-export interface UserProfile {
-  emailOrPhone: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-}
-
-export type AuthUser = UserProfile;
+export type { AuthUser as UserProfile, AuthUser } from '../lib/auth';

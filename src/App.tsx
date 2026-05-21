@@ -7,6 +7,7 @@ import OverviewPage from './pages/OverviewPage';
 import MonitoringPage from './pages/MonitoringPage';
 import PetsPage from './pages/PetsPage';
 import ClientViewPage from './pages/ClientViewPage';
+import { Toaster } from './components/ui/sonner';
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
+      <Toaster />
     </I18nProvider>
   );
 }

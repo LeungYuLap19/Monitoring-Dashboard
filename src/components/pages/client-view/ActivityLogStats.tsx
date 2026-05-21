@@ -1,28 +1,38 @@
-import { ActivityCount, ActivityLogStatsProps } from '../../../types';
+import { ActivityLogStatsProps } from '../../../types';
 import { useTranslation } from '../../../lib/i18n';
+import { Bar, BarChart, XAxis, YAxis, Cell } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '../../ui/chart';
 
 export default function ActivityLogStats({ activityCounts }: ActivityLogStatsProps) {
   const { t } = useTranslation();
+
+  const chartData = activityCounts.map((item) => ({
+    name: t(item.label),
+    value: item.value,
+    fill: item.color,
+  }));
+
+  const chartConfig: ChartConfig = activityCounts.reduce((acc, item) => {
+    acc[t(item.label)] = { label: t(item.label), color: item.color };
+    return acc;
+  }, {} as ChartConfig);
+
   return (
-    <div className="bg-slate-50/20 p-6 rounded-2xl border border-slate-100/50 space-y-4">
+    <div className="bg-slate-50/20 p-6 rounded-2xl space-y-4">
       <span className="block text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('clientView.statsLabel')}</span>
 
-      <div className="space-y-3">
-        {activityCounts.map((item, idx) => (
-          <div key={idx} className="space-y-1.5">
-            <div className="flex justify-between text-xs font-bold">
-              <span className="text-slate-600">{item.label}</span>
-              <span className="text-slate-800">{item.value} 次/天</span>
-            </div>
-            <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{ backgroundColor: item.color, width: `${(item.value / 12) * 100}%` }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
+      <ChartContainer config={chartConfig} className="h-[140px] w-full">
+        <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 30, left: 60, bottom: 0 }}>
+          <XAxis type="number" hide />
+          <YAxis type="category" dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#475569', fontWeight: 600 }} width={60} />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={10}>
+            {chartData.map((entry, index) => (
+              <Cell key={index} fill={entry.fill} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ChartContainer>
     </div>
   );
 }

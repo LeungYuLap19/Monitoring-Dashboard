@@ -1,22 +1,25 @@
 import { Navigate } from 'react-router-dom';
 import { ReactNode } from 'react';
+import { useRouteAccess } from '../../hooks/auth';
 
-function getAuthUser() {
-  const saved = localStorage.getItem('hkbr_current_user');
-  if (saved) {
-    try { return JSON.parse(saved); } catch { return null; }
-  }
-  return null;
+function FullPageChecking() {
+  return (
+    <div className="w-full min-h-screen flex items-center justify-center bg-slate-50 text-slate-500 text-sm font-semibold">
+      Authenticating...
+    </div>
+  );
 }
 
 export function AuthGuard({ children }: { children: ReactNode }) {
-  const user = getAuthUser();
-  if (!user) return <Navigate to="/login" replace />;
+  const access = useRouteAccess('auth-only');
+  if (access.isChecking) return <FullPageChecking />;
+  if (access.deny) return <Navigate to="/login" replace />;
   return <>{children}</>;
 }
 
 export function GuestGuard({ children }: { children: ReactNode }) {
-  const user = getAuthUser();
-  if (user) return <Navigate to="/" replace />;
+  const access = useRouteAccess('guest-only');
+  if (access.isChecking) return <FullPageChecking />;
+  if (access.deny) return <Navigate to="/" replace />;
   return <>{children}</>;
 }

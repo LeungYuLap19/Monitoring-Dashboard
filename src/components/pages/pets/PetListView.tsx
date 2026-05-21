@@ -1,64 +1,79 @@
 import React from 'react';
-import { BunnyGuest, PetListViewProps } from '../../../types';
+import type { PetListViewProps } from '../../../types';
+import { formatPetDate } from '../../../lib/utils/pet';
+import { useTranslation } from '../../../lib/i18n';
+import { Button } from '../../ui/button';
+import { Badge } from '../../ui/badge';
 
-export default function PetListView({ pets, onSelectPet, onRedirectToMonitoring }: PetListViewProps) {
+function getSexLabel(sex: 'male' | 'female' | null, t: ReturnType<typeof useTranslation>['t']): string {
+  if (sex === 'male') return t('pets.male');
+  if (sex === 'female') return t('pets.female');
+  return t('pets.notAvailable');
+}
+
+export default function PetListView({ pets, onSelectPet }: PetListViewProps) {
+  const { t, locale } = useTranslation();
+
   return (
-    <div id="pets-list-flow" className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden select-none">
+    <div id="pets-list-flow" className="overflow-hidden rounded-3xl bg-white shadow-sm select-none">
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full border-collapse text-left">
           <thead>
-            <tr className="bg-slate-50/70 border-b border-slate-150 text-slate-400 text-xs font-black uppercase tracking-wider">
-              <th className="py-4 px-6">寵物大名</th>
-              <th className="py-4 px-6">品種</th>
-              <th className="py-4 px-6">年齡 / 性別</th>
-              <th className="py-4 px-6">體重 / 疫苗</th>
-              <th className="py-4 px-6">日前狀態</th>
-              <th className="py-4 px-6 text-right">操作</th>
+            <tr className="border-b border-slate-100 bg-slate-50/70 text-xs font-black uppercase tracking-wider text-slate-400">
+              <th className="px-6 py-4">{t('pets.list.name')}</th>
+              <th className="px-6 py-4">{t('pets.list.animalBreed')}</th>
+              <th className="px-6 py-4">{t('pets.list.birthdaySex')}</th>
+              <th className="px-6 py-4">{t('pets.list.weightLocation')}</th>
+              <th className="px-6 py-4">{t('pets.list.status')}</th>
+              <th className="px-6 py-4 text-right">{t('pets.list.actions')}</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 font-semibold text-slate-650 text-xs">
+          <tbody className="divide-y divide-slate-100 text-xs font-semibold text-slate-650">
             {pets.map((pet) => (
-              <tr key={pet.id} className="hover:bg-slate-50/50 transition-colors">
-                <td className="py-4 px-6 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center text-teal-700 font-black uppercase shrink-0">
-                    {pet.name.substring(0, 2)}
+              <tr key={pet.id} className="transition-colors hover:bg-slate-50/50">
+                <td className="flex items-center gap-3 px-6 py-4">
+                  <div className="size-9 shrink-0 overflow-hidden rounded-xl bg-teal-50">
+                    {pet.primaryImageUrl ? (
+                      <img src={pet.primaryImageUrl} alt={pet.name} className="size-full object-cover" />
+                    ) : (
+                      <div className="flex size-full items-center justify-center font-black uppercase text-teal-700">
+                        {pet.name.substring(0, 2)}
+                      </div>
+                    )}
                   </div>
                   <div>
-                    <span className="block font-extrabold text-slate-800 text-sm">{pet.name}</span>
-                    <span className="block text-[10px] text-slate-400 font-bold uppercase">{pet.id}</span>
+                    <span className="block text-sm font-extrabold text-slate-800">{pet.name}</span>
+                    <span className="block text-[10px] font-bold uppercase text-slate-400">
+                      {pet.ngoPetId || pet.id}
+                    </span>
                   </div>
                 </td>
-                <td className="py-4 px-6">{pet.breed}</td>
-                <td className="py-4 px-6">{pet.age || 3} 歲 • {pet.gender === '公' ? '雄性' : '雌性'}</td>
-                <td className="py-4 px-6">
-                  <span>{pet.weight || 2.5} kg</span>
-                  <span className="block text-[10px] text-slate-400">{pet.vaccinated !== false ? '已接種疫苗' : '待接種疫苗'}</span>
+                <td className="px-6 py-4">
+                  <span className="block">{pet.animal || t('pets.notAvailable')}</span>
+                  <span className="block text-[10px] text-slate-400">{pet.breed || t('pets.notAvailable')}</span>
                 </td>
-                <td className="py-4 px-6">
-                  <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                    pet.status === '監測中'
-                      ? 'bg-amber-100 text-amber-800'
-                      : 'bg-emerald-100 text-emerald-800'
-                  }`}>
-                    {pet.status || '健康'}
+                <td className="px-6 py-4">
+                  <span className="block">{formatPetDate(pet.birthday, locale) || t('pets.notAvailable')}</span>
+                  <span className="block text-[10px] text-slate-400">
+                    {getSexLabel(pet.sex, t)}
+                    {pet.ageYears !== null ? ` · ${pet.ageYears} ${t('pets.ageUnit')}` : ''}
                   </span>
                 </td>
-                <td className="py-4 px-6 text-right">
-                  <div className="flex justify-end gap-2">
-                    <button
-                      onClick={() => onSelectPet(pet.id)}
-                      className="bg-slate-50 hover:bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200 transition-colors cursor-pointer"
-                    >
-                      查看詳情
-                    </button>
-                    <button
-                      onClick={() => onRedirectToMonitoring(pet.id)}
-                      className="bg-teal-50 hover:bg-teal-100 text-teal-700 px-3 py-1.5 rounded-lg border border-teal-100 transition-colors cursor-pointer"
-                      title="跳轉監控"
-                    >
-                      快速監控
-                    </button>
-                  </div>
+                <td className="px-6 py-4">
+                  <span>{pet.weight !== null ? `${pet.weight} kg` : t('pets.notAvailable')}</span>
+                  <span className="block text-[10px] text-slate-400">
+                    {pet.location || pet.position || t('pets.notAvailable')}
+                  </span>
+                </td>
+                <td className="px-6 py-4">
+                  <Badge className="border-0 bg-slate-100 text-[10px] font-black uppercase text-slate-700">
+                    {pet.status || t('pets.notAvailable')}
+                  </Badge>
+                </td>
+                <td className="px-6 py-4 text-right">
+                  <Button variant="outline" size="xs" onClick={() => onSelectPet(pet.id)}>
+                    {t('pets.viewDetails')}
+                  </Button>
                 </td>
               </tr>
             ))}

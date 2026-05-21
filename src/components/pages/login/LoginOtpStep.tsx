@@ -2,11 +2,15 @@ import { useRef, KeyboardEvent, ClipboardEvent } from 'react';
 import { LogIn } from 'lucide-react';
 import { LoginOtpStepProps } from '../../../types';
 import { useTranslation } from '../../../lib/i18n';
+import { Button } from '../../ui/button';
+import { Input } from '../../ui/input';
+import { Label } from '../../ui/label';
 
 export default function LoginOtpStep({
   inputValue,
   enteredOtp,
   onOtpChange,
+  isSubmitting = false,
   timer,
   onResend,
   onVerify,
@@ -65,13 +69,14 @@ export default function LoginOtpStep({
           <span className="text-[10px] font-black uppercase text-teal-700 tracking-wider">
             {t('auth.otpSentTo')}
           </span>
-          <button
+          <Button
             type="button"
+            variant="link"
             onClick={onBack}
-            className="text-[10px] text-teal-600 hover:underline font-extrabold cursor-pointer"
+            className="text-[10px] text-teal-600 hover:underline font-extrabold h-auto p-0"
           >
             {t('auth.changeInput')}
-          </button>
+          </Button>
         </div>
         <p className="text-xs font-bold text-teal-900 truncate font-mono">
           {inputValue}
@@ -79,13 +84,13 @@ export default function LoginOtpStep({
       </div>
 
       <div className="space-y-2">
-        <label className="text-xs font-extrabold text-slate-500 uppercase tracking-wider block">
+        <Label className="text-xs font-extrabold text-slate-500 uppercase tracking-wider">
           {t('auth.otpLabel')}
-        </label>
+        </Label>
 
         <div className="grid grid-cols-6 gap-2">
           {digits.map((digit, i) => (
-            <input
+            <Input
               key={i}
               ref={(el) => { inputRefs.current[i] = el; }}
               type="text"
@@ -93,10 +98,11 @@ export default function LoginOtpStep({
               maxLength={1}
               value={digit}
               autoFocus={i === 0}
+              disabled={isSubmitting}
               onChange={(e) => handleInput(i, e.target.value)}
               onKeyDown={(e) => handleKeyDown(i, e)}
               onPaste={handlePaste}
-              className="h-16 bg-slate-50 border border-slate-200 rounded-xl text-center font-mono text-lg font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 focus:bg-white transition-all"
+              className="h-16 text-center font-mono text-lg font-bold text-slate-800 border-slate-200 focus:border-teal-400"
             />
           ))}
         </div>
@@ -104,35 +110,40 @@ export default function LoginOtpStep({
         <div className="flex justify-between items-center text-[10px] font-semibold text-slate-400 px-1">
           <span>{t('auth.otpHint')}</span>
           {timer > 0 ? (
-            <span>重新發送 ({timer}s)</span>
+            <span>{t('auth.resendOtp')} ({timer}s)</span>
           ) : (
-            <button
+            <Button
               type="button"
+              variant="link"
+              disabled={isSubmitting}
               onClick={onResend}
-              className="text-teal-600 font-black hover:underline cursor-pointer"
+              className="text-teal-600 font-black text-[10px] h-auto p-0"
             >
               {t('auth.resendOtp')}
-            </button>
+            </Button>
           )}
         </div>
       </div>
 
       <div className="space-y-2">
-        <button
+        <Button
           type="submit"
-          className="w-full bg-[#0d9488] hover:bg-[#0c857a] text-white font-black py-3.5 rounded-xl shadow-lg shadow-teal-950/10 flex items-center justify-center gap-2 transition-all cursor-pointer text-xs sm:text-sm tracking-wide uppercase"
+          disabled={isSubmitting}
+          className="w-full py-3.5 shadow-lg shadow-teal-950/10 font-black text-xs sm:text-sm tracking-wide uppercase"
         >
-          <LogIn className="w-4.5 h-4.5" />
-          <span>{t('auth.verifyOtp')}</span>
-        </button>
+          <LogIn className="size-4.5" />
+          <span>{isSubmitting ? t('auth.loading') : t('auth.verifyOtp')}</span>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          disabled={isSubmitting}
           onClick={onBack}
-          className="w-full bg-slate-50 hover:bg-slate-100 text-slate-500 border border-slate-150 py-3 rounded-xl text-xs font-bold transition-all cursor-pointer"
+          className="w-full bg-slate-50 hover:bg-slate-100 text-slate-500 border border-slate-150 py-3"
         >
           {t('auth.backToInput')}
-        </button>
+        </Button>
       </div>
     </form>
   );

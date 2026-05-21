@@ -152,15 +152,15 @@ export const BEHAVIOR_STATS: Record<string, {
       { date: '16 apr', activityCount: 9, restingCount: 8, eatingCount: 2, drinkingCount: 1, averageOver3Days: 7 }
     ],
     activityCounts: [
-      { label: '休息', value: 8, color: '#94a3b8' },
-      { label: '活動', value: 6, color: '#f97316' },
-      { label: '進食', value: 2, color: '#0d9488' },
-      { label: '飲水', value: 1, color: '#06b6d4' }
+      { label: 'monitoring.behavior.resting', value: 8, color: '#94a3b8' },
+      { label: 'monitoring.behavior.active', value: 6, color: '#f97316' },
+      { label: 'monitoring.behavior.eating', value: 2, color: '#0d9488' },
+      { label: 'monitoring.behavior.drinking', value: 1, color: '#06b6d4' }
     ],
     hourlyTrend: [
-      { timeLabel: '活動', activityYesterday: 5, activityToday: 6 },
-      { timeLabel: '進食', activityYesterday: 1, activityToday: 2 },
-      { timeLabel: '飲水', activityYesterday: 2, activityToday: 1 }
+      { timeLabel: 'monitoring.behavior.active', activityYesterday: 5, activityToday: 6 },
+      { timeLabel: 'monitoring.behavior.eating', activityYesterday: 1, activityToday: 2 },
+      { timeLabel: 'monitoring.behavior.drinking', activityYesterday: 2, activityToday: 1 }
     ]
   },
   koko: {
@@ -172,15 +172,15 @@ export const BEHAVIOR_STATS: Record<string, {
       { date: '16 apr', activityCount: 6, restingCount: 9, eatingCount: 3, drinkingCount: 2, averageOver3Days: 5 }
     ],
     activityCounts: [
-      { label: '休息', value: 9, color: '#94a3b8' },
-      { label: '活動', value: 6, color: '#f97316' },
-      { label: '進食', value: 3, color: '#0d9488' },
-      { label: '飲水', value: 2, color: '#06b6d4' }
+      { label: 'monitoring.behavior.resting', value: 9, color: '#94a3b8' },
+      { label: 'monitoring.behavior.active', value: 6, color: '#f97316' },
+      { label: 'monitoring.behavior.eating', value: 3, color: '#0d9488' },
+      { label: 'monitoring.behavior.drinking', value: 2, color: '#06b6d4' }
     ],
     hourlyTrend: [
-      { timeLabel: '活動', activityYesterday: 4, activityToday: 6 },
-      { timeLabel: '進食', activityYesterday: 3, activityToday: 3 },
-      { timeLabel: '飲水', activityYesterday: 1, activityToday: 2 }
+      { timeLabel: 'monitoring.behavior.active', activityYesterday: 4, activityToday: 6 },
+      { timeLabel: 'monitoring.behavior.eating', activityYesterday: 3, activityToday: 3 },
+      { timeLabel: 'monitoring.behavior.drinking', activityYesterday: 1, activityToday: 2 }
     ]
   },
   pipi: {
@@ -192,15 +192,15 @@ export const BEHAVIOR_STATS: Record<string, {
       { date: '16 apr', activityCount: 11, restingCount: 4, eatingCount: 4, drinkingCount: 3, averageOver3Days: 8 }
     ],
     activityCounts: [
-      { label: '休息', value: 4, color: '#94a3b8' },
-      { label: '活動', value: 11, color: '#f97316' },
-      { label: '進食', value: 4, color: '#0d9488' },
-      { label: '飲水', value: 3, color: '#06b6d4' }
+      { label: 'monitoring.behavior.resting', value: 4, color: '#94a3b8' },
+      { label: 'monitoring.behavior.active', value: 11, color: '#f97316' },
+      { label: 'monitoring.behavior.eating', value: 4, color: '#0d9488' },
+      { label: 'monitoring.behavior.drinking', value: 3, color: '#06b6d4' }
     ],
     hourlyTrend: [
-      { timeLabel: '活動', activityYesterday: 8, activityToday: 11 },
-      { timeLabel: '進食', activityYesterday: 4, activityToday: 4 },
-      { timeLabel: '飲水', activityYesterday: 2, activityToday: 3 }
+      { timeLabel: 'monitoring.behavior.active', activityYesterday: 8, activityToday: 11 },
+      { timeLabel: 'monitoring.behavior.eating', activityYesterday: 4, activityToday: 4 },
+      { timeLabel: 'monitoring.behavior.drinking', activityYesterday: 2, activityToday: 3 }
     ]
   }
 };

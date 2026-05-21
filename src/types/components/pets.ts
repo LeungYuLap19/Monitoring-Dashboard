@@ -1,4 +1,5 @@
-import { BunnyGuest } from '../constants/domain';
+import type { PetManagementDetail, PetManagementDetailTab, PetManagementListItem } from '../lib/pet';
+import type { ApiPagination } from '../lib/api';
 
 export interface PetFormState {
   formId: string;
@@ -28,27 +29,29 @@ export interface PetSearchBarProps {
   onSearchChange: (value: string) => void;
   viewMode: 'grid' | 'list';
   onSetViewMode: (mode: 'grid' | 'list') => void;
-  onOpenAddModal: () => void;
 }
 
 export interface PetCardGridProps {
-  pets: BunnyGuest[];
+  pets: PetManagementListItem[];
   onSelectPet: (petId: string) => void;
 }
 
 export interface PetListViewProps {
-  pets: BunnyGuest[];
+  pets: PetManagementListItem[];
   onSelectPet: (petId: string) => void;
-  onRedirectToMonitoring: (petId: string) => void;
 }
 
 export interface PetDetailViewProps {
-  pet: BunnyGuest;
-  activeDetailTab: 'info' | 'photos' | 'videos' | 'health';
-  onSetActiveDetailTab: (tab: 'info' | 'photos' | 'videos' | 'health') => void;
+  pet: PetManagementDetail;
+  activeDetailTab: PetManagementDetailTab;
+  onSetActiveDetailTab: (tab: PetManagementDetailTab) => void;
   onBack: () => void;
-  onEdit: (pet: BunnyGuest) => void;
-  onDelete: (id: string, name: string) => void;
-  onRedirectToMonitoring: (petId: string) => void;
-  onToast: (msg: string) => void;
+}
+
+export interface PetPaginationProps {
+  pagination: ApiPagination | null;
+  isLoading?: boolean;
+  onPreviousPage: () => void;
+  onNextPage: () => void;
+  onPageSelect: (page: number) => void;
 }

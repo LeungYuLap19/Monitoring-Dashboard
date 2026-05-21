@@ -11,7 +11,6 @@ export interface NavItem {
 export interface SidebarProps {
   activeTab: TabId;
   setActiveTab: (tab: TabId) => void;
-  onLogout?: () => void;
   hasUnsentLogs: boolean;
   isOpen?: boolean;
   onClose?: () => void;
@@ -22,4 +21,5 @@ export interface HeaderProps {
   adminName?: string;
   onNotificationClick?: () => void;
   onMenuClick?: () => void;
+  onLogout?: () => void;
 }

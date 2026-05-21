@@ -1,48 +1,90 @@
-import { Plus } from 'lucide-react';
-import { useLayoutContext } from '../hooks/useLayoutContext';
-import { usePetManagement } from '../hooks/usePetManagement';
+import { LoaderCircle, RefreshCcw } from 'lucide-react';
+import { usePetManagement } from '../hooks/pet';
 import { useTranslation } from '../lib/i18n';
 import PetSearchBar from '../components/pages/pets/PetSearchBar';
 import PetCardGrid from '../components/pages/pets/PetCardGrid';
 import PetListView from '../components/pages/pets/PetListView';
 import PetDetailView from '../components/pages/pets/PetDetailView';
-import PetFormModal from '../components/pages/pets/PetFormModal';
-import { BUNNY_GUESTS } from '../constants';
+import PetPagination from '../components/pages/pets/PetPagination';
+import { Button } from '../components/ui/button';
+
+function LoadingState({ label }: { label: string }) {
+  return (
+    <div className="rounded-3xl border border-slate-100 bg-white py-16 text-center text-slate-400 shadow-sm">
+      <LoaderCircle className="mx-auto mb-3 size-8 animate-spin text-teal-600" />
+      <p className="text-xs font-semibold">{label}</p>
+    </div>
+  );
+}
+
+function ErrorState({
+  label,
+  actionLabel,
+  onRetry,
+}: {
+  label: string;
+  actionLabel: string;
+  onRetry: () => void;
+}) {
+  return (
+    <div className="rounded-3xl border border-rose-100 bg-white py-16 text-center text-slate-400 shadow-sm">
+      <p className="mb-4 text-xs font-semibold text-rose-600">{label}</p>
+      <Button type="button" variant="outline" onClick={onRetry} className="gap-2">
+        <RefreshCcw className="size-4" />
+        <span>{actionLabel}</span>
+      </Button>
+    </div>
+  );
+}
 
 export default function PetsPage() {
-  const { petsList, setPetsList, selectedBunnyId, setSelectedBunnyId, showToast, navigate } = useLayoutContext();
   const { t } = useTranslation();
-
   const {
-    searchTerm, setSearchTerm, viewMode, setViewMode,
-    selectedPetId, setSelectedPetId, selectedPet,
-    activeDetailTab, setActiveDetailTab,
-    filteredPets, isAddModalOpen, isEditModalOpen,
-    formState, handleFormFieldChange,
-    handleOpenAddModal, handleOpenEditModal,
-    handleSaveAddPet, handleSaveEditPet, handleDeletePet,
-    setIsAddModalOpen, setIsEditModalOpen,
-  } = usePetManagement(petsList, setPetsList, selectedBunnyId, setSelectedBunnyId, showToast);
-
-  const handleRedirectToMonitoring = (id: string) => {
-    setSelectedBunnyId(id);
-    navigate('/monitoring');
-    showToast(t('pets.toasts.redirected', { name: BUNNY_GUESTS.find(b => b.id === id)?.name || '兔兔' }));
-  };
+    pets,
+    selectedPet,
+    selectedPetId,
+    pagination,
+    searchTerm,
+    viewMode,
+    activeDetailTab,
+    isPetsLoading,
+    hasLoadedPets,
+    petsError,
+    isPetLoading,
+    petError,
+    setSearchTerm,
+    setViewMode,
+    setActiveDetailTab,
+    openPetDetails,
+    closePetDetails,
+    goToPage,
+    goToNextPage,
+    goToPreviousPage,
+    refreshPets,
+    refreshSelectedPet,
+  } = usePetManagement();
 
   return (
-    <div id="page-pets" className="p-4 md:p-8 space-y-6 md:space-y-8 select-none">
-      {selectedPet ? (
-        <PetDetailView
-          pet={selectedPet}
-          activeDetailTab={activeDetailTab}
-          onSetActiveDetailTab={setActiveDetailTab}
-          onBack={() => setSelectedPetId(null)}
-          onEdit={handleOpenEditModal}
-          onDelete={handleDeletePet}
-          onRedirectToMonitoring={handleRedirectToMonitoring}
-          onToast={showToast}
-        />
+    <div id="page-pets" className="space-y-6 p-4 select-none md:space-y-8 md:p-8">
+      {selectedPetId ? (
+        isPetLoading && !selectedPet ? (
+          <LoadingState label={t('pets.loadingDetail')} />
+        ) : petError && !selectedPet ? (
+          <ErrorState
+            label={t('pets.loadError')}
+            actionLabel={t('pets.retryLoad')}
+            onRetry={() => {
+              void refreshSelectedPet();
+            }}
+          />
+        ) : selectedPet ? (
+          <PetDetailView
+            pet={selectedPet}
+            activeDetailTab={activeDetailTab}
+            onSetActiveDetailTab={setActiveDetailTab}
+            onBack={closePetDetails}
+          />
+        ) : null
       ) : (
         <div id="pets-list-view" className="space-y-6">
           <PetSearchBar
@@ -50,35 +92,49 @@ export default function PetsPage() {
             onSearchChange={setSearchTerm}
             viewMode={viewMode}
             onSetViewMode={setViewMode}
-            onOpenAddModal={handleOpenAddModal}
           />
-          {filteredPets.length > 0 ? (
-            viewMode === 'grid' ? (
-              <PetCardGrid pets={filteredPets} onSelectPet={setSelectedPetId} />
-            ) : (
-              <PetListView
-                pets={filteredPets}
-                onSelectPet={setSelectedPetId}
-                onRedirectToMonitoring={handleRedirectToMonitoring}
+
+          {isPetsLoading && !hasLoadedPets ? (
+            <LoadingState label={t('pets.loadingList')} />
+          ) : petsError && pets.length === 0 ? (
+            <ErrorState
+              label={t('pets.loadError')}
+              actionLabel={t('pets.retryLoad')}
+              onRetry={() => {
+                void refreshPets();
+              }}
+            />
+          ) : pets.length > 0 ? (
+            <>
+              {viewMode === 'grid' ? (
+                <PetCardGrid pets={pets} onSelectPet={(petId) => { void openPetDetails(petId); }} />
+              ) : (
+                <PetListView pets={pets} onSelectPet={(petId) => { void openPetDetails(petId); }} />
+              )}
+
+              <PetPagination
+                pagination={pagination}
+                isLoading={isPetsLoading}
+                onPreviousPage={() => {
+                  void goToPreviousPage();
+                }}
+                onNextPage={() => {
+                  void goToNextPage();
+                }}
+                onPageSelect={(page) => {
+                  void goToPage(page);
+                }}
               />
-            )
+            </>
           ) : (
-            <div className="text-center py-16 bg-white border border-slate-100 rounded-3xl shadow-sm text-slate-400 text-xs font-semibold space-y-2">
-              <Plus className="w-10 h-10 text-slate-300 mx-auto" strokeWidth={1.5} />
+            <div className="space-y-2 rounded-3xl border border-slate-100 bg-white py-16 text-center text-xs font-semibold text-slate-400 shadow-sm">
               <p>{t('pets.emptyState')}</p>
-              <button onClick={() => setSearchTerm('')} className="text-teal-600 hover:underline cursor-pointer">
+              <button onClick={() => setSearchTerm('')} className="cursor-pointer text-teal-600 hover:underline">
                 {t('pets.clearFilter')}
               </button>
             </div>
           )}
         </div>
-      )}
-
-      {isAddModalOpen && (
-        <PetFormModal mode="add" formState={formState} onFieldChange={handleFormFieldChange} onSubmit={handleSaveAddPet} onClose={() => setIsAddModalOpen(false)} />
-      )}
-      {isEditModalOpen && (
-        <PetFormModal mode="edit" formState={formState} onFieldChange={handleFormFieldChange} onSubmit={handleSaveEditPet} onClose={() => setIsEditModalOpen(false)} />
       )}
     </div>
   );

@@ -7,6 +7,9 @@ import React from 'react';
 import { VideoOff, Play, ArrowRight, Video } from 'lucide-react';
 import { CameraFeed, CameraFeedGridProps, CameraCardProps } from '../../../types';
 import { useTranslation } from '../../../lib/i18n';
+import { Card, CardContent } from '../../ui/card';
+import { Badge } from '../../ui/badge';
+import { Button } from '../../ui/button';
 
 export default function CameraFeedGrid({
   feeds,
@@ -16,17 +19,16 @@ export default function CameraFeedGrid({
   const { t } = useTranslation();
   if (feeds.length === 0) {
     return (
-      <div id="no-feeds-indicator" className="bg-white p-12 rounded-2xl border border-slate-100 text-center space-y-3">
-        <VideoOff className="w-12 h-12 text-slate-300 mx-auto" />
-        <h4 className="text-sm font-bold text-slate-700">{t('overview.emptyState')}</h4>
-        <p className="text-xs text-slate-400 max-w-sm mx-auto font-medium">請試著修改上方的搜尋關鍵字或調整篩選條件後再試一次。</p>
-        <button
-          onClick={onClearFilters}
-          className="mt-2 text-xs font-bold text-teal-600 bg-teal-50 hover:bg-teal-100 px-4 py-2 rounded-xl transition-colors cursor-pointer"
-        >
-          {t('overview.clearFilter')}
-        </button>
-      </div>
+      <Card className="p-12 rounded-2xl text-center gap-3">
+        <CardContent className="p-0 space-y-3 flex flex-col items-center">
+          <VideoOff className="size-12 text-slate-300" />
+          <h4 className="text-sm font-bold text-slate-700">{t('overview.emptyState')}</h4>
+          <p className="text-xs text-slate-400 max-w-sm font-medium">{t('overview.emptyStateHint')}</p>
+          <Button variant="ghost" onClick={onClearFilters} className="mt-2 text-teal-600 bg-teal-50 hover:bg-teal-100">
+            {t('overview.clearFilter')}
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -41,30 +43,31 @@ export default function CameraFeedGrid({
 
 
 function CameraCard({ feed, onSelectCamera }: CameraCardProps) {
+  const { t } = useTranslation();
   return (
-    <div
+    <Card
       id={`camera-card-${feed.id}`}
       onClick={() => feed.isOnline && onSelectCamera(feed.id)}
-      className={`bg-white rounded-2xl border overflow-hidden shadow-sm flex flex-col justify-between transition-all group ${
+      className={`rounded-2xl overflow-hidden p-0 gap-0 flex flex-col justify-between transition-all group ${
         feed.isOnline
-          ? 'border-slate-100 hover:shadow-md hover:border-teal-200 cursor-pointer hover:-translate-y-0.5'
-          : 'border-slate-100 opacity-75'
+          ? 'hover:shadow-md hover:border-teal-200 cursor-pointer hover:-translate-y-0.5'
+          : 'opacity-75'
       }`}
     >
       {/* Card Header information */}
-      <div className="p-5 flex justify-between items-start border-b border-slate-50">
+      <div className="p-5 flex justify-between items-start border-b border-slate-100">
         <div>
           <h4 className="font-extrabold text-slate-800 text-sm group-hover:text-teal-600 transition-colors">
             {feed.name}
           </h4>
           <p className="text-[10px] text-slate-400 font-semibold font-mono mt-0.5 uppercase tracking-wider">
-            {feed.bunnyId ? `住客: ${feed.bunnyName}` : "空倉備用"}
+            {feed.bunnyId ? `${t('overview.cameraFeed.resident')} ${feed.bunnyName}` : t('overview.cameraFeed.empty')}
           </p>
         </div>
 
         {/* Camera connection indicator */}
         <div className="flex items-center gap-1.5">
-          <span className={`w-1.5 h-1.5 rounded-full ${feed.isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
+          <span className={`size-1.5 rounded-full ${feed.isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
           <span className={`text-[10px] font-black uppercase ${feed.isOnline ? 'text-emerald-600' : 'text-slate-400'}`}>
             {feed.isOnline ? 'ON' : 'OFF'}
           </span>
@@ -75,50 +78,50 @@ function CameraCard({ feed, onSelectCamera }: CameraCardProps) {
       <div className="relative aspect-video bg-slate-900 overflow-hidden">
         {feed.isOnline ? (
           <>
-            <div className="w-full h-full bg-slate-950 flex flex-col items-center justify-center text-slate-400 gap-2 font-mono select-none">
-              <Video className="w-6 h-6 text-teal-600 animate-pulse" />
+            <div className="size-full bg-slate-950 flex flex-col items-center justify-center text-slate-400 gap-2 font-mono select-none">
+              <Video className="size-6 text-teal-600 animate-pulse" />
               <span className="text-[9px] tracking-widest text-slate-400 uppercase font-black">CCTV {feed.id.toUpperCase()}</span>
               <span className="text-[9px] text-slate-500 font-bold">{feed.bunnyName ? `GUEST: ${feed.bunnyName}` : 'STANDBY'}</span>
             </div>
 
             {/* Red Live banner */}
             <div className="absolute top-3 left-3 bg-rose-600/90 text-white font-black text-[9px] px-2 py-0.5 rounded-md flex items-center gap-1 uppercase tracking-widest shadow-md">
-              <span className="w-1 h-1 rounded-full bg-white animate-ping" />
+              <span className="size-1 rounded-full bg-white animate-ping" />
               <span>LIVE</span>
             </div>
 
             {/* Location Tag */}
             {feed.bunnyId && (
               <div className="absolute bottom-3 left-3 bg-black/50 backdrop-blur-sm text-white font-bold text-[10px] px-2 py-1 rounded-lg">
-                當前行為: {feed.currentBehavior}
+                {t('overview.cameraFeed.currentBehavior')} {feed.currentBehavior}
               </div>
             )}
 
             {/* Hover Overlay play button effect */}
             <div className="absolute inset-0 bg-teal-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full bg-white/95 text-teal-600 flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
-                <Play className="w-4 h-4 fill-current ml-0.5" />
+              <div className="size-10 rounded-full bg-white/95 text-teal-600 flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform">
+                <Play className="size-4 fill-current ml-0.5" />
               </div>
             </div>
           </>
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 gap-2 p-4">
-            <VideoOff className="w-8 h-8 text-slate-300" />
-            <span className="text-xs font-semibold text-slate-300">相機離線 (Offline)</span>
+            <VideoOff className="size-8 text-slate-300" />
+            <span className="text-xs font-semibold text-slate-300">{t('overview.cameraFeed.offline')}</span>
           </div>
         )}
       </div>
 
       {/* Footer detail actions */}
-      <div className="p-4 bg-slate-50/50 border-t border-slate-50 flex justify-between items-center text-xs">
+      <div className="p-4 bg-slate-50/50 border-t border-slate-100 flex justify-between items-center text-xs">
         <span className="text-slate-400 font-bold">{feed.vibeText || '設備狀態良好'}</span>
         {feed.isOnline && (
           <span className="text-teal-600 font-extrabold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-            <span>觀看</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <span>{t('overview.cameraFeed.watch')}</span>
+            <ArrowRight className="size-3.5" />
           </span>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

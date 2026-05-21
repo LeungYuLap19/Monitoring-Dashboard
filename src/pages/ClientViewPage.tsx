@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLayoutContext } from '../hooks/useLayoutContext';
+import { useLayoutContext } from '../hooks/layout';
 import { BUNNY_GUESTS, BEHAVIOR_STATS } from '../constants';
 import { useTranslation } from '../lib/i18n';
 import ActivityLogBanner from '../components/pages/client-view/ActivityLogBanner';

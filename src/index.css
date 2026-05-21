@@ -1,10 +1,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: theme(--color-border);
+  }
+}
+
 @theme {
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --radius: 0.75rem;
+  --color-background: oklch(0.984 0.003 247.858);
+  --color-foreground: oklch(0.129 0.042 264.695);
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: oklch(0.129 0.042 264.695);
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.129 0.042 264.695);
+  --color-primary: oklch(0.556 0.107 172.515);
+  --color-primary-foreground: oklch(1 0 0);
+  --color-secondary: oklch(0.968 0.007 247.896);
+  --color-secondary-foreground: oklch(0.446 0.043 257.281);
+  --color-muted: oklch(0.968 0.007 247.896);
+  --color-muted-foreground: oklch(0.554 0.046 257.417);
+  --color-accent: oklch(0.968 0.007 247.896);
+  --color-accent-foreground: oklch(0.129 0.042 264.695);
+  --color-destructive: oklch(0.577 0.245 27.325);
+  --color-destructive-foreground: oklch(1 0 0);
+  --color-border: oklch(0.929 0.013 255.508);
+  --color-input: oklch(0.929 0.013 255.508);
+  --color-ring: oklch(0.556 0.107 172.515);
 }
 
 body {

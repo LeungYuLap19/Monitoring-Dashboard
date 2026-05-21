@@ -17,14 +17,14 @@ export default function MonitoringHeader({
 }: MonitoringHeaderProps) {
   const { t } = useTranslation();
   return (
-    <div id="monitoring-grid-header" className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-50 shadow-sm">
+    <div id="monitoring-grid-header" className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm">
       <div>
         <h3 id="monitor-heading" className="text-base font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
-          <Video className="w-5 h-5 text-teal-600" />
-          <span>快速監控 Live Monitoring Feed</span>
+          <Video className="size-5 text-teal-600" />
+          <span>{t('overview.monitoringHeader.title')}</span>
         </h3>
         <p id="monitor-subheading" className="text-xs text-slate-400 font-medium mt-1">
-          點擊任意籠內預覽卡片可切換至「快速監控」細項以查看即時行為 AI 捕捉與歷史日誌。
+          {t('overview.monitoringHeader.description')}
         </p>
       </div>
 
@@ -33,20 +33,20 @@ export default function MonitoringHeader({
 
         {/* Search Input */}
         <div id="search-input-wrapper" className="relative shrink-0 w-full md:w-48">
-          <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-2.5 size-4 text-slate-400" />
           <input
             id="search-cameras-input"
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={t('overview.searchPlaceholder')}
-            className="w-full text-xs font-medium pl-9 pr-3 py-2 bg-slate-50 border border-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0d9488]/20 focus:bg-white"
+            className="w-full text-xs font-medium pl-9 pr-3 py-2 bg-slate-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:bg-white"
           />
         </div>
 
         {/* Dropdown status selector */}
-        <div id="status-select-wrapper" className="flex items-center gap-1.5 bg-slate-50 border border-slate-100 rounded-xl px-3 py-1.5 shrink-0">
-          <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400" />
+        <div id="status-select-wrapper" className="flex items-center gap-1.5 bg-slate-50 rounded-xl px-3 py-1.5 shrink-0">
+          <SlidersHorizontal className="size-3.5 text-slate-400" />
           <select
             id="status-filter-select"
             value={filterType}
@@ -68,7 +68,7 @@ export default function MonitoringHeader({
             onClick={onClearFilters}
             className="flex items-center gap-1 text-xs text-rose-500 font-bold px-2.5 py-1.5 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
           >
-            <RefreshCw className="w-3 h-3" />
+            <RefreshCw className="size-3" />
             <span>{t('overview.clearFilter')}</span>
           </button>
         )}

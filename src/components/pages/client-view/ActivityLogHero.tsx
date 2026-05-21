@@ -15,11 +15,11 @@ export default function ActivityLogHero({ bunnyName }: ActivityLogHeroProps) {
           </span>
           <h2 className="text-xl font-bold font-display">{t('clientView.heroTitle', { name: bunnyName })}</h2>
           <p className="text-xs text-emerald-50/80 font-medium font-sans">
-            親愛的 {bunnyName} 家長：以下是寶貝本日（4月16日）在 救兔之家 的智慧活動日誌
+            {t('clientView.heroSubtitle', { name: bunnyName })}
           </p>
         </div>
         <div
-          className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-white bg-white/20 flex items-center justify-center text-[#fef08a] font-black text-sm sm:text-base select-none shrink-0"
+          className="size-14 sm:size-16 rounded-full border-2 border-white bg-white/20 flex items-center justify-center text-yellow-200 font-black text-sm sm:text-base select-none shrink-0"
           title={bunnyName}
         >
           {bunnyName.substring(0, 2)}

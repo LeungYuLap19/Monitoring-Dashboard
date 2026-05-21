@@ -1,6 +1,8 @@
 import { NavigateFunction } from 'react-router-dom';
 import { BunnyGuest } from '../constants/domain';
 
+export * from './pet';
+
 export interface LayoutContext {
   selectedBunnyId: string;
   setSelectedBunnyId: (id: string) => void;

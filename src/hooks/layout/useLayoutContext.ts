@@ -1,5 +1,5 @@
 import { useOutletContext } from 'react-router-dom';
-import { LayoutContext } from '../types';
+import { LayoutContext } from '../../types';
 
 export type { LayoutContext };
 
