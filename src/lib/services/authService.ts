@@ -11,6 +11,7 @@ import type {
   AuthVerifyRequest,
   AuthVerifyResponseData,
   LoginMethod,
+  NgoLoginResponseData,
   UserMeResponseData,
 } from '../../types/lib/auth';
 import type {
@@ -23,6 +24,7 @@ import {
   AuthApiError,
   clearManualSignOut,
   clearStoredAuthSession,
+  decodeJwtPayload,
   getAuthIdentifier,
   getStoredAccessToken,
   getStoredAuthUser,
@@ -79,7 +81,22 @@ protectedApiClient.interceptors.request.use((config) => {
 let refreshInFlight: Promise<AuthUser | null> | null = null;
 
 async function fetchCurrentUserWithToken(token: string): Promise<AuthUser> {
+  const payload = decodeJwtPayload(token);
+  const tokenRole = payload?.userRole ?? payload?.role;
+
   try {
+    if (tokenRole === 'ngo') {
+      const response = await publicAuthClient.get<ApiSuccessEnvelope<{ userProfile?: UserMeResponseData; ngoProfile?: { _id?: string } }>>('/ngo/me', {
+        headers: {
+          ...getAuthApiHeaders(API_KEY),
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = response.data.data ?? {};
+      const user = toAuthUser(data.userProfile ?? {}, 'ngo', data.ngoProfile?._id);
+      return user;
+    }
+
     const response = await publicAuthClient.get<ApiSuccessEnvelope<UserMeResponseData>>('/user/me', {
       headers: {
         ...getAuthApiHeaders(API_KEY),
@@ -222,6 +239,15 @@ export async function registerUserFromOtp(params: {
   );
 }
 
+export async function loginNgo(email: string, password: string): Promise<NgoLoginResponseData> {
+  return unwrapAuthData(
+    cookieAuthClient.post<ApiSuccessEnvelope<NgoLoginResponseData> | ApiErrorEnvelope>(
+      '/auth/login/ngo',
+      { email, password },
+    ),
+  );
+}
+
 export async function refreshAccessToken(): Promise<AuthRefreshResponseData> {
   return unwrapAuthData(
     cookieAuthClient.post<ApiSuccessEnvelope<AuthRefreshResponseData> | ApiErrorEnvelope>(
@@ -261,7 +287,7 @@ export function logoutAuthSession(): void {
   clearAuthSession();
 }
 
-export async function bootstrapSessionWithToken(token: string, fallbackRole?: string): Promise<AuthUser> {
+export async function bootstrapSessionWithToken(token: string, fallbackRole?: string, ngoId?: string): Promise<AuthUser> {
   const clearEpochAtStart = authClearEpoch;
 
   try {
@@ -276,7 +302,10 @@ export async function bootstrapSessionWithToken(token: string, fallbackRole?: st
       });
     }
     if (!user.role && fallbackRole) {
-      user.role = fallbackRole;
+      user.role = fallbackRole as AuthUser['role'];
+    }
+    if (ngoId) {
+      user.ngoId = ngoId;
     }
     setStoredAuthUser(user);
     return user;

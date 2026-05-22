@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BunnyGuest, CameraFeed, BehaviorStats, ActivityClip } from '../types';
+import { PetGuest, CameraFeed, BehaviorStats, ActivityClip } from '../types';
 
-export const BUNNY_GUESTS: BunnyGuest[] = [
+export const PET_GUESTS: PetGuest[] = [
   {
     id: 'momo',
     name: 'MOMO',
@@ -98,8 +98,8 @@ export const CAMERA_FEEDS: CameraFeed[] = [
     name: '特大籠房間1號',
     isOnline: true,
     currentBehavior: '休息',
-    bunnyId: 'momo',
-    bunnyName: 'MOMO',
+    petId: 'momo',
+    petName: 'MOMO',
     isLive: true,
     vibeText: '吃飯監控中...'
   },
@@ -108,8 +108,8 @@ export const CAMERA_FEEDS: CameraFeed[] = [
     name: '特大籠房間2號',
     isOnline: true,
     currentBehavior: '休息',
-    bunnyId: 'koko',
-    bunnyName: 'KOKO',
+    petId: 'koko',
+    petName: 'KOKO',
     isLive: true,
     vibeText: '靜止睡眠中...'
   },
@@ -118,8 +118,8 @@ export const CAMERA_FEEDS: CameraFeed[] = [
     name: '特大籠房間3號',
     isOnline: true,
     currentBehavior: '休息',
-    bunnyId: 'pipi',
-    bunnyName: 'PIPI',
+    petId: 'pipi',
+    petName: 'PIPI',
     isLive: false,
     vibeText: '相機離線'
   },
@@ -128,8 +128,8 @@ export const CAMERA_FEEDS: CameraFeed[] = [
     name: '放風區',
     isOnline: true,
     currentBehavior: '活動',
-    bunnyId: 'momo',
-    bunnyName: 'MOMO',
+    petId: 'momo',
+    petName: 'MOMO',
     isLive: true,
     vibeText: '自由活動中'
   }
@@ -209,7 +209,7 @@ export const ACTIVITY_CLIPS: ActivityClip[] = [
   {
     id: 'clip-1',
     timestamp: '2026年4月16日 12:44 下午',
-    bunnyName: 'MOMO',
+    petName: 'MOMO',
     action: '在放風區喝水30s',
     thumbnailUrl: 'https://images.unsplash.com/photo-1559214369-a6b1a7cd19f6?auto=format&fit=crop&q=80&w=400&h=250',
     isUrgent: false
@@ -217,7 +217,7 @@ export const ACTIVITY_CLIPS: ActivityClip[] = [
   {
     id: 'clip-2',
     timestamp: '2026年4月16日 15:40 下午',
-    bunnyName: 'MOMO',
+    petName: 'MOMO',
     action: '在放風區躺下1min',
     thumbnailUrl: 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&q=80&w=400&h=250',
     isUrgent: false
@@ -225,7 +225,7 @@ export const ACTIVITY_CLIPS: ActivityClip[] = [
   {
     id: 'clip-3',
     timestamp: '2026年4月16日 10:23 上午',
-    bunnyName: 'MOMO',
+    petName: 'MOMO',
     action: '開始在放風空間活動30分鐘',
     thumbnailUrl: 'https://images.unsplash.com/photo-1484557985045-eaa252be76fc?auto=format&fit=crop&q=80&w=400&h=250',
     isUrgent: false
@@ -233,7 +233,7 @@ export const ACTIVITY_CLIPS: ActivityClip[] = [
   {
     id: 'clip-4',
     timestamp: '2026年4月16日 09:12 上午',
-    bunnyName: 'KOKO',
+    petName: 'KOKO',
     action: '在籠內進食優質提摩西草',
     thumbnailUrl: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?auto=format&fit=crop&q=80&w=400&h=250',
     isUrgent: false
@@ -241,7 +241,7 @@ export const ACTIVITY_CLIPS: ActivityClip[] = [
   {
     id: 'clip-5',
     timestamp: '2026年4月15日 11:30 上午',
-    bunnyName: 'PIPI',
+    petName: 'PIPI',
     action: '在放風區探索障礙玩具',
     thumbnailUrl: 'https://images.unsplash.com/photo-1559214369-a6b1a7cd19f6?auto=format&fit=crop&q=80&w=400&h=250',
     isUrgent: false
@@ -249,7 +249,7 @@ export const ACTIVITY_CLIPS: ActivityClip[] = [
   {
     id: 'clip-6',
     timestamp: '2026年4月16日 01:15 上午',
-    bunnyName: 'MOMO',
+    petName: 'MOMO',
     action: '夜間稍微抓撓耳朵，已紀錄並持續追蹤異常情況',
     thumbnailUrl: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&q=80&w=400&h=250',
     isUrgent: true

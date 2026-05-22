@@ -18,12 +18,12 @@ import {
 } from '../../ui/dialog';
 
 export default function ActivityLogPreviewModal({
-  bunnyId,
+  petId,
   onClose,
   onSendSuccess
 }: ActivityLogPreviewModalProps) {
   const { t } = useTranslation();
-  const cameraLabel = bunnyId.toUpperCase();
+  const cameraLabel = petId.toUpperCase();
 
   const [includeClips, setIncludeClips] = useState(true);
   const [remarks, setRemarks] = useState('');
@@ -33,7 +33,7 @@ export default function ActivityLogPreviewModal({
     setSending(true);
     setTimeout(() => {
       setSending(false);
-      onSendSuccess(bunnyId);
+      onSendSuccess(petId);
     }, 1200);
   };
 
@@ -68,7 +68,7 @@ export default function ActivityLogPreviewModal({
               <div className="border-b border-slate-100 pb-5">
                 <div className="flex items-center gap-2.5 mb-2">
                   <div className="size-8 rounded-lg bg-teal-600 flex items-center justify-center font-bold text-xs text-white">HK</div>
-                  <span className="text-xs font-extrabold text-teal-600 uppercase tracking-wide">HKBR Bunny Hotel</span>
+                  <span className="text-xs font-extrabold text-teal-600 uppercase tracking-wide">{t('header.orgName')}</span>
                 </div>
                 <h4 className="text-lg font-black text-slate-800 tracking-tight">
                   <span className="text-teal-600">{cameraLabel}</span> {t('monitoring.logPreview.dateTitle')}

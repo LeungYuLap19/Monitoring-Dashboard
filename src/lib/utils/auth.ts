@@ -124,16 +124,17 @@ export function mapStatusToErrorKey(status: number, message?: string): string | 
   return undefined;
 }
 
-export function toAuthUser(data: UserMeResponseData, fallbackRole?: string): AuthUser {
+export function toAuthUser(data: UserMeResponseData, fallbackRole?: string, ngoId?: string): AuthUser {
   const emailOrPhone = data.email ?? data.phoneNumber;
   return {
     id: data._id,
     emailOrPhone,
     firstName: data.firstName ?? '',
     lastName: data.lastName ?? '',
-    role: data.role ?? fallbackRole ?? 'user',
+    role: (data.role ?? fallbackRole ?? 'user') as AuthUser['role'],
     email: data.email,
     phoneNumber: data.phoneNumber,
     isVerified: data.verified,
+    ngoId,
   };
 }

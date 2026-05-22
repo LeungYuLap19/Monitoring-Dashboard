@@ -74,7 +74,7 @@ function CameraCard({ feed, onSelectCamera }: CameraCardProps) {
             {feed.name}
           </h4>
           <p className="text-[10px] text-slate-400 font-semibold font-mono mt-0.5 uppercase tracking-wider">
-            {feed.bunnyId ? `${t('overview.cameraFeed.resident')} ${feed.bunnyName}` : t('overview.cameraFeed.empty')}
+            {feed.petId ? `${t('overview.cameraFeed.resident')} ${feed.petName}` : t('overview.cameraFeed.empty')}
           </p>
         </div>
 
@@ -102,7 +102,7 @@ function CameraCard({ feed, onSelectCamera }: CameraCardProps) {
               <div className="size-full bg-slate-950 flex flex-col items-center justify-center text-slate-400 gap-2 font-mono select-none">
                 <Video className="size-6 text-teal-600 animate-pulse" />
                 <span className="text-[9px] tracking-widest text-slate-400 uppercase font-black">CCTV {feed.id.toUpperCase()}</span>
-                <span className="text-[9px] text-slate-500 font-bold">{feed.bunnyName ? `GUEST: ${feed.bunnyName}` : 'STANDBY'}</span>
+                <span className="text-[9px] text-slate-500 font-bold">{feed.petName ? `GUEST: ${feed.petName}` : 'STANDBY'}</span>
               </div>
             )}
 
@@ -113,7 +113,7 @@ function CameraCard({ feed, onSelectCamera }: CameraCardProps) {
             </div>
 
             {/* Location Tag */}
-            {feed.bunnyId && (
+            {feed.petId && (
               <div className="absolute bottom-3 left-3 bg-black/50 backdrop-blur-sm text-white font-bold text-[10px] px-2 py-1 rounded-lg">
                 {t('overview.cameraFeed.currentBehavior')} {feed.currentBehavior}
               </div>

@@ -1,15 +1,15 @@
 import { ActivityCount } from '../constants/domain';
 
 export interface ActivityLogBannerProps {
-  bunnyName: string;
+  petName: string;
 }
 
 export interface ActivityLogHeroProps {
-  bunnyName: string;
+  petName: string;
 }
 
 export interface ActivityLogSummaryProps {
-  bunnyName: string;
+  petName: string;
   totalActivities: number;
 }
 

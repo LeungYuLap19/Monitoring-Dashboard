@@ -67,7 +67,7 @@ export default function MetricsGrid({
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-extrabold text-slate-800 font-display">1</span>
-            <span className="text-sm font-semibold text-slate-500">{t('overview.metrics.bunnyUnit')}</span>
+            <span className="text-sm font-semibold text-slate-500">{t('overview.metrics.petUnit')}</span>
           </div>
         </CardContent>
       </Card>
@@ -81,7 +81,7 @@ export default function MetricsGrid({
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-extrabold text-slate-800 font-display">2</span>
-            <span className="text-sm font-semibold text-slate-500">{t('overview.metrics.bunnyUnit')}</span>
+            <span className="text-sm font-semibold text-slate-500">{t('overview.metrics.petUnit')}</span>
           </div>
         </CardContent>
       </Card>

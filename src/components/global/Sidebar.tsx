@@ -6,21 +6,23 @@ import PHealthIcon from './PHealthIcon';
 import { Button } from '../ui/button';
 import { Sheet, SheetContent } from '../ui/sheet';
 
-export default function Sidebar({ activeTab, setActiveTab, hasUnsentLogs, isOpen, onClose }: SidebarProps) {
+export default function Sidebar({ activeTab, setActiveTab, hasUnsentLogs, role = 'user', isOpen, onClose }: SidebarProps) {
   const { t } = useTranslation();
   const handleTabClick = (tab: TabId) => {
     setActiveTab(tab);
     if (onClose) onClose();
   };
 
+  const visibleNavItems = NAV_ITEMS.filter((item) => !item.roles || item.roles.includes(role));
+
   const sidebarContent = (
     <>
       <div id="sidebar-upper" className="flex flex-col p-6 space-y-8">
-        <div><HKBRIcon /></div>
+        <div>{role === 'user' ? <PHealthIcon size="small" /> : <HKBRIcon />}</div>
         <span className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-4 px-2">{t('nav.menu')}</span>
 
         <nav id="sidebar-nav" className="flex flex-col gap-1.5">
-          {NAV_ITEMS.map(({ id, label, icon: Icon, badge }) => {
+          {visibleNavItems.map(({ id, label, icon: Icon, badge }) => {
             const isActive = activeTab === id;
             const showBadge = badge === 'dot' && hasUnsentLogs;
             const showPulse = badge === 'pulse';
@@ -56,7 +58,7 @@ export default function Sidebar({ activeTab, setActiveTab, hasUnsentLogs, isOpen
       </div>
 
       <div id="sidebar-footer" className="p-6 flex flex-col items-center justify-center w-full">
-        <PHealthIcon size={'small'} />
+        {role === 'ngo' ? <PHealthIcon size={'small'} /> : null}
       </div>
     </>
   );

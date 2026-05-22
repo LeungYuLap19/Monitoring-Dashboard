@@ -3,13 +3,13 @@ import { PetMonitorCameraSnapshot } from '../lib/monitoring';
 
 export type FilterCategory = 'all' | 'active' | 'eat' | 'drink' | 'abnormal';
 
-export interface BunnySelectorProps {
-  selectedBunnyId: string;
-  setSelectedBunnyId: (id: string) => void;
+export interface PetSelectorProps {
+  selectedPetId: string;
+  setSelectedPetId: (id: string) => void;
   cameraFeeds: CameraFeed[];
 }
 
-export interface BunnyProfileCardProps {
+export interface PetProfileCardProps {
   activeFeed: CameraFeed;
   snapshot?: PetMonitorCameraSnapshot | null;
   onOpenClipsModal: () => void;
@@ -34,6 +34,7 @@ export interface BehaviorStatsProps {
   summary: string;
   avgOver3Days: number;
   statsByTime: StatByTime[];
+  trendStatsByTime: StatByTime[];
   activeCategory: ActivityCount[];
   totalActivities: number;
   onGenerateLog: () => void;
@@ -46,15 +47,14 @@ export interface BehaviorStatsProps {
 }
 
 export interface ClipSelectorModalProps {
-  bunnyName: string;
+  petName: string;
   onClose: () => void;
   clips?: ActivityClip[];
   getVideoUrl?: (clip: ActivityClip) => string | null;
 }
 
 export interface ActivityLogPreviewModalProps {
-  bunnyId: string;
+  petId: string;
   onClose: () => void;
   onSendSuccess: (logId: string) => void;
 }
-

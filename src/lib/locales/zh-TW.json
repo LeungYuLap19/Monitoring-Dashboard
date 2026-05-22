@@ -18,11 +18,13 @@
     "monitoring": "快速監控",
     "pets": "寵物數據",
     "clientLog": "活動日誌",
+    "subscription": "訂閱方案",
     "logout": "登出"
   },
   "header": {
     "orgName": "救兔之家",
-    "subtitle": "安穩、健康的兔子臨時看護與智能觀察日誌系統",
+    "orgNameUser": "PHealth OS",
+    "subtitle": "安穩、健康的寵物臨時看護與智能觀察日誌系統",
     "notifications": "最新通知",
     "markAllRead": "全部已讀"
   },
@@ -75,11 +77,31 @@
       "otpVerified": "驗證通過！系統未偵測到此帳號，請在此填寫基本家長姓名以完成註冊。",
       "registered": "註冊成功！親愛的 {{name}}，歡迎加入救兔之家。",
       "loggedOut": "已成功登出觀察管理系統"
+    },
+    "tabs": {
+      "user": "用戶登入",
+      "ngo": "機構登入"
+    },
+    "ngo": {
+      "signInTitle": "機構登入",
+      "signInSubtitle": "使用機構電郵及密碼登入",
+      "emailLabel": "電郵",
+      "emailPlaceholder": "admin@yourorg.com",
+      "passwordLabel": "密碼",
+      "passwordPlaceholder": "輸入密碼",
+      "loginBtn": "登入",
+      "errors": {
+        "emptyEmail": "請輸入電郵地址。",
+        "emptyPassword": "請輸入密碼。",
+        "invalidCredentials": "電郵或密碼不正確。",
+        "rateLimited": "嘗試次數過多，請稍後再試。",
+        "unknown": "登入失敗，請重試。"
+      }
     }
   },
   "pets": {
     "heading": "寵物數據管理",
-    "badge": "BUNNY PET DATABASE",
+    "badge": "PET DATABASE",
     "description": "瀏覽目前由寵物檔案 API 返回的寵物資料。",
     "searchPlaceholder": "搜尋寵物姓名、品種、動物類型、飼主或位置...",
     "gridView": "網格視圖",
@@ -203,7 +225,7 @@
       "statusMonitoring": "觀察監測中",
       "statusResting": "休整中",
       "notesLabel": "備註/護理說明",
-      "notesPlaceholder": "請填寫兔子入住的注意事項...",
+      "notesPlaceholder": "請填寫寵物入住的注意事項...",
       "servicesLabel": "附加照護客房要求",
       "servicesPlaceholder": "例如: 每日下午需要人工梳毛一次",
       "submitAdd": "確認添加",
@@ -220,9 +242,9 @@
   },
   "monitoring": {
     "breadcrumb": "快速監控",
-    "selectBunny": "選擇兔兔",
+    "selectPet": "選擇寵物",
     "cageDetails": "籠內詳情",
-    "currentlyWatching": "目前觀看兔兔:",
+    "currentlyWatching": "目前觀看寵物:",
     "behavior": {
       "resting": "休息",
       "active": "活動",
@@ -239,7 +261,8 @@
       "yesterdayAvg": "昨日平均:",
       "distributionLabel": "今日行為事件分布",
       "activityPerDay": "次活動/天",
-      "comparisonLabel": "行為對比昨日",
+      "comparisonLabel": "近7天行為趨勢",
+      "countAxis": "次數",
       "yesterday": "昨日",
       "today": "今日",
       "noAbnormalTitle": "今天捕捉到0次異常情況",
@@ -290,7 +313,7 @@
       "sending": "發送中..."
     },
     "toasts": {
-      "cameraSwitch": "已自動打開監測鏡頭並載入對應兔兔住客數據"
+      "cameraSwitch": "已自動打開監測鏡頭並載入對應寵物住客數據"
     },
     "placeholders": {
       "failedToConnect": "連線失敗",
@@ -321,9 +344,9 @@
     "summaryLabel": "整體行為分析",
     "statsLabel": "今日捕捉行為明細",
     "tipTitle": "溫馨叮嚀:",
-    "tipContent": "兔子通常在傍晚與清晨氣候溫和時活動能力較大。如您對日誌內容有任何疑問，或想瞭解更多寶貝照拂狀況，請隨時使用右下角聯絡工作人員，我們會在第一時間爲您解答！祝兔寶入住愉快！",
+    "tipContent": "寵物通常在傍晚與清晨氣候溫和時活動能力較大。如您對日誌內容有任何疑問，或想瞭解更多寶貝照拂狀況，請隨時使用右下角聯絡工作人員，我們會在第一時間爲您解答！祝寶貝入住愉快！",
     "feedbackTitle": "您對本日的住店小札感到滿意嗎？",
-    "feedbackSubtitle": "您的反饋是我們持續提供好品質兔子看護照料的最大動力！",
+    "feedbackSubtitle": "您的反饋是我們持續提供好品質寵物看護照料的最大動力！",
     "liked": "家長已按讚",
     "likeBtn": "給今天的小札按個讚",
     "commentsLabel": "家長即時留言 (留言板)",
@@ -331,7 +354,7 @@
     "commentAuthor": "兔寶家長",
     "commentPlaceholder": "在此回填家長意見或回覆工作人員...",
     "commentSubmit": "發表留言",
-    "simulatingLabel": "模擬中 - 觀察兔兔:",
+    "simulatingLabel": "模擬中 - 觀察寵物:",
     "clipsLabel": "本日智慧節選片段",
     "clipDrinking": "飲水精華片段",
     "clipDrinkingTime": "12:44 下午 - 喝水 30s",
@@ -342,8 +365,10 @@
     "healthStatus": "全日無異常事件。活動健康度 100%",
     "healthDiet": "飲食攝水量:",
     "healthDietValue": "充足 (良好)",
-    "healthStool": "排便狀態:",
-    "healthStoolValue": "正常且顆粒碩大",
+    "healthRoomTemperature": "房間溫度:",
+    "healthRoomTemperatureValue": "-- °C",
+    "healthRoomHumidity": "房間濕度:",
+    "healthRoomHumidityValue": "--%",
     "healthMood": "感官及精神:",
     "healthMoodValue": "活力飽滿"
   },
@@ -355,7 +380,7 @@
       "luxSuite": "豪華套房:",
       "arrivingLabel": "今日預期入住",
       "departingLabel": "今日預期退房",
-      "bunnyUnit": "隻兔兔",
+      "petUnit": "隻寵物",
       "alertsLabel": "今日異常事件",
       "noAlerts": "無異常",
       "aiDiagnosis": "智能診斷無潛在呼吸異常",
@@ -381,7 +406,7 @@
       "offline": "相機離線",
       "statusGood": "設備狀態良好"
     },
-    "bunnyProfile": {
+    "petProfile": {
       "male": "公",
       "female": "母",
       "breedLabel": "品種:",
@@ -403,5 +428,70 @@
     "emptyState": "目前條件下沒有相機。",
     "emptyStateHint": "請試著修改上方的搜尋關鍵字或調整篩選條件後再試一次。",
     "clearFilter": "重設過濾"
+  },
+  "subscription": {
+    "title": "PHealth OS 家庭版收費計劃",
+    "subtitle": "選擇最適合您寵物監控需求的方案",
+    "disclaimer": "所有方案自動續訂，可隨時取消。價格以港幣顯示。",
+    "billingHistory": "查看帳單紀錄",
+    "current": {
+      "badge": "使用中",
+      "planName": "免費試用",
+      "duration": "90 天免費試用期",
+      "startLabel": "開始日期",
+      "endLabel": "到期日期",
+      "billingLabel": "付款方式",
+      "billingNone": "尚未設定",
+      "cancel": "取消訂閱",
+      "currentPlan": "目前方案"
+    },
+    "plans": {
+      "free": {
+        "badge": "免費試用",
+        "title": "免費試用",
+        "description": "3 個月免費使用",
+        "price": "HK$0",
+        "priceNote": "無需信用卡",
+        "cta": "開始免費試用"
+      },
+      "basic": {
+        "title": "Basic 基礎",
+        "description": "單隻寵物基本監控",
+        "price": "HK$58",
+        "priceUnit": "/月",
+        "priceNote": "年費 HK$588",
+        "cta": "訂閱"
+      },
+      "pro": {
+        "badge": "推薦",
+        "title": "Pro 高級",
+        "description": "多鏡頭完整監控方案",
+        "price": "HK$118",
+        "priceUnit": "/月",
+        "priceNote": "年費 HK$1,188",
+        "cta": "訂閱"
+      },
+      "travel": {
+        "title": "Travel 5 Days",
+        "description": "外出時短期監控",
+        "price": "HK$28",
+        "priceUnit": "/次",
+        "priceNote": "固定 5 日使用",
+        "cta": "購買"
+      }
+    },
+    "features": {
+      "liveCam1": "1 組即時鏡頭串流",
+      "liveCam3": "最多 3 組即時鏡頭串流",
+      "behaviorAi": "AI 行為偵測",
+      "dailyLog": "每日活動日誌",
+      "clips3days": "影片片段保存（3 天）",
+      "clips5days": "影片片段保存（5 天）",
+      "clips7days": "影片片段保存（7 天）",
+      "clips30days": "影片片段保存（30 天）",
+      "multiCam": "多鏡頭支援",
+      "exportReport": "匯出活動報告",
+      "prioritySupport": "優先客服支援"
+    }
   }
 }

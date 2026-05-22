@@ -17,7 +17,7 @@ import {
 } from '../../ui/dialog';
 
 export default function ClipSelectorModal({
-  bunnyName,
+  petName,
   onClose,
   clips = ACTIVITY_CLIPS,
   getVideoUrl,
@@ -29,8 +29,8 @@ export default function ClipSelectorModal({
 
   const filteredClips = useMemo(() => {
     return clips.filter(clip => {
-      const matchesBunny = clip.bunnyName.toLowerCase() === bunnyName.toLowerCase() ||
-        clip.bunnyName.toLowerCase().startsWith('camera');
+      const matchesPet = clip.petName.toLowerCase() === petName.toLowerCase() ||
+        clip.petName.toLowerCase().startsWith('camera');
       const matchesSearch = clip.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             clip.timestamp.toLowerCase().includes(searchQuery.toLowerCase());
       const normalizedAction = clip.action.toLowerCase();
@@ -40,9 +40,9 @@ export default function ClipSelectorModal({
         activeCategory === 'eat' ? clip.action.includes('進食') || normalizedAction.includes('eat') :
         activeCategory === 'drink' ? clip.action.includes('喝水') || normalizedAction.includes('drink') :
         activeCategory === 'abnormal' ? clip.isUrgent : true;
-      return matchesBunny && matchesSearch && matchesCategory;
+      return matchesPet && matchesSearch && matchesCategory;
     });
-  }, [activeCategory, bunnyName, clips, searchQuery]);
+  }, [activeCategory, petName, clips, searchQuery]);
 
   const handleDownload = (clipId: string) => {
     if (downloadedClips.includes(clipId)) return;
@@ -61,7 +61,7 @@ export default function ClipSelectorModal({
         <DialogHeader className="px-4 sm:px-8 py-4 border-b border-slate-100 bg-slate-50/50">
           <DialogTitle className="text-base font-black text-slate-800 flex items-center gap-2">
             <Film className="size-5 text-teal-600" />
-            <span>{t('monitoring.clips.title', { name: bunnyName })}</span>
+            <span>{t('monitoring.clips.title', { name: petName })}</span>
           </DialogTitle>
           <DialogDescription className="text-xs text-slate-400 font-medium mt-0.5">
             {t('monitoring.clips.description')}

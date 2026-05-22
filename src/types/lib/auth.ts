@@ -1,14 +1,16 @@
 export type LoginMethod = 'email' | 'phone';
+export type AppRole = 'user' | 'ngo';
 
 export interface AuthUser {
   id?: string;
   emailOrPhone?: string;
   firstName: string;
   lastName: string;
-  role: string;
+  role: AppRole;
   email?: string;
   phoneNumber?: string;
   isVerified?: boolean;
+  ngoId?: string;
 }
 
 export interface AuthApiSuccessEnvelope<TData = unknown> {
@@ -87,4 +89,17 @@ export interface AuthApiErrorInfo {
   message: string;
   requestId?: string;
   details?: unknown;
+}
+
+export interface NgoLoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface NgoLoginResponseData {
+  userId: string;
+  role: 'ngo';
+  isVerified: boolean;
+  token: string;
+  ngoId: string;
 }

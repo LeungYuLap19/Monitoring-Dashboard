@@ -18,11 +18,13 @@
     "monitoring": "Monitoring",
     "pets": "Pets",
     "clientLog": "Client Log",
+    "subscription": "Subscription",
     "logout": "Log out"
   },
   "header": {
     "orgName": "HKBR Bunny Hotel",
-    "subtitle": "Smart bunny care monitoring and activity journal system",
+    "orgNameUser": "PHealth OS",
+    "subtitle": "Smart pet care monitoring and activity journal system",
     "notifications": "Notifications",
     "markAllRead": "Mark all read"
   },
@@ -74,12 +76,32 @@
       "welcomeBack": "Welcome back, {{name}}! You are now signed in.",
       "otpVerified": "Verified! No account found — please complete registration below.",
       "registered": "Registration complete! Welcome, {{name}}.",
-      "loggedOut": "You have been signed out of HKBR."
+      "loggedOut": "You have been signed out."
+    },
+    "tabs": {
+      "user": "User Login",
+      "ngo": "NGO Login"
+    },
+    "ngo": {
+      "signInTitle": "NGO Sign In",
+      "signInSubtitle": "Sign in with your NGO email and password",
+      "emailLabel": "Email",
+      "emailPlaceholder": "admin@yourorg.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "loginBtn": "Sign In",
+      "errors": {
+        "emptyEmail": "Please enter your email address.",
+        "emptyPassword": "Please enter your password.",
+        "invalidCredentials": "Invalid email or password.",
+        "rateLimited": "Too many attempts. Please try again later.",
+        "unknown": "Login failed. Please try again."
+      }
     }
   },
   "pets": {
     "heading": "Pet Management",
-    "badge": "BUNNY PET DATABASE",
+    "badge": "PET DATABASE",
     "description": "Browse the current pet profile records returned by the pet profile API.",
     "searchPlaceholder": "Search by name, breed, animal, owner, or location...",
     "gridView": "Grid view",
@@ -220,7 +242,7 @@
   },
   "monitoring": {
     "breadcrumb": "Monitoring",
-    "selectBunny": "Select bunny",
+    "selectPet": "Select pet",
     "cageDetails": "Cage Details",
     "currentlyWatching": "Currently watching:",
     "behavior": {
@@ -239,7 +261,8 @@
       "yesterdayAvg": "Yesterday avg:",
       "distributionLabel": "Today's Behavior Distribution",
       "activityPerDay": " activities/day",
-      "comparisonLabel": "Comparing to Yesterday",
+      "comparisonLabel": "7-Day Behavior Trend",
+      "countAxis": "Count",
       "yesterday": "Yesterday",
       "today": "Today",
       "noAbnormalTitle": "0 abnormal events detected today",
@@ -290,7 +313,7 @@
       "sending": "Sending..."
     },
     "toasts": {
-      "cameraSwitch": "Camera switched — loading bunny monitoring data."
+      "cameraSwitch": "Camera switched — loading pet monitoring data."
     },
     "placeholders": {
       "failedToConnect": "Failed to connect",
@@ -321,9 +344,9 @@
     "summaryLabel": "Behavior Summary",
     "statsLabel": "Today's Activity Breakdown",
     "tipTitle": "Friendly Reminder:",
-    "tipContent": "Rabbits are typically most active during dawn and dusk when temperatures are mild. If you have any questions about this log or want to learn more about your pet's care, please contact our staff anytime using the button in the bottom right. Wishing your bunny a happy stay!",
+    "tipContent": "Pets are typically most active during dawn and dusk when temperatures are mild. If you have any questions about this log or want to learn more about your pet's care, please contact our staff anytime using the button in the bottom right. Wishing your pet a happy stay!",
     "feedbackTitle": "Are you satisfied with today's journal?",
-    "feedbackSubtitle": "Your feedback helps us continue providing quality bunny care!",
+    "feedbackSubtitle": "Your feedback helps us continue providing quality pet care!",
     "liked": "Liked",
     "likeBtn": "Like today's journal",
     "commentsLabel": "Parent Comments",
@@ -331,7 +354,7 @@
     "commentAuthor": "Pet Parent",
     "commentPlaceholder": "Leave a comment or reply to staff...",
     "commentSubmit": "Post Comment",
-    "simulatingLabel": "Simulating - Observing bunny:",
+    "simulatingLabel": "Simulating - Observing pet:",
     "clipsLabel": "Today's AI-Selected Clips",
     "clipDrinking": "Drinking highlight clip",
     "clipDrinkingTime": "12:44 PM - Drinking 30s",
@@ -342,8 +365,10 @@
     "healthStatus": "No abnormal events all day. Activity health score 100%",
     "healthDiet": "Diet & water intake:",
     "healthDietValue": "Sufficient (Good)",
-    "healthStool": "Stool condition:",
-    "healthStoolValue": "Normal, large pellets",
+    "healthRoomTemperature": "Room temperature:",
+    "healthRoomTemperatureValue": "-- °C",
+    "healthRoomHumidity": "Room humidity:",
+    "healthRoomHumidityValue": "--%",
     "healthMood": "Senses & mood:",
     "healthMoodValue": "Energetic"
   },
@@ -355,7 +380,7 @@
       "luxSuite": "Luxury Suite:",
       "arrivingLabel": "Arriving Today",
       "departingLabel": "Departing Today",
-      "bunnyUnit": "bunnies",
+      "petUnit": "pets",
       "alertsLabel": "Alerts Today",
       "noAlerts": "No Alerts",
       "aiDiagnosis": "AI diagnosis: no respiratory anomalies",
@@ -381,7 +406,7 @@
       "offline": "Camera Offline",
       "statusGood": "Equipment status: OK"
     },
-    "bunnyProfile": {
+    "petProfile": {
       "male": "Male",
       "female": "Female",
       "breedLabel": "Breed:",
@@ -403,5 +428,70 @@
     "emptyState": "No cameras match the current filters.",
     "emptyStateHint": "Try adjusting your search keywords or filter settings.",
     "clearFilter": "Reset filters"
+  },
+  "subscription": {
+    "title": "PHealth OS Home Edition Plans",
+    "subtitle": "Choose the plan that fits your pet monitoring needs",
+    "disclaimer": "All plans auto-renew. Cancel anytime. Prices shown in HKD.",
+    "billingHistory": "View billing history",
+    "current": {
+      "badge": "Active",
+      "planName": "Free Trial",
+      "duration": "90-day free trial period",
+      "startLabel": "Started",
+      "endLabel": "Expires",
+      "billingLabel": "Payment method",
+      "billingNone": "None on file",
+      "cancel": "Cancel subscription",
+      "currentPlan": "Current plan"
+    },
+    "plans": {
+      "free": {
+        "badge": "Free trial",
+        "title": "Free Trial",
+        "description": "3 months free access",
+        "price": "HK$0",
+        "priceNote": "No credit card required",
+        "cta": "Start free trial"
+      },
+      "basic": {
+        "title": "Basic",
+        "description": "Essential monitoring for one pet",
+        "price": "HK$58",
+        "priceUnit": "/mo",
+        "priceNote": "Annual HK$588",
+        "cta": "Subscribe"
+      },
+      "pro": {
+        "badge": "Recommended",
+        "title": "Pro",
+        "description": "Full monitoring with multi-cam support",
+        "price": "HK$118",
+        "priceUnit": "/mo",
+        "priceNote": "Annual HK$1,188",
+        "cta": "Subscribe"
+      },
+      "travel": {
+        "title": "Travel 5 Days",
+        "description": "Short-term monitoring while away",
+        "price": "HK$28",
+        "priceUnit": "/use",
+        "priceNote": "Fixed 5-day access",
+        "cta": "Purchase"
+      }
+    },
+    "features": {
+      "liveCam1": "1 live camera stream",
+      "liveCam3": "Up to 3 live camera streams",
+      "behaviorAi": "AI behavior detection",
+      "dailyLog": "Daily activity log",
+      "clips3days": "Clip storage (3 days)",
+      "clips5days": "Clip storage (5 days)",
+      "clips7days": "Clip storage (7 days)",
+      "clips30days": "Clip storage (30 days)",
+      "multiCam": "Multi-camera support",
+      "exportReport": "Export activity reports",
+      "prioritySupport": "Priority support"
+    }
   }
 }

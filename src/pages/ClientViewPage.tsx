@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLayoutContext } from '../hooks/layout';
-import { BUNNY_GUESTS, BEHAVIOR_STATS } from '../constants';
+import { PET_GUESTS, BEHAVIOR_STATS } from '../constants';
 import { useTranslation } from '../lib/i18n';
 import ActivityLogBanner from '../components/pages/client-view/ActivityLogBanner';
 import ActivityLogHero from '../components/pages/client-view/ActivityLogHero';
@@ -11,7 +11,7 @@ import ActivityLogClips from '../components/pages/client-view/ActivityLogClips';
 import ActivityLogFeedback from '../components/pages/client-view/ActivityLogFeedback';
 
 export default function ClientViewPage() {
-  const { selectedBunnyId } = useLayoutContext();
+  const { selectedPetId } = useLayoutContext();
   const { t } = useTranslation();
 
   const [liked, setLiked] = useState(false);
@@ -21,8 +21,8 @@ export default function ClientViewPage() {
     '今天在放風區跳很高，看來適應得很棒呢！'
   ]);
 
-  const activeBunny = BUNNY_GUESTS.find(b => b.id === selectedBunnyId) || BUNNY_GUESTS[0];
-  const statsObj = BEHAVIOR_STATS[activeBunny.id] || BEHAVIOR_STATS.momo;
+  const activePet = PET_GUESTS.find(b => b.id === selectedPetId) || PET_GUESTS[0];
+  const statsObj = BEHAVIOR_STATS[activePet.id] || BEHAVIOR_STATS.momo;
   const totalActivities = statsObj.activityCounts.reduce((acc, curr) => acc + curr.value, 0);
 
   const handleAddComment = (e: React.FormEvent) => {
@@ -34,11 +34,11 @@ export default function ClientViewPage() {
 
   return (
     <div id="page-client-view" className="p-4 sm:p-8 max-w-4xl mx-auto space-y-6 sm:space-y-8 select-none">
-      <ActivityLogBanner bunnyName={activeBunny.name} />
+      <ActivityLogBanner petName={activePet.name} />
       <div id="parent-letter-container" className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-        <ActivityLogHero bunnyName={activeBunny.name} />
+        <ActivityLogHero petName={activePet.name} />
         <div id="letter-sheet-body" className="p-4 sm:p-8 space-y-6 sm:space-y-8">
-          <ActivityLogSummary bunnyName={activeBunny.name} totalActivities={totalActivities} />
+          <ActivityLogSummary petName={activePet.name} totalActivities={totalActivities} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
             <ActivityLogStats activityCounts={statsObj.activityCounts} />
             <ActivityLogHealth />

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Bell, ChevronDown, LogOut, Menu, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Bell, ChevronDown, CreditCard, LogOut, Menu, User } from 'lucide-react';
 import { HeaderProps } from '../../types';
 import { useTranslation } from '../../lib/i18n';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -18,10 +19,12 @@ import { Separator } from '../ui/separator';
 export default function Header({
   userEmail,
   adminName = 'admin user',
+  role = 'user',
   onMenuClick,
   onLogout,
 }: HeaderProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([
     { id: 1, text: 'MOMO剛剛完成了15分鐘放風！', read: false, time: '剛才' },
     { id: 2, text: '注意：MOMO感冒餵藥時間到了（18:00）', read: false, time: '1小時前' },
@@ -55,7 +58,7 @@ export default function Header({
         </Button>
         <div className="max-sm:hidden">
           <h2 className="text-base sm:text-lg md:text-xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
-            {t('header.orgName')}
+            {role === 'user' ? t('header.orgNameUser') : t('header.orgName')}
           </h2>
           <p className="text-[10px] sm:text-xs text-slate-400 font-medium mt-0.5 hidden md:block">
             {t('header.subtitle')}
@@ -132,6 +135,17 @@ export default function Header({
             </PopoverHeader>
             <Separator className="bg-slate-100" />
             <div className="p-2">
+              {role === 'user' && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => { setOpenUserMenu(false); navigate('/subscription'); }}
+                  className="w-full justify-start gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-800"
+                >
+                  <CreditCard className="size-4 shrink-0" />
+                  <span>{t('nav.subscription')}</span>
+                </Button>
+              )}
               <Button
                 type="button"
                 variant="ghost"

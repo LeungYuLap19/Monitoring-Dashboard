@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useLayoutContext } from '../hooks/layout';
 import { useCameraPetMap } from '../hooks/pet';
 import { usePetMonitorDashboard } from '../hooks/monitoring';
+import { getCurrentSessionUser } from '../lib/services/authService';
 import { toPetMonitorCameraFeeds } from '../lib/utils/services/pet-monitor-ui';
 import MetricsGrid from '../components/pages/overview/MetricsGrid';
 import MonitoringHeader from '../components/pages/overview/MonitoringHeader';
@@ -10,6 +11,8 @@ import CameraFeedGrid from '../components/pages/overview/CameraFeedGrid';
 export default function OverviewPage() {
   const { onSelectCamera } = useLayoutContext();
   const { cameraPetMap } = useCameraPetMap();
+  const currentUser = getCurrentSessionUser();
+  const isNgo = currentUser?.role === 'ngo';
   const monitor = usePetMonitorDashboard({
     autoLoad: true,
     statsPollIntervalMs: 5000,
@@ -28,7 +31,7 @@ export default function OverviewPage() {
     return feeds.map((feed) => {
       const petInfo = feed.deviceId ? cameraPetMap[feed.deviceId] : undefined;
       if (petInfo) {
-        return { ...feed, bunnyName: petInfo.name, bunnyId: petInfo.petId };
+        return { ...feed, petName: petInfo.name, petId: petInfo.petId };
       }
       return feed;
     });
@@ -42,7 +45,7 @@ export default function OverviewPage() {
   const filteredFeeds = useMemo(() => {
     return cameraFeeds.filter(feed => {
       const matchesSearch = feed.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (feed.bunnyName && feed.bunnyName.toLowerCase().includes(searchQuery.toLowerCase()));
+        (feed.petName && feed.petName.toLowerCase().includes(searchQuery.toLowerCase()));
       const matchesFilter =
         filterType === 'all' ? true :
         filterType === 'online' ? feed.isOnline :
@@ -65,12 +68,14 @@ export default function OverviewPage() {
 
   return (
     <div id="page-overview" className="p-4 md:p-8 space-y-6 md:space-y-8 select-none">
-      <MetricsGrid
-        onlineCameras={onlineCameraCount}
-        totalCameras={cameraFeeds.length}
-        alertsToday={0}
-        isLoading={monitor.isLoading}
-      />
+      {isNgo && (
+        <MetricsGrid
+          onlineCameras={onlineCameraCount}
+          totalCameras={cameraFeeds.length}
+          alertsToday={0}
+          isLoading={monitor.isLoading}
+        />
+      )}
       <section id="monitoring-grid-container" className="space-y-6">
         <MonitoringHeader
           searchQuery={searchQuery}

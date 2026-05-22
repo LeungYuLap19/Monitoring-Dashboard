@@ -16,8 +16,10 @@ import {
   toPetMonitorCameraFeeds,
   toStatsByTime,
 } from '../lib/utils/services/pet-monitor-ui';
-import BunnySelector from '../components/pages/monitoring/BunnySelector';
-import BunnyProfileCard from '../components/pages/monitoring/BunnyProfileCard';
+import { getPetMonitorBehaviorTimeline } from '../lib/services/petMonitorService';
+import type { PetMonitorBehaviorTimelineResponse } from '../types/lib/monitoring';
+import PetSelector from '../components/pages/monitoring/PetSelector';
+import PetProfileCard from '../components/pages/monitoring/PetProfileCard';
 import LiveStreamView from '../components/pages/monitoring/LiveStreamView';
 import BehaviorStats from '../components/pages/monitoring/BehaviorStats';
 import { Button } from '../components/ui/button';
@@ -59,11 +61,12 @@ function MonitoringPlaceholder({
 }
 
 export default function MonitoringPage() {
-  const { selectedBunnyId, setSelectedBunnyId, onOpenClipsModal, onGenerateLog } = useLayoutContext();
+  const { selectedPetId, setSelectedPetId, onOpenClipsModal, onGenerateLog } = useLayoutContext();
   const { t } = useTranslation();
 
   const [timeFilter, setTimeFilter] = useState<'1' | '3' | '7'>('3');
   const [streamActive, setStreamActive] = useState(true);
+  const [trendTimeline, setTrendTimeline] = useState<PetMonitorBehaviorTimelineResponse | null>(null);
   const monitor = usePetMonitorDashboard({
     autoLoad: true,
     statsPollIntervalMs: 5000,
@@ -87,7 +90,14 @@ export default function MonitoringPage() {
     return feeds.map((feed) => {
       const petInfo = feed.deviceId ? cameraPetMap[feed.deviceId] : undefined;
       if (petInfo) {
-        return { ...feed, bunnyName: petInfo.name, bunnyId: petInfo.petId };
+        return {
+          ...feed,
+          petName: petInfo.name,
+          petId: petInfo.petId,
+          petBreed: petInfo.breed,
+          petAnimal: petInfo.animal,
+          petStatus: petInfo.status,
+        };
       }
       return feed;
     });
@@ -100,8 +110,8 @@ export default function MonitoringPage() {
 
   const activeFeed = useMemo(() => {
     if (!cameraFeeds.length) return null;
-    return cameraFeeds.find((feed) => feed.id === selectedBunnyId) ?? cameraFeeds[0];
-  }, [cameraFeeds, selectedBunnyId]);
+    return cameraFeeds.find((feed) => feed.id === selectedPetId) ?? cameraFeeds[0];
+  }, [cameraFeeds, selectedPetId]);
 
   const selectedCamId = useMemo(
     () => getCameraIdFromMonitorId(activeFeed?.id),
@@ -119,16 +129,17 @@ export default function MonitoringPage() {
 
   useEffect(() => {
     if (!cameraFeeds.length) return;
-    if (cameraFeeds.some((feed) => feed.id === selectedBunnyId)) return;
-    setSelectedBunnyId(cameraFeeds[0].id);
-  }, [cameraFeeds, selectedBunnyId, setSelectedBunnyId]);
+    if (cameraFeeds.some((feed) => feed.id === selectedPetId)) return;
+    setSelectedPetId(cameraFeeds[0].id);
+  }, [cameraFeeds, selectedPetId, setSelectedPetId]);
 
   useEffect(() => {
     if (selectedCamId === null) return;
 
     const now = new Date();
     const start = new Date(now);
-    start.setDate(now.getDate() - Number(timeFilter));
+    start.setDate(now.getDate() - (Number(timeFilter) - 1));
+    start.setHours(0, 0, 0, 0);
     const startText = formatPetMonitorDateTime(start);
     const endText = formatPetMonitorDateTime(now);
 
@@ -149,6 +160,24 @@ export default function MonitoringPage() {
     void loadCameraConfig(selectedCamId).catch(() => undefined);
   }, [loadBehaviorStats, loadBehaviorTimeline, loadCameraConfig, loadRecords, selectedCamId, timeFilter]);
 
+  useEffect(() => {
+    if (selectedCamId === null) return;
+
+    const now = new Date();
+    const start = new Date(now);
+    start.setDate(now.getDate() - 6);
+    start.setHours(0, 0, 0, 0);
+
+    void getPetMonitorBehaviorTimeline({
+      cam_id: selectedCamId,
+      start: formatPetMonitorDateTime(start),
+      end: formatPetMonitorDateTime(now),
+      bucket: '1d',
+    })
+      .then(setTrendTimeline)
+      .catch(() => setTrendTimeline(null));
+  }, [selectedCamId]);
+
   const backendActivityCounts = useMemo(
     () => toActivityCounts(behavior.behaviorStats, selectedSnapshot),
     [behavior.behaviorStats, selectedSnapshot],
@@ -156,6 +185,10 @@ export default function MonitoringPage() {
   const statsByTime = useMemo(
     () => (behavior.timeline?.points?.length ? toStatsByTime(behavior.timeline, backendActivityCounts) : []),
     [backendActivityCounts, behavior.timeline],
+  );
+  const trendStatsByTime = useMemo(
+    () => (trendTimeline?.points?.length ? toStatsByTime(trendTimeline, []) : []),
+    [trendTimeline],
   );
   const totalActivities = useMemo(
     () => backendActivityCounts.reduce((acc, curr) => acc + curr.value, 0),
@@ -168,7 +201,7 @@ export default function MonitoringPage() {
   }, [statsByTime]);
   const behaviorSummary = useMemo(() => {
     if (!activeFeed) return t('monitoring.placeholders.noCameraSelectedSummary');
-    return toBehaviorSummary(activeFeed.bunnyName || activeFeed.name, totalActivities, totalActivities > 0 || statsByTime.length > 0);
+    return toBehaviorSummary(activeFeed.petName || activeFeed.name, totalActivities, totalActivities > 0 || statsByTime.length > 0);
   }, [activeFeed, statsByTime.length, t, totalActivities]);
 
   const livePlaceholder = useMemo(() => {
@@ -227,9 +260,9 @@ export default function MonitoringPage() {
     <div id="page-monitoring" className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 select-none">
       <div id="monitoring-left" className="col-span-1 lg:col-span-8 space-y-6">
         {hasFeeds ? (
-          <BunnySelector
-            selectedBunnyId={activeFeed?.id ?? selectedBunnyId}
-            setSelectedBunnyId={setSelectedBunnyId}
+          <PetSelector
+            selectedPetId={activeFeed?.id ?? selectedPetId}
+            setSelectedPetId={setSelectedPetId}
             cameraFeeds={cameraFeeds}
           />
         ) : hasMonitorError ? (
@@ -252,7 +285,7 @@ export default function MonitoringPage() {
 
         {activeFeed ? (
           <>
-            <BunnyProfileCard
+            <PetProfileCard
               activeFeed={activeFeed}
               snapshot={selectedSnapshot}
               onOpenClipsModal={onOpenClipsModal}
@@ -283,6 +316,7 @@ export default function MonitoringPage() {
         summary={behaviorSummary}
         avgOver3Days={avgOver3Days}
         statsByTime={statsByTime}
+        trendStatsByTime={trendStatsByTime}
         activeCategory={backendActivityCounts}
         totalActivities={totalActivities}
         onGenerateLog={onGenerateLog}

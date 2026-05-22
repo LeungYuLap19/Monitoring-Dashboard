@@ -33,7 +33,7 @@ export default function LiveStreamView({
     );
   }
 
-  const displayName = activeFeed.bunnyName || activeFeed.name;
+  const displayName = activeFeed.petName || activeFeed.name;
 
   return (
     <div id="video-stream-dashboard" className="bg-slate-900 rounded-3xl overflow-hidden relative shadow-lg aspect-video group select-none flex items-center justify-center">

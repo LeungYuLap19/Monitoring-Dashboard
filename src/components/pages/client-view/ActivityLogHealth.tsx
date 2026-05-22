@@ -19,8 +19,12 @@ export default function ActivityLogHealth() {
             <span className="font-semibold text-teal-600">{t('clientView.healthDietValue')}</span>
           </div>
           <div className="flex justify-between border-b border-slate-100 border-dashed pb-1.5">
-            <span className="font-bold">{t('clientView.healthStool')}</span>
-            <span className="font-semibold text-emerald-600">{t('clientView.healthStoolValue')}</span>
+            <span className="font-bold">{t('clientView.healthRoomTemperature')}</span>
+            <span className="font-semibold text-emerald-600">{t('clientView.healthRoomTemperatureValue')}</span>
+          </div>
+          <div className="flex justify-between border-b border-slate-100 border-dashed pb-1.5">
+            <span className="font-bold">{t('clientView.healthRoomHumidity')}</span>
+            <span className="font-semibold text-cyan-600">{t('clientView.healthRoomHumidityValue')}</span>
           </div>
           <div className="flex justify-between pb-1.5">
             <span className="font-bold">{t('clientView.healthMood')}</span>

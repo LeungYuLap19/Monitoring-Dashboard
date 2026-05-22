@@ -5,14 +5,14 @@
 
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
-import { BunnySelectorProps } from '../../../types';
+import { PetSelectorProps } from '../../../types';
 import { useTranslation } from '../../../lib/i18n';
 
-export default function BunnySelector({
-  selectedBunnyId,
-  setSelectedBunnyId,
+export default function PetSelector({
+  selectedPetId,
+  setSelectedPetId,
   cameraFeeds,
-}: BunnySelectorProps) {
+}: PetSelectorProps) {
   const { t } = useTranslation();
   return (
     <div id="monitoring-breadcrumb" className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 sm:px-6 sm:py-4 rounded-2xl shadow-sm gap-4">
@@ -27,13 +27,13 @@ export default function BunnySelector({
         <span className="text-xs font-bold text-slate-400">{t('monitoring.currentlyWatching')}</span>
         <div className="relative">
           <select
-            id="active-bunny-selector"
-            value={selectedBunnyId}
-            onChange={(e) => setSelectedBunnyId(e.target.value)}
+            id="active-pet-selector"
+            value={selectedPetId}
+            onChange={(e) => setSelectedPetId(e.target.value)}
             className="appearance-none bg-slate-50 rounded-xl px-4 py-1.5 pr-8 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/10 cursor-pointer"
           >
             {cameraFeeds.map((feed) => (
-              <option key={feed.id} value={feed.id}>{feed.bunnyName || feed.name}</option>
+              <option key={feed.id} value={feed.id}>{feed.petName || feed.name}</option>
             ))}
           </select>
           <ChevronDown className="size-3.5 text-slate-500 absolute right-2.5 top-2.5 pointer-events-none" />

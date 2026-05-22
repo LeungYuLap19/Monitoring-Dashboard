@@ -18,6 +18,7 @@ export default function AuthenticatedLayout() {
         activeTab={state.activeTab}
         setActiveTab={state.handleNavigateTab}
         hasUnsentLogs={state.hasUnsentLogs}
+        role={state.currentUser.role}
         isOpen={state.isSidebarOpen}
         onClose={() => state.setIsSidebarOpen(false)}
       />
@@ -26,6 +27,7 @@ export default function AuthenticatedLayout() {
         <Header
           adminName={`${state.currentUser.lastName}${state.currentUser.firstName} (${state.currentUser.role})`}
           userEmail={state.currentUser.email ?? state.currentUser.phoneNumber ?? state.currentUser.emailOrPhone}
+          role={state.currentUser.role}
           onMenuClick={() => state.setIsSidebarOpen(true)}
           onLogout={state.handleLogout}
         />
@@ -33,12 +35,12 @@ export default function AuthenticatedLayout() {
         <main id="app-main-viewport" className="flex-1 overflow-y-auto pb-16">
           <Outlet
             context={{
-              selectedBunnyId: state.selectedBunnyId,
-              setSelectedBunnyId: state.setSelectedBunnyId,
+              selectedPetId: state.selectedPetId,
+              setSelectedPetId: state.setSelectedPetId,
               petsList: state.petsList,
               setPetsList: state.setPetsList,
               onSelectCamera: state.handleSelectCameraFromOverview,
-              onSelectBunny: state.handleSelectBunnyFromOverview,
+              onSelectPet: state.handleSelectPetFromOverview,
               onOpenClipsModal: () => state.setIsClipsOpen(true),
               onGenerateLog: () => state.setIsLogPreviewOpen(true),
               showToast: state.showToast,
@@ -50,7 +52,7 @@ export default function AuthenticatedLayout() {
 
       {state.isClipsOpen && (
         <ClipSelectorModal
-          bunnyName={state.activeBunnyObj.name}
+          petName={state.activePetObj.name}
           clips={state.monitorClips}
           getVideoUrl={(clip) => clip.videoUrl ? state.getMonitorClipVideoUrl(clip.videoUrl) : null}
           onClose={() => state.setIsClipsOpen(false)}
@@ -59,7 +61,7 @@ export default function AuthenticatedLayout() {
 
       {state.isLogPreviewOpen && (
         <ActivityLogPreviewModal
-          bunnyId={state.selectedBunnyId}
+          petId={state.selectedPetId}
           onClose={() => state.setIsLogPreviewOpen(false)}
           onSendSuccess={() => state.handleLogSendSuccess()}
         />

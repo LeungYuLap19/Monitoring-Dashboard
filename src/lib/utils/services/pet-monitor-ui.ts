@@ -1,7 +1,7 @@
 import type {
   ActivityClip,
   ActivityCount,
-  BunnyGuest,
+  PetGuest,
   CameraFeed,
   StatByTime,
 } from '../../../types/constants/domain';
@@ -50,6 +50,26 @@ const BEHAVIOR_LABELS: Record<string, string> = {
 
 function normalizeBehaviorKey(value?: string | null): string {
   return (value ?? '').trim().toLowerCase().replace(/\s+/g, '_');
+}
+
+function toTimelineBehaviorCounts(counts: Record<string, number>): Record<string, number> {
+  return Object.entries(counts).reduce<Record<string, number>>((acc, [rawLabel, rawCount]) => {
+    const count = Number.isFinite(rawCount) ? rawCount : 0;
+
+    rawLabel.split(',').forEach((label) => {
+      const key = normalizeBehaviorKey(label);
+      const normalizedKey =
+        ['active', 'activity', 'moving'].includes(key) ? 'moving' :
+        ['rest', 'sleep', 'sleeping'].includes(key) ? 'resting' :
+        key;
+
+      if (normalizedKey) {
+        acc[normalizedKey] = (acc[normalizedKey] ?? 0) + count;
+      }
+    });
+
+    return acc;
+  }, {});
 }
 
 function toDisplayBehavior(value?: string | null): string {
@@ -117,8 +137,8 @@ export function toPetMonitorCameraFeeds(
       name: formatCameraName(camId, snapshot),
       isOnline,
       currentBehavior: getSnapshotBehavior(snapshot),
-      bunnyId: formatCameraId(camId, cameraKey),
-      bunnyName: formatCameraName(camId, snapshot),
+      petId: formatCameraId(camId, cameraKey),
+      petName: formatCameraName(camId, snapshot),
       isLive: isOnline,
       vibeText: getStatusText(snapshot),
       streamUrl: camId === null ? undefined : getVideoFeedUrl?.(camId),
@@ -130,8 +150,8 @@ export function toPetMonitorCameraFeeds(
 
 export function toPetMonitorGuests(
   feeds: CameraFeed[],
-  fallbackGuests: BunnyGuest[],
-): BunnyGuest[] {
+  fallbackGuests: PetGuest[],
+): PetGuest[] {
   if (!feeds.length) return fallbackGuests;
 
   return feeds.map((feed, index) => {
@@ -139,7 +159,7 @@ export function toPetMonitorGuests(
     return {
       ...fallback,
       id: feed.id,
-      name: feed.bunnyName || feed.name,
+      name: feed.petName || feed.name,
       breed: 'Pet monitor stream',
       checkInDate: 'Live monitoring',
       checkOutDate: 'Active',
@@ -178,13 +198,13 @@ export function toStatsByTime(
 ): StatByTime[] {
   if (timeline?.points?.length) {
     return timeline.points.map((point) => {
-      const counts = point.counts ?? {};
-      const activityCount = Object.values(counts).reduce((sum, value) => sum + value, 0);
+      const counts = toTimelineBehaviorCounts(point.counts ?? {});
+      const activityCount = counts.moving ?? 0;
 
       return {
         date: point.label,
         activityCount,
-        restingCount: counts.resting ?? counts.rest ?? counts.sleeping ?? 0,
+        restingCount: counts.resting ?? 0,
         eatingCount: counts.eating ?? counts.eat ?? 0,
         drinkingCount: counts.drinking ?? counts.drink ?? 0,
         averageOver3Days: activityCount,
@@ -215,7 +235,7 @@ export function toActivityClips(
   return records.map((record) => ({
     id: String(record.id),
     timestamp: record.start_time,
-    bunnyName: `Camera ${record.cam_id}`,
+    petName: `Camera ${record.cam_id}`,
     action: record.trigger_action,
     thumbnailUrl: getThumbnailUrl(record.filename),
     videoUrl: record.filename,

@@ -2,7 +2,7 @@ import { LucideIcon } from 'lucide-react';
 
 export type TabId = 'overview' | 'monitoring' | 'client-view' | 'pets';
 
-export interface BunnyGuest {
+export interface PetGuest {
   id: string;
   name: string;
   breed: string;
@@ -32,8 +32,11 @@ export interface CameraFeed {
   name: string;
   isOnline: boolean;
   currentBehavior: string;
-  bunnyId?: string;
-  bunnyName?: string;
+  petId?: string;
+  petName?: string;
+  petBreed?: string | null;
+  petAnimal?: string | null;
+  petStatus?: string | null;
   isLive: boolean;
   vibeText?: string;
   streamUrl?: string;
@@ -44,7 +47,7 @@ export interface CameraFeed {
 export interface ActivityClip {
   id: string;
   timestamp: string;
-  bunnyName: string;
+  petName: string;
   action: string;
   thumbnailUrl: string;
   videoUrl?: string;
@@ -70,7 +73,7 @@ export type BehaviorStats = StatByTime;
 
 export interface LogTemplateConfig {
   date: string;
-  bunnyId: string;
+  petId: string;
   summaryText: string;
   showClips: boolean;
   selectedClips: string[];

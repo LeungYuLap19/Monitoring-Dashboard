@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { BUNNY_GUESTS } from '../../constants';
+import { PET_GUESTS } from '../../constants';
 import { useTranslation } from '../../lib/i18n';
 import { clearAuthSession, getCurrentSessionUser, logoutAuthSession } from '../../lib/services/authService';
 import { AUTH_STORAGE_KEYS, isManualSignOutActive } from '../../lib/utils/auth';
@@ -16,8 +16,8 @@ export function useAuthenticatedLayout() {
   const { t } = useTranslation();
 
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => getCurrentSessionUser());
-  const [petsList, setPetsList] = useState(BUNNY_GUESTS);
-  const [selectedBunnyId, setSelectedBunnyId] = useState<string>('momo');
+  const [petsList, setPetsList] = useState(PET_GUESTS);
+  const [selectedPetId, setSelectedPetId] = useState<string>('momo');
   const [isClipsOpen, setIsClipsOpen] = useState(false);
   const [isLogPreviewOpen, setIsLogPreviewOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -28,9 +28,9 @@ export function useAuthenticatedLayout() {
     toast.success(message);
   }, []);
 
-  const activeBunnyObj = useMemo(
-    () => petsList.find((b) => b.id === selectedBunnyId) || petsList[0],
-    [petsList, selectedBunnyId],
+  const activePetObj = useMemo(
+    () => petsList.find((b) => b.id === selectedPetId) || petsList[0],
+    [petsList, selectedPetId],
   );
 
   const monitorClips = useMemo(
@@ -51,20 +51,20 @@ export function useAuthenticatedLayout() {
   };
 
   const handleSelectCameraFromOverview = (camId: string) => {
-    setSelectedBunnyId(camId);
+    setSelectedPetId(camId);
     navigate('/monitoring');
     showToast(t('monitoring.toasts.cameraSwitch'));
   };
 
-  const handleSelectBunnyFromOverview = (bunnyId: string) => {
-    setSelectedBunnyId(bunnyId);
+  const handleSelectPetFromOverview = (petId: string) => {
+    setSelectedPetId(petId);
     navigate('/monitoring');
   };
 
   const handleLogSendSuccess = () => {
     setIsLogPreviewOpen(false);
     setHasUnsentLogs(false);
-    showToast(t('monitoring.logPreview.sendSuccess', { name: activeBunnyObj.name }));
+    showToast(t('monitoring.logPreview.sendSuccess', { name: activePetObj.name }));
     setTimeout(() => navigate('/client-view'), 400);
   };
 
@@ -118,9 +118,9 @@ export function useAuthenticatedLayout() {
     activeTab,
     petsList,
     setPetsList,
-    selectedBunnyId,
-    setSelectedBunnyId,
-    activeBunnyObj,
+    selectedPetId,
+    setSelectedPetId,
+    activePetObj,
     isClipsOpen,
     setIsClipsOpen,
     isLogPreviewOpen,
@@ -133,7 +133,7 @@ export function useAuthenticatedLayout() {
     navigate,
     handleNavigateTab,
     handleSelectCameraFromOverview,
-    handleSelectBunnyFromOverview,
+    handleSelectPetFromOverview,
     handleLogSendSuccess,
     handleLogout,
     monitorClips,

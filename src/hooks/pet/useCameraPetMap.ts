@@ -5,6 +5,9 @@ import { fetchUserPets } from '../../lib/services/petService';
 export interface CameraPetInfo {
   petId: string;
   name: string;
+  breed: string | null;
+  animal: string | null;
+  status: string | null;
   imageUrl: string | null;
 }
 
@@ -33,6 +36,9 @@ export function useCameraPetMap() {
         map[pet.monitorCameraId] = {
           petId: pet._id,
           name: pet.name || '',
+          breed: pet.breed || null,
+          animal: pet.animal || null,
+          status: pet.status || null,
           imageUrl: pet.breedimage?.[0] ?? null,
         };
       }

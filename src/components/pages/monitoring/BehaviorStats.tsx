@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertTriangle, ChevronDown, FileText, Sparkles } from 'lucide-react';
 import { BehaviorStatsProps } from '../../../types';
-import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, XAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '../../ui/chart';
 import { Card, CardContent } from '../../ui/card';
 import { Button } from '../../ui/button';
@@ -13,6 +13,7 @@ export default function BehaviorStats({
   summary,
   avgOver3Days,
   statsByTime,
+  trendStatsByTime,
   activeCategory,
   totalActivities,
   onGenerateLog,
@@ -44,28 +45,13 @@ export default function BehaviorStats({
   }, {} as ChartConfig);
 
   const todayStats = statsByTime[statsByTime.length - 1];
-  const yesterdayStats = statsByTime[statsByTime.length - 2];
-  const lineData = [
-    {
-      name: t('monitoring.clips.active'),
-      today: todayStats?.activityCount ?? 0,
-      yesterday: yesterdayStats?.activityCount ?? 0,
-    },
-    {
-      name: t('monitoring.clips.eat'),
-      today: todayStats?.eatingCount ?? 0,
-      yesterday: yesterdayStats?.eatingCount ?? 0,
-    },
-    {
-      name: t('monitoring.clips.drink'),
-      today: todayStats?.drinkingCount ?? 0,
-      yesterday: yesterdayStats?.drinkingCount ?? 0,
-    },
-  ];
+  const trendData = trendStatsByTime.slice(-7);
 
   const lineChartConfig: ChartConfig = {
-    today: { label: t('monitoring.stats.today'), color: '#0d9488' },
-    yesterday: { label: t('monitoring.stats.yesterday'), color: '#94a3b8' },
+    restingCount: { label: t('monitoring.behavior.resting'), color: '#94a3b8' },
+    eatingCount: { label: t('monitoring.behavior.eating'), color: '#0d9488' },
+    drinkingCount: { label: t('monitoring.behavior.drinking'), color: '#06b6d4' },
+    activityCount: { label: t('monitoring.behavior.active'), color: '#f97316' },
   };
 
   return (
@@ -162,23 +148,30 @@ export default function BehaviorStats({
               <div className="space-y-4">
                 <span className="block text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('monitoring.stats.comparisonLabel')}</span>
                 <ChartContainer config={lineChartConfig} className="h-[120px] w-full">
-                  <LineChart data={lineData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                  <LineChart data={trendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                    <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 700 }} />
+                    <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 700 }} />
+                    <YAxis
+                      allowDecimals={false}
+                      tickLine={false}
+                      axisLine={false}
+                      label={{ value: t('monitoring.stats.countAxis'), angle: -90, position: 'insideLeft', fill: '#94a3b8', fontSize: 9, fontWeight: 700 }}
+                      tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 700 }}
+                    />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Line type="monotone" dataKey="yesterday" stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="4 4" dot={{ r: 3, fill: '#94a3b8' }} />
-                    <Line type="monotone" dataKey="today" stroke="#0d9488" strokeWidth={2} dot={{ r: 4, fill: '#0d9488' }} />
+                    <Line type="monotone" dataKey="restingCount" stroke="var(--color-restingCount)" strokeWidth={1.75} dot={{ r: 2.5, fill: 'var(--color-restingCount)' }} />
+                    <Line type="monotone" dataKey="eatingCount" stroke="var(--color-eatingCount)" strokeWidth={1.75} dot={{ r: 2.5, fill: 'var(--color-eatingCount)' }} />
+                    <Line type="monotone" dataKey="drinkingCount" stroke="var(--color-drinkingCount)" strokeWidth={1.75} dot={{ r: 2.5, fill: 'var(--color-drinkingCount)' }} />
+                    <Line type="monotone" dataKey="activityCount" stroke="var(--color-activityCount)" strokeWidth={2} dot={{ r: 3, fill: 'var(--color-activityCount)' }} />
                   </LineChart>
                 </ChartContainer>
-                <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 justify-end">
-                  <div className="flex items-center gap-1">
-                    <span className="w-2 h-0.5 bg-slate-300 inline-block" />
-                    <span>{t('monitoring.stats.yesterday')}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className="w-2.5 h-0.5 bg-teal-600 inline-block" />
-                    <span className="text-teal-600">{t('monitoring.stats.today')}</span>
-                  </div>
+                <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px] font-bold text-slate-400">
+                  {Object.entries(lineChartConfig).map(([key, config]) => (
+                    <div key={key} className="flex items-center gap-1 min-w-0">
+                      <span className="w-2.5 h-0.5 shrink-0 inline-block" style={{ backgroundColor: config.color }} />
+                      <span className="truncate">{config.label}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </>
