@@ -9,15 +9,14 @@ export interface PetMonitorRequestState {
   isLoading: boolean;
   hasLoaded: boolean;
   error: Error | null;
+  consecutiveFailures: number;
+  isBlocked: boolean;
 }
 
 export interface RunPetMonitorRequestOptions<TData> {
   fallbackMessage: string;
   onSuccess?: (data: TData) => void;
-}
-
-export interface UsePetMonitorSetupOptions {
-  autoLoad?: boolean;
+  onError?: (error: Error) => void;
 }
 
 export interface UsePetMonitorStatsOptions {

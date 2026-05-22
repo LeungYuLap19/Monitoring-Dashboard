@@ -7,6 +7,7 @@ import React from 'react';
 import { Search, SlidersHorizontal, RefreshCw, Video } from 'lucide-react';
 import { MonitoringHeaderProps } from '../../../types';
 import { useTranslation } from '../../../lib/i18n';
+import { Button } from '../../ui/button';
 
 export default function MonitoringHeader({
   searchQuery,
@@ -14,6 +15,8 @@ export default function MonitoringHeader({
   filterType,
   onFilterChange,
   onClearFilters,
+  onReconnect,
+  reconnectDisabled = false,
 }: MonitoringHeaderProps) {
   const { t } = useTranslation();
   return (
@@ -71,6 +74,18 @@ export default function MonitoringHeader({
             <RefreshCw className="size-3" />
             <span>{t('overview.clearFilter')}</span>
           </button>
+        )}
+
+        {onReconnect && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onReconnect}
+            disabled={reconnectDisabled}
+          >
+            <RefreshCw className="size-3.5" />
+            <span>Reconnect</span>
+          </Button>
         )}
       </div>
     </div>

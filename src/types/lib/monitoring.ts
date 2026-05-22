@@ -3,13 +3,6 @@ export type PetMonitorRecordCameraId = number;
 export type PetMonitorStreamSubtype = 'hd' | 'sd';
 export type PetMonitorBehaviorTimelineBucket = '5m' | '1h' | '1d';
 
-export interface PetMonitorXiaomiLoginPayload {
-  username: string;
-  password: string;
-  region: string;
-  captcha?: string;
-  verify?: string;
-}
 
 export interface PetMonitorTrackState {
   id: number;
@@ -70,48 +63,6 @@ export interface PetMonitorSetupStatus {
   has_xiaomi_token: boolean;
 }
 
-export interface PetMonitorXiaomiLoginResponse {
-  success: boolean;
-  result?: unknown;
-  accounts?: string[];
-  requires_verification?: boolean;
-  requires_captcha?: boolean;
-  error?: string;
-}
-
-export interface PetMonitorXiaomiCameraListResponse {
-  success: boolean;
-  account_id: string;
-  region: string;
-  cameras: PetMonitorXiaomiCamera[];
-  raw?: unknown;
-  error?: unknown;
-}
-
-export interface PetMonitorSelectedCameraSetup {
-  setup_complete: boolean;
-  account_id: string;
-  region: string;
-  stream_name: string;
-  stream_url: string;
-  selected_camera: PetMonitorSelectedCamera;
-}
-
-export interface PetMonitorSelectXiaomiCameraPayload {
-  account_id: string;
-  region: string;
-  camera: PetMonitorXiaomiCamera;
-  subtype?: PetMonitorStreamSubtype;
-}
-
-export interface PetMonitorSelectXiaomiCameraResponse {
-  success: boolean;
-  setup?: PetMonitorSelectedCameraSetup;
-  status?: PetMonitorSetupStatus;
-  stream_runtime_synced?: boolean;
-  stream_runtime_sync_result?: unknown;
-  error?: string;
-}
 
 export interface PetMonitorActiveCamerasResponse {
   active_cams: PetMonitorCameraIndex[];

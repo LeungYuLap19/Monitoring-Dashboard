@@ -127,7 +127,7 @@ export default function PetsPage() {
             />
           ) : pets.length > 0 ? (
             <div className="relative" aria-busy={isRefreshingPets}>
-              <div className={isRefreshingPets ? 'opacity-60 transition-opacity' : 'transition-opacity'}>
+              <div className={`flex flex-col gap-6 ${isRefreshingPets ? 'opacity-60 transition-opacity' : 'transition-opacity'}`}>
                 {viewMode === 'grid' ? (
                   <PetCardGrid pets={pets} onSelectPet={(petId) => { void openPetDetails(petId); }} />
                 ) : (

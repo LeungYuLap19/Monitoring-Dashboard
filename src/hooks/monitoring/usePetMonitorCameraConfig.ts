@@ -47,6 +47,7 @@ export function usePetMonitorCameraConfig(options: UsePetMonitorCameraConfigOpti
       {
         fallbackMessage: `Failed to fetch PetMonitor config for camera ${resolvedCamId}`,
         onSuccess: (result) => setConfig(result),
+        onError: () => setConfig(null),
       },
     );
   }, [runLoadRequest]);

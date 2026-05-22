@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Database, WifiOff } from 'lucide-react';
 import { useLayoutContext } from '../hooks/layout';
 import {
   usePetMonitorBehavior,
@@ -6,20 +7,54 @@ import {
   usePetMonitorDashboard,
   usePetMonitorRecords,
 } from '../hooks/monitoring';
-import { BUNNY_GUESTS, BEHAVIOR_STATS } from '../constants';
 import {
   getCameraIdFromMonitorId,
   toActivityCounts,
   toBehaviorSummary,
   toPetMonitorCameraFeeds,
-  toPetMonitorGuests,
   toStatsByTime,
 } from '../lib/utils/services/pet-monitor-ui';
 import BunnySelector from '../components/pages/monitoring/BunnySelector';
 import BunnyProfileCard from '../components/pages/monitoring/BunnyProfileCard';
 import LiveStreamView from '../components/pages/monitoring/LiveStreamView';
 import BehaviorStats from '../components/pages/monitoring/BehaviorStats';
-import PetMonitorSetupPanel from '../components/pages/monitoring/PetMonitorSetupPanel';
+import { Button } from '../components/ui/button';
+
+function formatPetMonitorDateTime(date: Date): string {
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
+function MonitoringPlaceholder({
+  icon,
+  title,
+  message,
+  onReconnect,
+  reconnectDisabled = false,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  message: string;
+  onReconnect?: () => void;
+  reconnectDisabled?: boolean;
+}) {
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-dashed border-slate-200 p-8 text-center space-y-3">
+      <div className="flex justify-center">{icon}</div>
+      <div className="space-y-1">
+        <p className="text-sm font-extrabold text-slate-700">{title}</p>
+        <p className="text-xs text-slate-500 leading-relaxed max-w-md mx-auto">{message}</p>
+      </div>
+      {onReconnect ? (
+        <div className="pt-2">
+          <Button variant="outline" onClick={onReconnect} disabled={reconnectDisabled}>
+            Reconnect
+          </Button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 export default function MonitoringPage() {
   const { selectedBunnyId, setSelectedBunnyId, onOpenClipsModal, onGenerateLog } = useLayoutContext();
@@ -39,43 +74,36 @@ export default function MonitoringPage() {
   const { getCameraSnapshot } = monitor.stats;
 
   const cameraFeeds = useMemo(() => {
-    const backendFeeds = toPetMonitorCameraFeeds(
+    return toPetMonitorCameraFeeds(
       monitor.stats.cameraSnapshots,
       monitor.activeCameras.activeCameras,
-      monitor.setup.setupStatus,
+      null,
       monitor.urls.getVideoFeedUrl,
     );
-
-    return backendFeeds.length ? backendFeeds : [];
   }, [
     monitor.activeCameras.activeCameras,
-    monitor.setup.setupStatus,
     monitor.stats.cameraSnapshots,
     monitor.urls.getVideoFeedUrl,
   ]);
 
-  const monitorGuests = useMemo(
-    () => toPetMonitorGuests(cameraFeeds, BUNNY_GUESTS),
-    [cameraFeeds],
-  );
-
-  const activeBunny = useMemo(() => {
-    return monitorGuests.find(b => b.id === selectedBunnyId) || monitorGuests[0] || BUNNY_GUESTS[0];
-  }, [monitorGuests, selectedBunnyId]);
+  const activeFeed = useMemo(() => {
+    if (!cameraFeeds.length) return null;
+    return cameraFeeds.find((feed) => feed.id === selectedBunnyId) ?? cameraFeeds[0];
+  }, [cameraFeeds, selectedBunnyId]);
 
   const selectedCamId = useMemo(
-    () => getCameraIdFromMonitorId(activeBunny.id),
-    [activeBunny.id],
+    () => getCameraIdFromMonitorId(activeFeed?.id),
+    [activeFeed?.id],
   );
-
-  const activeFeed = useMemo(() => {
-    return cameraFeeds.find((feed) => feed.id === activeBunny.id) ?? null;
-  }, [activeBunny.id, cameraFeeds]);
 
   const selectedSnapshot = useMemo(() => {
     if (selectedCamId === null) return null;
     return getCameraSnapshot(selectedCamId);
   }, [getCameraSnapshot, selectedCamId]);
+
+  const hasMonitorError = Boolean(monitor.stats.error || monitor.activeCameras.error);
+  const hasFeeds = cameraFeeds.length > 0;
+  const hasCameraSelection = activeFeed !== null;
 
   useEffect(() => {
     if (!cameraFeeds.length) return;
@@ -89,17 +117,19 @@ export default function MonitoringPage() {
     const now = new Date();
     const start = new Date(now);
     start.setDate(now.getDate() - Number(timeFilter));
+    const startText = formatPetMonitorDateTime(start);
+    const endText = formatPetMonitorDateTime(now);
 
     void loadBehaviorStats({
       cam_id: selectedCamId,
-      start: start.toISOString(),
-      end: now.toISOString(),
+      start: startText,
+      end: endText,
     }).catch(() => undefined);
 
     void loadBehaviorTimeline({
       cam_id: selectedCamId,
-      start: start.toISOString(),
-      end: now.toISOString(),
+      start: startText,
+      end: endText,
       bucket: timeFilter === '1' ? '1h' : '1d',
     }).catch(() => undefined);
 
@@ -107,59 +137,132 @@ export default function MonitoringPage() {
     void loadCameraConfig(selectedCamId).catch(() => undefined);
   }, [loadBehaviorStats, loadBehaviorTimeline, loadCameraConfig, loadRecords, selectedCamId, timeFilter]);
 
-  const bunnyStatsObj = useMemo(() => {
-    return BEHAVIOR_STATS[activeBunny.id] || BEHAVIOR_STATS.momo;
-  }, [activeBunny]);
-
   const backendActivityCounts = useMemo(
     () => toActivityCounts(behavior.behaviorStats, selectedSnapshot),
     [behavior.behaviorStats, selectedSnapshot],
   );
-  const activeCategory = backendActivityCounts.length ? backendActivityCounts : bunnyStatsObj.activityCounts;
-  const totalActivities = useMemo(() => {
-    return activeCategory.reduce((acc, curr) => acc + curr.value, 0);
-  }, [activeCategory]);
-  const statsByTime = useMemo(() => {
-    const mappedStats = toStatsByTime(behavior.timeline, activeCategory);
-    return behavior.timeline?.points?.length ? mappedStats : bunnyStatsObj.statsByTime;
-  }, [activeCategory, behavior.timeline, bunnyStatsObj.statsByTime]);
+  const statsByTime = useMemo(
+    () => (behavior.timeline?.points?.length ? toStatsByTime(behavior.timeline, backendActivityCounts) : []),
+    [backendActivityCounts, behavior.timeline],
+  );
+  const totalActivities = useMemo(
+    () => backendActivityCounts.reduce((acc, curr) => acc + curr.value, 0),
+    [backendActivityCounts],
+  );
   const avgOver3Days = useMemo(() => {
-    if (!statsByTime.length) return bunnyStatsObj.avgOver3Days;
+    if (!statsByTime.length) return 0;
     const total = statsByTime.reduce((sum, item) => sum + item.activityCount, 0);
     return Math.round(total / statsByTime.length);
-  }, [bunnyStatsObj.avgOver3Days, statsByTime]);
-  const behaviorSummary = useMemo(() => (
-    backendActivityCounts.length || behavior.timeline?.points?.length
-      ? toBehaviorSummary(activeBunny.name, totalActivities, true)
-      : bunnyStatsObj.summary
-  ), [activeBunny.name, backendActivityCounts.length, behavior.timeline?.points?.length, bunnyStatsObj.summary, totalActivities]);
+  }, [statsByTime]);
+  const behaviorSummary = useMemo(() => {
+    if (!activeFeed) return 'No monitoring camera selected.';
+    return toBehaviorSummary(activeFeed.bunnyName || activeFeed.name, totalActivities, totalActivities > 0 || statsByTime.length > 0);
+  }, [activeFeed, statsByTime.length, totalActivities]);
+
+  const livePlaceholder = useMemo(() => {
+    if (hasMonitorError) {
+      return {
+        title: 'Failed to connect',
+        message: 'The monitoring service could not be reached.',
+      };
+    }
+    if (!hasCameraSelection) {
+      return {
+        title: 'No camera data',
+        message: 'No monitoring camera is currently available from the backend.',
+      };
+    }
+    if (!activeFeed?.streamUrl && !activeFeed?.isLive) {
+      return {
+        title: 'No live stream data',
+        message: 'This camera is not currently publishing a live feed.',
+      };
+    }
+    return null;
+  }, [activeFeed, hasCameraSelection, hasMonitorError]);
+
+  const statsPlaceholder = useMemo(() => {
+    if (behavior.statsError || behavior.timelineError || hasMonitorError) {
+      return {
+        title: 'Behavior data unavailable',
+        message: 'The dashboard could not load behavior telemetry for this camera.',
+      };
+    }
+    if (!hasCameraSelection) {
+      return {
+        title: 'No camera selected',
+        message: 'Select an available camera when backend monitoring data is present.',
+      };
+    }
+    if (!backendActivityCounts.length || !statsByTime.length) {
+      return {
+        title: 'No data',
+        message: 'No behavior events were returned for the selected time window.',
+      };
+    }
+    return null;
+  }, [
+    backendActivityCounts.length,
+    behavior.statsError,
+    behavior.timelineError,
+    hasCameraSelection,
+    hasMonitorError,
+    statsByTime.length,
+  ]);
 
   return (
     <div id="page-monitoring" className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 select-none">
       <div id="monitoring-left" className="col-span-1 lg:col-span-8 space-y-6">
-        {(!monitor.setup.setupStatus?.setup_complete || monitor.setup.error) && (
-          <PetMonitorSetupPanel
-            setupStatus={monitor.setup.setupStatus}
-            onSetupChanged={monitor.setup.refreshSetupStatus}
+        {hasFeeds ? (
+          <BunnySelector
+            selectedBunnyId={activeFeed?.id ?? selectedBunnyId}
+            setSelectedBunnyId={setSelectedBunnyId}
+            cameraFeeds={cameraFeeds}
+          />
+        ) : hasMonitorError ? (
+          <MonitoringPlaceholder
+            icon={<WifiOff className="size-8 text-rose-500" />}
+            title="Failed to connect"
+            message="The monitoring backend could not be reached."
+            onReconnect={monitor.isBlocked ? () => void monitor.reconnectDashboard().catch(() => undefined) : undefined}
+            reconnectDisabled={monitor.isLoading}
+          />
+        ) : (
+          <MonitoringPlaceholder
+            icon={<Database className="size-8 text-slate-400" />}
+            title="No data"
+            message="No active monitoring feeds were returned from the backend."
+            onReconnect={monitor.isBlocked ? () => void monitor.reconnectDashboard().catch(() => undefined) : undefined}
+            reconnectDisabled={monitor.isLoading}
           />
         )}
-        <BunnySelector
-          selectedBunnyId={selectedBunnyId}
-          setSelectedBunnyId={setSelectedBunnyId}
-          bunnyGuests={monitorGuests}
-        />
-        <BunnyProfileCard
-          activeBunny={activeBunny}
-          onOpenClipsModal={onOpenClipsModal}
-        />
-        <LiveStreamView
-          activeBunny={activeBunny}
-          streamActive={streamActive}
-          setStreamActive={setStreamActive}
-          streamUrl={activeFeed?.streamUrl}
-          camId={selectedCamId}
-          statusText={activeFeed?.vibeText ?? cameraConfig.config?.yolo_fps_mode ?? null}
-        />
+
+        {activeFeed ? (
+          <>
+            <BunnyProfileCard
+              activeFeed={activeFeed}
+              snapshot={selectedSnapshot}
+              onOpenClipsModal={onOpenClipsModal}
+            />
+            <LiveStreamView
+              activeFeed={activeFeed}
+              streamActive={streamActive}
+              setStreamActive={setStreamActive}
+              streamUrl={activeFeed.streamUrl}
+              camId={selectedCamId}
+              statusText={activeFeed.vibeText ?? cameraConfig.config?.yolo_fps_mode ?? null}
+              placeholder={livePlaceholder}
+            />
+          </>
+        ) : (
+          <MonitoringPlaceholder
+            icon={<Database className="size-8 text-slate-400" />}
+            title="No data"
+            message="There is no active monitoring profile to display."
+            onReconnect={monitor.isBlocked ? () => void monitor.reconnectDashboard().catch(() => undefined) : undefined}
+            reconnectDisabled={monitor.isLoading}
+          />
+        )}
       </div>
       <BehaviorStats
         timeFilter={timeFilter}
@@ -167,11 +270,12 @@ export default function MonitoringPage() {
         summary={behaviorSummary}
         avgOver3Days={avgOver3Days}
         statsByTime={statsByTime}
-        activeCategory={activeCategory}
+        activeCategory={backendActivityCounts}
         totalActivities={totalActivities}
         onGenerateLog={onGenerateLog}
         isLoading={behavior.isLoadingStats || behavior.isLoadingTimeline || monitor.stats.isLoading}
         error={behavior.statsError ?? behavior.timelineError ?? monitor.error}
+        placeholder={statsPlaceholder}
       />
     </div>
   );

@@ -12,7 +12,11 @@ export function usePetMonitorActiveCameras(options: UsePetMonitorActiveCamerasOp
   const [activeCameras, setActiveCamerasState] = useState<PetMonitorCameraIndex[]>([]);
   const loadRequest = usePetMonitorRequest();
   const updateRequest = usePetMonitorRequest();
-  const { runRequest: runLoadRequest, resetRequest: resetLoadRequest } = loadRequest;
+  const {
+    runRequest: runLoadRequest,
+    resetRequest: resetLoadRequest,
+    reconnectRequest: reconnectLoadRequest,
+  } = loadRequest;
   const { runRequest: runUpdateRequest, resetRequest: resetUpdateRequest } = updateRequest;
 
   const loadActiveCameras = useCallback(() => runLoadRequest(
@@ -20,6 +24,7 @@ export function usePetMonitorActiveCameras(options: UsePetMonitorActiveCamerasOp
     {
       fallbackMessage: 'Failed to fetch active PetMonitor cameras',
       onSuccess: (result) => setActiveCamerasState(result),
+      onError: () => setActiveCamerasState([]),
     },
   ), [runLoadRequest]);
 
@@ -56,8 +61,14 @@ export function usePetMonitorActiveCameras(options: UsePetMonitorActiveCamerasOp
     isSubmitting: updateRequest.isLoading,
     hasLoaded: loadRequest.hasLoaded,
     error: loadRequest.error ?? updateRequest.error,
+    consecutiveFailures: loadRequest.consecutiveFailures,
+    isBlocked: loadRequest.isBlocked,
     loadActiveCameras,
     refreshActiveCameras: loadActiveCameras,
+    reconnectActiveCameras: () => {
+      reconnectLoadRequest();
+      return loadActiveCameras();
+    },
     setActiveCameras,
     toggleActiveCamera,
     resetActiveCameras,

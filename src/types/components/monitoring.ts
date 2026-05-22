@@ -1,26 +1,31 @@
-import { BunnyGuest, ActivityCount, ActivityClip, StatByTime } from '../constants/domain';
-import { PetMonitorSetupStatus } from '../lib/monitoring';
+import { ActivityCount, ActivityClip, CameraFeed, StatByTime } from '../constants/domain';
+import { PetMonitorCameraSnapshot } from '../lib/monitoring';
 
 export type FilterCategory = 'all' | 'active' | 'eat' | 'drink' | 'abnormal';
 
 export interface BunnySelectorProps {
   selectedBunnyId: string;
   setSelectedBunnyId: (id: string) => void;
-  bunnyGuests: BunnyGuest[];
+  cameraFeeds: CameraFeed[];
 }
 
 export interface BunnyProfileCardProps {
-  activeBunny: BunnyGuest;
+  activeFeed: CameraFeed;
+  snapshot?: PetMonitorCameraSnapshot | null;
   onOpenClipsModal: () => void;
 }
 
 export interface LiveStreamViewProps {
-  activeBunny: BunnyGuest;
+  activeFeed: CameraFeed;
   streamActive: boolean;
   setStreamActive: (active: boolean) => void;
   streamUrl?: string | null;
   camId?: number | null;
   statusText?: string | null;
+  placeholder?: {
+    title: string;
+    message: string;
+  } | null;
 }
 
 export interface BehaviorStatsProps {
@@ -34,6 +39,10 @@ export interface BehaviorStatsProps {
   onGenerateLog: () => void;
   isLoading?: boolean;
   error?: Error | null;
+  placeholder?: {
+    title: string;
+    message: string;
+  } | null;
 }
 
 export interface ClipSelectorModalProps {
@@ -49,7 +58,3 @@ export interface ActivityLogPreviewModalProps {
   onSendSuccess: (logId: string) => void;
 }
 
-export interface PetMonitorSetupPanelProps {
-  setupStatus: PetMonitorSetupStatus | null;
-  onSetupChanged: () => Promise<PetMonitorSetupStatus>;
-}

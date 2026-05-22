@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type {
   PetManagementListItem,
   PetProfileFull,
@@ -31,6 +31,7 @@ export function usePetManagement(): UsePetManagementResult {
     loadPets,
     refreshPets,
   } = useUserPets({
+    autoLoad: false,
     initialQuery: {
       page: 1,
       limit: PETS_PAGE_SIZE,
@@ -52,17 +53,8 @@ export function usePetManagement(): UsePetManagementResult {
     initialView: 'full',
   });
 
-  const hasInitializedFiltersRef = useRef(false);
-
   useEffect(() => {
     const normalizedSearch = searchTerm.trim();
-
-    if (!hasInitializedFiltersRef.current) {
-      hasInitializedFiltersRef.current = true;
-      if (!normalizedSearch && sortBy === DEFAULT_SORT_BY && sortOrder === DEFAULT_SORT_ORDER) {
-        return;
-      }
-    }
 
     const timer = window.setTimeout(() => {
       void loadPets({

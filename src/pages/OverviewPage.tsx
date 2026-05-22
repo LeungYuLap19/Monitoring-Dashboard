@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useLayoutContext } from '../hooks/layout';
 import { usePetMonitorDashboard } from '../hooks/monitoring';
-import { CAMERA_FEEDS } from '../constants';
 import { toPetMonitorCameraFeeds } from '../lib/utils/services/pet-monitor-ui';
 import MetricsGrid from '../components/pages/overview/MetricsGrid';
 import MonitoringHeader from '../components/pages/overview/MonitoringHeader';
@@ -18,17 +17,14 @@ export default function OverviewPage() {
   const [filterType, setFilterType] = useState<'all' | 'online' | 'offline' | 'resting' | 'active'>('all');
 
   const cameraFeeds = useMemo(() => {
-    const backendFeeds = toPetMonitorCameraFeeds(
+    return toPetMonitorCameraFeeds(
       monitor.stats.cameraSnapshots,
       monitor.activeCameras.activeCameras,
-      monitor.setup.setupStatus,
+      null,
       monitor.urls.getVideoFeedUrl,
     );
-
-    return backendFeeds.length ? backendFeeds : CAMERA_FEEDS;
   }, [
     monitor.activeCameras.activeCameras,
-    monitor.setup.setupStatus,
     monitor.stats.cameraSnapshots,
     monitor.urls.getVideoFeedUrl,
   ]);
@@ -72,11 +68,19 @@ export default function OverviewPage() {
           filterType={filterType}
           onFilterChange={setFilterType}
           onClearFilters={clearFilters}
+          onReconnect={() => {
+            void monitor.reconnectDashboard().catch(() => undefined);
+          }}
+          reconnectDisabled={monitor.isLoading}
         />
         <CameraFeedGrid
           feeds={filteredFeeds}
           onSelectCamera={onSelectCamera}
           onClearFilters={clearFilters}
+          isBlocked={monitor.isBlocked}
+          onReconnect={() => {
+            void monitor.reconnectDashboard().catch(() => undefined);
+          }}
         />
       </section>
     </div>

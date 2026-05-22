@@ -11,18 +11,10 @@ import type {
   PetMonitorCameraRuntimeConfig,
   PetMonitorCameraRuntimeConfigUpdate,
   PetMonitorDeleteVideoRecordResponse,
-  PetMonitorSelectXiaomiCameraPayload,
-  PetMonitorSelectXiaomiCameraResponse,
-  PetMonitorSetupStatus,
   PetMonitorVideoRecordsQuery,
   PetMonitorVideoRecordsResponse,
-  PetMonitorXiaomiCamera,
-  PetMonitorXiaomiCameraListResponse,
-  PetMonitorXiaomiLoginPayload,
-  PetMonitorXiaomiLoginResponse,
 } from '../../types/lib/monitoring';
 import {
-  asString,
   isObjectRecord,
   isSuccessStatus,
   readErrorMessage,
@@ -33,8 +25,6 @@ import {
   buildPetMonitorUrl as buildPetMonitorUrlWithBase,
   buildPetMonitorVideoFeedUrl,
   createPetMonitorClient,
-  extractPetMonitorLoginError,
-  isPetMonitorPayloadSuccess,
   normalizePetMonitorApiBaseUrl,
   requestPetMonitor as requestPetMonitorWithClient,
   requirePetMonitorSuccess as requireSuccessStatus,
@@ -66,75 +56,6 @@ export function getPetMonitorRecordVideoUrl(filename: string): string {
 
 export function getPetMonitorRecordThumbnailUrl(filename: string): string {
   return buildPetMonitorRecordThumbnailUrl(PET_MONITOR_API_BASE_URL, filename);
-}
-
-export async function getPetMonitorSetupStatus(): Promise<PetMonitorSetupStatus> {
-  const response = await requestPetMonitor<PetMonitorSetupStatus>({
-    method: 'GET',
-    url: '/api/setup/status',
-  });
-
-  return requireSuccessStatus(response, 'Failed to fetch PetMonitor setup status');
-}
-
-export async function loginPetMonitorXiaomi(
-  payload: PetMonitorXiaomiLoginPayload,
-): Promise<PetMonitorXiaomiLoginResponse> {
-  const response = await requestPetMonitor<PetMonitorXiaomiLoginResponse>({
-    method: 'POST',
-    url: '/api/setup/xiaomi/login',
-    data: payload,
-  });
-
-  const data = (response.data ?? {}) as PetMonitorXiaomiLoginResponse;
-  return {
-    ...data,
-    success: isPetMonitorPayloadSuccess(response.status, data),
-    error: extractPetMonitorLoginError(data),
-  };
-}
-
-export async function getPetMonitorXiaomiCameras(
-  accountId: string,
-  region: string,
-): Promise<PetMonitorXiaomiCameraListResponse> {
-  const response = await requestPetMonitor<Partial<PetMonitorXiaomiCameraListResponse>>({
-    method: 'GET',
-    url: '/api/setup/xiaomi/cameras',
-    params: {
-      account_id: accountId,
-      region,
-    },
-  });
-
-  const data = response.data ?? {};
-  return {
-    success: isSuccessStatus(response.status) && data.success !== false,
-    account_id: asString(data.account_id) ?? accountId,
-    region: asString(data.region) ?? region,
-    cameras: Array.isArray(data.cameras) ? (data.cameras as PetMonitorXiaomiCamera[]) : [],
-    raw: data.raw,
-    error: data.error,
-  };
-}
-
-export async function selectPetMonitorXiaomiCamera(
-  payload: PetMonitorSelectXiaomiCameraPayload,
-): Promise<PetMonitorSelectXiaomiCameraResponse> {
-  const response = await requestPetMonitor<PetMonitorSelectXiaomiCameraResponse>({
-    method: 'POST',
-    url: '/api/setup/xiaomi/select',
-    data: payload,
-  });
-
-  const data = (response.data ?? {}) as PetMonitorSelectXiaomiCameraResponse;
-  return {
-    ...data,
-    success: isSuccessStatus(response.status) && data.success !== false,
-    error: data.error ?? (!isSuccessStatus(response.status)
-      ? readErrorMessage(data, 'Failed to select Xiaomi camera')
-      : undefined),
-  };
 }
 
 export async function fetchPetMonitorCameraStats(): Promise<PetMonitorBackendStatsResponse> {

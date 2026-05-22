@@ -3,7 +3,6 @@ import type { UsePetMonitorDashboardOptions } from '../../types';
 import { usePetMonitorActiveCameras } from './usePetMonitorActiveCameras';
 import { usePetMonitorBehavior } from './usePetMonitorBehavior';
 import { usePetMonitorRecords } from './usePetMonitorRecords';
-import { usePetMonitorSetup } from './usePetMonitorSetup';
 import { usePetMonitorStats } from './usePetMonitorStats';
 import { usePetMonitorUrls } from './usePetMonitorUrls';
 
@@ -16,7 +15,6 @@ export function usePetMonitorDashboard(options: UsePetMonitorDashboardOptions = 
     recordsQuery = {},
   } = options;
 
-  const setup = usePetMonitorSetup({ autoLoad });
   const stats = usePetMonitorStats({ autoLoad, pollIntervalMs: statsPollIntervalMs });
   const activeCameras = usePetMonitorActiveCameras({ autoLoad });
   const behavior = usePetMonitorBehavior({
@@ -33,34 +31,49 @@ export function usePetMonitorDashboard(options: UsePetMonitorDashboardOptions = 
 
   const refreshDashboard = useCallback(async () => {
     await Promise.all([
-      setup.refreshSetupStatus(),
       stats.refreshStats(),
       activeCameras.refreshActiveCameras(),
       records.refreshRecords(),
       behavior.logsQuery ? behavior.refreshBehaviorStats() : Promise.resolve(null),
       behavior.timelineQuery ? behavior.refreshBehaviorTimeline() : Promise.resolve(null),
     ]);
-  }, [activeCameras, behavior, records, setup, stats]);
+  }, [activeCameras, behavior, records, stats]);
+
+  const reconnectDashboard = useCallback(async () => {
+    await Promise.all([
+      stats.reconnectStats(),
+      activeCameras.reconnectActiveCameras(),
+      records.reconnectRecords(),
+      behavior.logsQuery ? behavior.reconnectBehaviorStats() : Promise.resolve(null),
+      behavior.timelineQuery ? behavior.reconnectBehaviorTimeline() : Promise.resolve(null),
+    ]);
+  }, [activeCameras, behavior, records, stats]);
 
   return {
-    setup,
     stats,
     activeCameras,
     behavior,
     records,
     urls,
-    isLoading: setup.isLoading ||
+    isLoading:
       stats.isLoading ||
       activeCameras.isLoading ||
       behavior.isLoadingStats ||
       behavior.isLoadingTimeline ||
       records.isLoading,
-    error: setup.error ||
+    isBlocked:
+      stats.isBlocked ||
+      activeCameras.isBlocked ||
+      behavior.isStatsBlocked ||
+      behavior.isTimelineBlocked ||
+      records.isBlocked,
+    error:
       stats.error ||
       activeCameras.error ||
       behavior.statsError ||
       behavior.timelineError ||
       records.error,
     refreshDashboard,
+    reconnectDashboard,
   };
 }

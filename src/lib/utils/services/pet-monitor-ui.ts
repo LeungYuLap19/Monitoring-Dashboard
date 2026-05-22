@@ -10,7 +10,6 @@ import type {
   PetMonitorBehaviorTimelineResponse,
   PetMonitorCameraIndex,
   PetMonitorCameraSnapshot,
-  PetMonitorSetupStatus,
   PetMonitorVideoRecord,
 } from '../../../types/lib/monitoring';
 
@@ -105,22 +104,9 @@ export function getCameraIdFromMonitorId(id?: string | null): PetMonitorCameraIn
 export function toPetMonitorCameraFeeds(
   snapshots: PetMonitorCameraSnapshotItem[],
   activeCameras: PetMonitorCameraIndex[] = [],
-  setupStatus?: PetMonitorSetupStatus | null,
+  _unused?: unknown,
   getVideoFeedUrl?: (camId: PetMonitorCameraIndex) => string,
 ): CameraFeed[] {
-  if (!snapshots.length && setupStatus?.selected_camera) {
-    return [{
-      id: 'cam-0',
-      name: setupStatus.stream_name || setupStatus.selected_camera.name || 'Selected camera',
-      isOnline: Boolean(setupStatus.stream_runtime_running),
-      currentBehavior: setupStatus.stream_runtime_running ? '監測中' : '離線',
-      isLive: Boolean(setupStatus.stream_runtime_running),
-      vibeText: setupStatus.stream_url ? 'Stream configured' : 'Awaiting stream setup',
-      streamUrl: setupStatus.stream_url,
-      camId: 0,
-    }];
-  }
-
   return snapshots.map(({ cameraKey, camId, snapshot }) => {
     const isActive = camId === null ? true : activeCameras.length === 0 || activeCameras.includes(camId);
     const status = normalizeBehaviorKey(snapshot.stats.status);

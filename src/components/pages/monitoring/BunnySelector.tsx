@@ -5,13 +5,13 @@
 
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
-import { BunnyGuest, BunnySelectorProps } from '../../../types';
+import { BunnySelectorProps } from '../../../types';
 import { useTranslation } from '../../../lib/i18n';
 
 export default function BunnySelector({
   selectedBunnyId,
   setSelectedBunnyId,
-  bunnyGuests
+  cameraFeeds,
 }: BunnySelectorProps) {
   const { t } = useTranslation();
   return (
@@ -32,8 +32,8 @@ export default function BunnySelector({
             onChange={(e) => setSelectedBunnyId(e.target.value)}
             className="appearance-none bg-slate-50 rounded-xl px-4 py-1.5 pr-8 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/10 cursor-pointer"
           >
-            {bunnyGuests.map(b => (
-              <option key={b.id} value={b.id}>{b.name}</option>
+            {cameraFeeds.map((feed) => (
+              <option key={feed.id} value={feed.id}>{feed.bunnyName || feed.name}</option>
             ))}
           </select>
           <ChevronDown className="size-3.5 text-slate-500 absolute right-2.5 top-2.5 pointer-events-none" />

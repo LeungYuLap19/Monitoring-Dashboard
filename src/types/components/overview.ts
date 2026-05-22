@@ -13,12 +13,16 @@ export interface MonitoringHeaderProps {
   filterType: 'all' | 'online' | 'offline' | 'resting' | 'active';
   onFilterChange: (value: 'all' | 'online' | 'offline' | 'resting' | 'active') => void;
   onClearFilters: () => void;
+  onReconnect?: () => void;
+  reconnectDisabled?: boolean;
 }
 
 export interface CameraFeedGridProps {
   feeds: CameraFeed[];
   onSelectCamera: (camId: string) => void;
   onClearFilters: () => void;
+  isBlocked?: boolean;
+  onReconnect?: () => void;
 }
 
 export interface CameraCardProps {

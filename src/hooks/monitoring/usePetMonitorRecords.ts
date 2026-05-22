@@ -22,7 +22,11 @@ export function usePetMonitorRecords(options: UsePetMonitorRecordsOptions = {}) 
   const queryRef = useRef<PetMonitorVideoRecordsQuery>(initialQuery);
   const loadRequest = usePetMonitorRequest();
   const deleteRequest = usePetMonitorRequest();
-  const { runRequest: runLoadRequest, resetRequest: resetLoadRequest } = loadRequest;
+  const {
+    runRequest: runLoadRequest,
+    resetRequest: resetLoadRequest,
+    reconnectRequest: reconnectLoadRequest,
+  } = loadRequest;
   const { runRequest: runDeleteRequest, resetRequest: resetDeleteRequest } = deleteRequest;
 
   useEffect(() => {
@@ -39,6 +43,7 @@ export function usePetMonitorRecords(options: UsePetMonitorRecordsOptions = {}) 
       {
         fallbackMessage: 'Failed to fetch PetMonitor video records',
         onSuccess: (result: PetMonitorVideoRecordsResponse) => setRecords(result.records),
+        onError: () => setRecords([]),
       },
     );
   }, [runLoadRequest]);
@@ -79,9 +84,15 @@ export function usePetMonitorRecords(options: UsePetMonitorRecordsOptions = {}) 
     isDeleting: deleteRequest.isLoading,
     hasLoaded: loadRequest.hasLoaded,
     error: loadRequest.error ?? deleteRequest.error,
+    consecutiveFailures: loadRequest.consecutiveFailures,
+    isBlocked: loadRequest.isBlocked,
     setQuery,
     loadRecords,
     refreshRecords: loadRecords,
+    reconnectRecords: () => {
+      reconnectLoadRequest();
+      return loadRecords();
+    },
     deleteRecord: removeRecord,
     getRecordVideoUrl,
     getRecordThumbnailUrl,

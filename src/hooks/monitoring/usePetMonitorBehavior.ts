@@ -28,8 +28,16 @@ export function usePetMonitorBehavior(options: UsePetMonitorBehaviorOptions = {}
   const timelineQueryRef = useRef<PetMonitorBehaviorTimelineQuery | null>(initialTimelineQuery);
   const logsRequest = usePetMonitorRequest();
   const timelineRequest = usePetMonitorRequest();
-  const { runRequest: runLogsRequest, resetRequest: resetLogsRequest } = logsRequest;
-  const { runRequest: runTimelineRequest, resetRequest: resetTimelineRequest } = timelineRequest;
+  const {
+    runRequest: runLogsRequest,
+    resetRequest: resetLogsRequest,
+    reconnectRequest: reconnectLogsRequest,
+  } = logsRequest;
+  const {
+    runRequest: runTimelineRequest,
+    resetRequest: resetTimelineRequest,
+    reconnectRequest: reconnectTimelineRequest,
+  } = timelineRequest;
 
   useEffect(() => {
     logsQueryRef.current = logsQuery;
@@ -54,6 +62,7 @@ export function usePetMonitorBehavior(options: UsePetMonitorBehaviorOptions = {}
       {
         fallbackMessage: 'Failed to fetch PetMonitor behavior logs',
         onSuccess: (result) => setBehaviorStats(result),
+        onError: () => setBehaviorStats(null),
       },
     );
   }, [runLogsRequest]);
@@ -73,6 +82,7 @@ export function usePetMonitorBehavior(options: UsePetMonitorBehaviorOptions = {}
       {
         fallbackMessage: 'Failed to fetch PetMonitor behavior timeline',
         onSuccess: (result) => setTimeline(result),
+        onError: () => setTimeline(null),
       },
     );
   }, [runTimelineRequest]);
@@ -108,12 +118,24 @@ export function usePetMonitorBehavior(options: UsePetMonitorBehaviorOptions = {}
     hasLoadedTimeline: timelineRequest.hasLoaded,
     statsError: logsRequest.error,
     timelineError: timelineRequest.error,
+    statsConsecutiveFailures: logsRequest.consecutiveFailures,
+    timelineConsecutiveFailures: timelineRequest.consecutiveFailures,
+    isStatsBlocked: logsRequest.isBlocked,
+    isTimelineBlocked: timelineRequest.isBlocked,
     setLogsQuery,
     setTimelineQuery,
     loadBehaviorStats,
     loadBehaviorTimeline,
     refreshBehaviorStats,
     refreshBehaviorTimeline,
+    reconnectBehaviorStats: () => {
+      reconnectLogsRequest();
+      return loadBehaviorStats();
+    },
+    reconnectBehaviorTimeline: () => {
+      reconnectTimelineRequest();
+      return loadBehaviorTimeline();
+    },
     resetBehavior,
   };
 }

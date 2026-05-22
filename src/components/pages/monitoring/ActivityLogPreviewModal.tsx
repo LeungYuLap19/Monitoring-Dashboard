@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Check, EyeOff, Loader2, PlayCircle } from 'lucide-react';
 import { ActivityLogPreviewModalProps } from '../../../types';
-import { BUNNY_GUESTS, BEHAVIOR_STATS } from '../../../constants';
 import { useTranslation } from '../../../lib/i18n';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
@@ -24,20 +23,17 @@ export default function ActivityLogPreviewModal({
   onSendSuccess
 }: ActivityLogPreviewModalProps) {
   const { t } = useTranslation();
-  const activeBunny = BUNNY_GUESTS.find(b => b.id === bunnyId) || BUNNY_GUESTS[0];
-  const statsObj = BEHAVIOR_STATS[activeBunny.id] || BEHAVIOR_STATS.momo;
+  const cameraLabel = bunnyId.toUpperCase();
 
   const [includeClips, setIncludeClips] = useState(true);
-  const [remarks, setRemarks] = useState(activeBunny.extraServices);
+  const [remarks, setRemarks] = useState('');
   const [sending, setSending] = useState(false);
-
-  const totalActivities = statsObj.activityCounts.reduce((acc, curr) => acc + curr.value, 0);
 
   const handleSend = () => {
     setSending(true);
     setTimeout(() => {
       setSending(false);
-      onSendSuccess(activeBunny.id);
+      onSendSuccess(bunnyId);
     }, 1200);
   };
 
@@ -75,14 +71,14 @@ export default function ActivityLogPreviewModal({
                   <span className="text-xs font-extrabold text-teal-600 uppercase tracking-wide">HKBR Bunny Hotel</span>
                 </div>
                 <h4 className="text-lg font-black text-slate-800 tracking-tight">
-                  <span className="text-teal-600">{activeBunny.name}</span> {t('monitoring.logPreview.dateTitle')}
+                  <span className="text-teal-600">{cameraLabel}</span> {t('monitoring.logPreview.dateTitle')}
                 </h4>
               </div>
 
               <div className="space-y-2">
                 <span className="text-xs text-teal-600 font-bold">{t('monitoring.logPreview.summaryLabel')}</span>
                 <p className="text-xs text-slate-600 leading-relaxed font-semibold bg-green-50/40 p-4 rounded-xl border">
-                  {activeBunny.name}{t('monitoring.logPreview.summaryText', { count: totalActivities })}
+                  No backend behavior summary is available for this monitoring selection.
                 </p>
               </div>
 
@@ -91,16 +87,20 @@ export default function ActivityLogPreviewModal({
                 <div className="bg-slate-50/50 p-4 rounded-xl flex justify-between items-center">
                   <div className="space-y-1">
                     <span className="block text-2xl font-black text-slate-800 leading-none">
-                      {statsObj.statsByTime[2].activityCount} <span className="text-[10px] text-slate-400 font-semibold">{t('monitoring.logPreview.perDay')}</span>
+                      0 <span className="text-[10px] text-slate-400 font-semibold">{t('monitoring.logPreview.perDay')}</span>
                     </span>
-                    <span className="text-[10px] text-slate-400 font-bold">{t('monitoring.logPreview.avg3Days')}: {statsObj.avgOver3Days}{t('monitoring.logPreview.perDay')}</span>
+                    <span className="text-[10px] text-slate-400 font-bold">{t('monitoring.logPreview.avg3Days')}: 0{t('monitoring.logPreview.perDay')}</span>
                   </div>
                   <ChartContainer config={{ activityCount: { label: t('monitoring.logPreview.perDay'), color: '#0d9488' } }} className="h-[60px] w-[120px]">
-                    <BarChart data={statsObj.statsByTime.map((d, i) => ({ date: d.date, activityCount: d.activityCount, fill: i === 2 ? '#0d9488' : '#94a3b8' }))} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+                    <BarChart data={[
+                      { date: 'N-2', activityCount: 0, fill: '#94a3b8' },
+                      { date: 'N-1', activityCount: 0, fill: '#94a3b8' },
+                      { date: 'Now', activityCount: 0, fill: '#0d9488' },
+                    ]} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
                       <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 9, fill: '#94a3b8', fontWeight: 700 }} />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <Bar dataKey="activityCount" radius={[3, 3, 0, 0]}>
-                        {statsObj.statsByTime.map((_, i) => (
+                        {[0, 1, 2].map((i) => (
                           <Cell key={i} fill={i === 2 ? '#0d9488' : '#94a3b8'} />
                         ))}
                       </Bar>
@@ -112,15 +112,9 @@ export default function ActivityLogPreviewModal({
               <div className="space-y-3">
                 <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider">{t('monitoring.logPreview.detailLabel')}</span>
                 <div className="grid grid-cols-2 gap-4">
-                  {statsObj.activityCounts.map((item, idx) => (
-                    <div key={idx} className="bg-slate-50/30 p-3 rounded-xl flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                        <span className="text-[11px] font-bold text-slate-600">{t(item.label)}</span>
-                      </div>
-                      <span className="text-xs font-black text-slate-800">{item.value}{t('monitoring.logPreview.perDay')}</span>
-                    </div>
-                  ))}
+                  <div className="col-span-2 bg-slate-50/30 p-4 rounded-xl text-[11px] font-medium text-slate-500">
+                    No real activity breakdown is available. Mock monitoring data is no longer displayed here.
+                  </div>
                 </div>
               </div>
 

@@ -15,6 +15,8 @@ export default function CameraFeedGrid({
   feeds,
   onSelectCamera,
   onClearFilters,
+  isBlocked = false,
+  onReconnect,
 }: CameraFeedGridProps) {
   const { t } = useTranslation();
   if (feeds.length === 0) {
@@ -22,11 +24,22 @@ export default function CameraFeedGrid({
       <Card className="p-12 rounded-2xl text-center gap-3">
         <CardContent className="p-0 space-y-3 flex flex-col items-center">
           <VideoOff className="size-12 text-slate-300" />
-          <h4 className="text-sm font-bold text-slate-700">{t('overview.emptyState')}</h4>
-          <p className="text-xs text-slate-400 max-w-sm font-medium">{t('overview.emptyStateHint')}</p>
-          <Button variant="ghost" onClick={onClearFilters} className="mt-2 text-teal-600 bg-teal-50 hover:bg-teal-100">
-            {t('overview.clearFilter')}
-          </Button>
+          <h4 className="text-sm font-bold text-slate-700">{isBlocked ? 'Monitoring paused' : t('overview.emptyState')}</h4>
+          <p className="text-xs text-slate-400 max-w-sm font-medium">
+            {isBlocked
+              ? 'The monitoring API request failed. Automatic reconnect is paused until you retry manually.'
+              : t('overview.emptyStateHint')}
+          </p>
+          <div className="mt-2 flex items-center gap-2">
+            {isBlocked && onReconnect ? (
+              <Button variant="outline" onClick={onReconnect}>
+                Reconnect
+              </Button>
+            ) : null}
+            <Button variant="ghost" onClick={onClearFilters} className="text-teal-600 bg-teal-50 hover:bg-teal-100">
+              {t('overview.clearFilter')}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );

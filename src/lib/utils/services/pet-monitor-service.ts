@@ -1,9 +1,7 @@
 import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
-import type { PetMonitorCameraIndex, PetMonitorXiaomiLoginResponse } from '../../../types/lib/monitoring';
+import type { PetMonitorCameraIndex } from '../../../types/lib/monitoring';
 import {
-  asString,
   createJsonHttpClient,
-  isObjectRecord,
   isSuccessStatus,
   readErrorMessage,
 } from '../http/http';
@@ -86,26 +84,6 @@ export function requirePetMonitorSuccess<T>(
   return response.data;
 }
 
-export function isPetMonitorPayloadSuccess(
-  status: number,
-  payload?: { success?: boolean } | null,
-): boolean {
-  return isSuccessStatus(status) && payload?.success !== false;
-}
-
-export function extractPetMonitorLoginError(
-  data: PetMonitorXiaomiLoginResponse,
-): string | undefined {
-  if (data.error) {
-    return data.error;
-  }
-
-  if (isObjectRecord(data.result)) {
-    return asString(data.result.error) ?? asString(data.result.message);
-  }
-
-  return undefined;
-}
 
 function encodePathSegments(path: string): string {
   return path

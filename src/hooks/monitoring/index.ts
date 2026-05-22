@@ -4,7 +4,5 @@ export * from './usePetMonitorCameraConfig';
 export * from './usePetMonitorDashboard';
 export * from './usePetMonitorRecords';
 export * from './usePetMonitorRequest';
-export * from './usePetMonitorSetup';
 export * from './usePetMonitorStats';
 export * from './usePetMonitorUrls';
-export * from './usePetMonitorXiaomiSetup';

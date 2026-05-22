@@ -19,7 +19,7 @@ export function usePetMonitorStats(options: UsePetMonitorStatsOptions = {}) {
   const { autoLoad = true, pollIntervalMs = 0 } = options;
   const [stats, setStats] = useState<PetMonitorBackendStatsResponse>({});
   const request = usePetMonitorRequest();
-  const { runRequest, resetRequest } = request;
+  const { runRequest, resetRequest, reconnectRequest } = request;
   const isMountedRef = useRef(false);
 
   const loadStats = useCallback(() => runRequest(
@@ -27,6 +27,7 @@ export function usePetMonitorStats(options: UsePetMonitorStatsOptions = {}) {
     {
       fallbackMessage: 'Failed to fetch PetMonitor camera stats',
       onSuccess: (result) => setStats(result),
+      onError: () => setStats({}),
     },
   ), [runRequest]);
 
@@ -60,7 +61,7 @@ export function usePetMonitorStats(options: UsePetMonitorStatsOptions = {}) {
   }, [autoLoad, loadStats]);
 
   useEffect(() => {
-    if (!autoLoad || pollIntervalMs <= 0) return;
+    if (!autoLoad || pollIntervalMs <= 0 || request.isBlocked) return;
 
     const timer = window.setInterval(() => {
       if (isMountedRef.current) {
@@ -71,7 +72,7 @@ export function usePetMonitorStats(options: UsePetMonitorStatsOptions = {}) {
     return () => {
       window.clearInterval(timer);
     };
-  }, [autoLoad, loadStats, pollIntervalMs]);
+  }, [autoLoad, loadStats, pollIntervalMs, request.isBlocked]);
 
   return {
     stats,
@@ -79,8 +80,14 @@ export function usePetMonitorStats(options: UsePetMonitorStatsOptions = {}) {
     isLoading: request.isLoading,
     hasLoaded: request.hasLoaded,
     error: request.error,
+    consecutiveFailures: request.consecutiveFailures,
+    isBlocked: request.isBlocked,
     loadStats,
     refreshStats: loadStats,
+    reconnectStats: () => {
+      reconnectRequest();
+      return loadStats();
+    },
     resetStats,
     getCameraSnapshot,
   };
