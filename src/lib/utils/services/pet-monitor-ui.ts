@@ -123,6 +123,7 @@ export function toPetMonitorCameraFeeds(
       vibeText: getStatusText(snapshot),
       streamUrl: camId === null ? undefined : getVideoFeedUrl?.(camId),
       camId,
+      deviceId: snapshot.stats.deviceId ?? null,
     };
   });
 }

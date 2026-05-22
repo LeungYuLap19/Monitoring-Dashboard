@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Database, WifiOff } from 'lucide-react';
 import { useLayoutContext } from '../hooks/layout';
+import { useTranslation } from '../lib/i18n';
+import { useCameraPetMap } from '../hooks/pet';
 import {
   usePetMonitorBehavior,
   usePetMonitorCameraConfig,
@@ -58,6 +60,7 @@ function MonitoringPlaceholder({
 
 export default function MonitoringPage() {
   const { selectedBunnyId, setSelectedBunnyId, onOpenClipsModal, onGenerateLog } = useLayoutContext();
+  const { t } = useTranslation();
 
   const [timeFilter, setTimeFilter] = useState<'1' | '3' | '7'>('3');
   const [streamActive, setStreamActive] = useState(true);
@@ -68,19 +71,28 @@ export default function MonitoringPage() {
   const behavior = usePetMonitorBehavior({ autoLoadLogs: false, autoLoadTimeline: false });
   const records = usePetMonitorRecords({ autoLoad: false });
   const cameraConfig = usePetMonitorCameraConfig({ autoLoad: false });
+  const { cameraPetMap } = useCameraPetMap();
   const { loadBehaviorStats, loadBehaviorTimeline } = behavior;
   const { loadRecords } = records;
   const { loadCameraConfig } = cameraConfig;
   const { getCameraSnapshot } = monitor.stats;
 
   const cameraFeeds = useMemo(() => {
-    return toPetMonitorCameraFeeds(
+    const feeds = toPetMonitorCameraFeeds(
       monitor.stats.cameraSnapshots,
       monitor.activeCameras.activeCameras,
       null,
       monitor.urls.getVideoFeedUrl,
     );
+    return feeds.map((feed) => {
+      const petInfo = feed.deviceId ? cameraPetMap[feed.deviceId] : undefined;
+      if (petInfo) {
+        return { ...feed, bunnyName: petInfo.name, bunnyId: petInfo.petId };
+      }
+      return feed;
+    });
   }, [
+    cameraPetMap,
     monitor.activeCameras.activeCameras,
     monitor.stats.cameraSnapshots,
     monitor.urls.getVideoFeedUrl,
@@ -155,49 +167,49 @@ export default function MonitoringPage() {
     return Math.round(total / statsByTime.length);
   }, [statsByTime]);
   const behaviorSummary = useMemo(() => {
-    if (!activeFeed) return 'No monitoring camera selected.';
+    if (!activeFeed) return t('monitoring.placeholders.noCameraSelectedSummary');
     return toBehaviorSummary(activeFeed.bunnyName || activeFeed.name, totalActivities, totalActivities > 0 || statsByTime.length > 0);
-  }, [activeFeed, statsByTime.length, totalActivities]);
+  }, [activeFeed, statsByTime.length, t, totalActivities]);
 
   const livePlaceholder = useMemo(() => {
     if (hasMonitorError) {
       return {
-        title: 'Failed to connect',
-        message: 'The monitoring service could not be reached.',
+        title: t('monitoring.placeholders.failedToConnect'),
+        message: t('monitoring.placeholders.failedToConnectMsg'),
       };
     }
     if (!hasCameraSelection) {
       return {
-        title: 'No camera data',
-        message: 'No monitoring camera is currently available from the backend.',
+        title: t('monitoring.placeholders.noCameraData'),
+        message: t('monitoring.placeholders.noCameraDataMsg'),
       };
     }
     if (!activeFeed?.streamUrl && !activeFeed?.isLive) {
       return {
-        title: 'No live stream data',
-        message: 'This camera is not currently publishing a live feed.',
+        title: t('monitoring.placeholders.noLiveStream'),
+        message: t('monitoring.placeholders.noLiveStreamMsg'),
       };
     }
     return null;
-  }, [activeFeed, hasCameraSelection, hasMonitorError]);
+  }, [activeFeed, hasCameraSelection, hasMonitorError, t]);
 
   const statsPlaceholder = useMemo(() => {
     if (behavior.statsError || behavior.timelineError || hasMonitorError) {
       return {
-        title: 'Behavior data unavailable',
-        message: 'The dashboard could not load behavior telemetry for this camera.',
+        title: t('monitoring.placeholders.behaviorUnavailable'),
+        message: t('monitoring.placeholders.behaviorUnavailableMsg'),
       };
     }
     if (!hasCameraSelection) {
       return {
-        title: 'No camera selected',
-        message: 'Select an available camera when backend monitoring data is present.',
+        title: t('monitoring.placeholders.noCameraSelected'),
+        message: t('monitoring.placeholders.noCameraSelectedMsg'),
       };
     }
     if (!backendActivityCounts.length || !statsByTime.length) {
       return {
-        title: 'No data',
-        message: 'No behavior events were returned for the selected time window.',
+        title: t('monitoring.placeholders.noData'),
+        message: t('monitoring.placeholders.noDataMsg'),
       };
     }
     return null;
@@ -208,6 +220,7 @@ export default function MonitoringPage() {
     hasCameraSelection,
     hasMonitorError,
     statsByTime.length,
+    t,
   ]);
 
   return (
@@ -222,16 +235,16 @@ export default function MonitoringPage() {
         ) : hasMonitorError ? (
           <MonitoringPlaceholder
             icon={<WifiOff className="size-8 text-rose-500" />}
-            title="Failed to connect"
-            message="The monitoring backend could not be reached."
+            title={t('monitoring.placeholders.failedToConnect')}
+            message={t('monitoring.placeholders.failedToConnectMsg')}
             onReconnect={monitor.isBlocked ? () => void monitor.reconnectDashboard().catch(() => undefined) : undefined}
             reconnectDisabled={monitor.isLoading}
           />
         ) : (
           <MonitoringPlaceholder
             icon={<Database className="size-8 text-slate-400" />}
-            title="No data"
-            message="No active monitoring feeds were returned from the backend."
+            title={t('monitoring.placeholders.noData')}
+            message={t('monitoring.placeholders.noFeedsBackend')}
             onReconnect={monitor.isBlocked ? () => void monitor.reconnectDashboard().catch(() => undefined) : undefined}
             reconnectDisabled={monitor.isLoading}
           />
@@ -257,8 +270,8 @@ export default function MonitoringPage() {
         ) : (
           <MonitoringPlaceholder
             icon={<Database className="size-8 text-slate-400" />}
-            title="No data"
-            message="There is no active monitoring profile to display."
+            title={t('monitoring.placeholders.noData')}
+            message={t('monitoring.placeholders.noProfile')}
             onReconnect={monitor.isBlocked ? () => void monitor.reconnectDashboard().catch(() => undefined) : undefined}
             reconnectDisabled={monitor.isLoading}
           />

@@ -20,6 +20,7 @@ export interface PetMonitorCameraStats {
   decodeMs: number;
   status: string;
   camId: PetMonitorCameraIndex;
+  deviceId?: string | null;
   imgsz?: number;
   isRecording?: boolean;
   name?: string;

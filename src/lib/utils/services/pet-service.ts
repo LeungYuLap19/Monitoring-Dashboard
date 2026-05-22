@@ -42,6 +42,7 @@ const PET_PROFILE_UPDATE_NULLABLE_STRING_FIELDS = [
   'fatherBreed',
   'fatherChip',
   'fatherPlaceOfBirth',
+  'monitorCameraId',
 ] as const;
 
 const PET_PROFILE_UPDATE_BOOLEAN_FIELDS = [
@@ -246,6 +247,7 @@ export function toPetManagementDetail(pet: PetProfileFull): PetManagementDetail 
     createdAt: toNullableString(pet.createdAt),
     updatedAt: toNullableString(pet.updatedAt),
     latestPetLostId: toNullableString(pet.latestPetLostId),
+    monitorCameraId: toNullableString(pet.monitorCameraId),
     sterilizationDate: toNullableString(pet.sterilizationDate),
     chipId: toNullableString(pet.chipId),
     placeOfBirth: toNullableString(pet.placeOfBirth),

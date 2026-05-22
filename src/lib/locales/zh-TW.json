@@ -130,6 +130,15 @@
     "motherParityLabel": "母親胎次",
     "transferCountLabel": "轉移紀錄數",
     "transferNgoCountLabel": "NGO 轉移紀錄數",
+    "monitorCameraTitle": "監控鏡頭",
+    "monitorCameraNone": "未連結",
+    "monitorCameraNoLink": "尚未連結鏡頭",
+    "monitorCameraNoLinkHint": "請在下方選擇鏡頭以連結即時監控。",
+    "monitorCameraDisconnected": "監控後端已斷線",
+    "monitorCameraDisconnectedHint": "已指定鏡頭但監控服務目前無法連線。",
+    "monitorCameraGoLive": "查看即時影像",
+    "monitorCameraSelectLabel": "指定鏡頭",
+    "tabMonitoring": "監控",
     "loadingList": "載入寵物檔案中...",
     "refreshingList": "更新寵物檔案中...",
     "loadingDetail": "載入寵物詳情中...",
@@ -282,6 +291,24 @@
     },
     "toasts": {
       "cameraSwitch": "已自動打開監測鏡頭並載入對應兔兔住客數據"
+    },
+    "placeholders": {
+      "failedToConnect": "連線失敗",
+      "failedToConnectMsg": "無法連接監控服務。",
+      "noCameraData": "無鏡頭資料",
+      "noCameraDataMsg": "後端目前沒有可用的監控鏡頭。",
+      "noLiveStream": "無即時串流",
+      "noLiveStreamMsg": "此鏡頭目前未提供即時影像。",
+      "behaviorUnavailable": "行為資料無法取得",
+      "behaviorUnavailableMsg": "無法載入此鏡頭的行為遙測資料。",
+      "noCameraSelected": "未選擇鏡頭",
+      "noCameraSelectedMsg": "請在後端有監控資料時選擇可用鏡頭。",
+      "noData": "無資料",
+      "noDataMsg": "所選時間範圍內無行為事件紀錄。",
+      "noFeedsBackend": "後端未回傳任何監控串流。",
+      "noProfile": "目前沒有可顯示的監控資料。",
+      "noCameraSelectedSummary": "未選擇監控鏡頭。",
+      "loadingTelemetry": "正在從 PetMonitor 載入行為遙測資料..."
     }
   },
   "clientView": {

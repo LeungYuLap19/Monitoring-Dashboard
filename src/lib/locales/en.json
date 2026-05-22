@@ -130,6 +130,15 @@
     "motherParityLabel": "Mother parity",
     "transferCountLabel": "Transfer records",
     "transferNgoCountLabel": "NGO transfer records",
+    "monitorCameraTitle": "Live camera",
+    "monitorCameraNone": "Not linked",
+    "monitorCameraNoLink": "No camera linked",
+    "monitorCameraNoLinkHint": "Select a camera below to link live monitoring to this pet.",
+    "monitorCameraDisconnected": "Monitor backend disconnected",
+    "monitorCameraDisconnectedHint": "The camera is assigned but the monitoring service is not reachable.",
+    "monitorCameraGoLive": "View live",
+    "monitorCameraSelectLabel": "Assign camera",
+    "tabMonitoring": "Monitoring",
     "loadingList": "Loading pet profiles...",
     "refreshingList": "Updating pet profiles...",
     "loadingDetail": "Loading pet details...",
@@ -282,6 +291,24 @@
     },
     "toasts": {
       "cameraSwitch": "Camera switched — loading bunny monitoring data."
+    },
+    "placeholders": {
+      "failedToConnect": "Failed to connect",
+      "failedToConnectMsg": "The monitoring service could not be reached.",
+      "noCameraData": "No camera data",
+      "noCameraDataMsg": "No monitoring camera is currently available from the backend.",
+      "noLiveStream": "No live stream data",
+      "noLiveStreamMsg": "This camera is not currently publishing a live feed.",
+      "behaviorUnavailable": "Behavior data unavailable",
+      "behaviorUnavailableMsg": "The dashboard could not load behavior telemetry for this camera.",
+      "noCameraSelected": "No camera selected",
+      "noCameraSelectedMsg": "Select an available camera when backend monitoring data is present.",
+      "noData": "No data",
+      "noDataMsg": "No behavior events were returned for the selected time window.",
+      "noFeedsBackend": "No active monitoring feeds were returned from the backend.",
+      "noProfile": "There is no active monitoring profile to display.",
+      "noCameraSelectedSummary": "No monitoring camera selected.",
+      "loadingTelemetry": "Loading behavior telemetry from PetMonitor..."
     }
   },
   "clientView": {

@@ -56,6 +56,11 @@ export interface PetDetailViewProps {
   activeDetailTab: PetManagementDetailTab;
   onSetActiveDetailTab: (tab: PetManagementDetailTab) => void;
   onBack: () => void;
+  availableCameras?: { id: string; name: string }[];
+  onUpdateMonitorCamera?: (cameraId: string | null) => void;
+  isUpdatingCamera?: boolean;
+  monitorBackendConnected?: boolean;
+  onNavigateToMonitoring?: () => void;
 }
 
 export interface PetPaginationProps {

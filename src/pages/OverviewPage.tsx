@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useLayoutContext } from '../hooks/layout';
+import { useCameraPetMap } from '../hooks/pet';
 import { usePetMonitorDashboard } from '../hooks/monitoring';
 import { toPetMonitorCameraFeeds } from '../lib/utils/services/pet-monitor-ui';
 import MetricsGrid from '../components/pages/overview/MetricsGrid';
@@ -8,6 +9,7 @@ import CameraFeedGrid from '../components/pages/overview/CameraFeedGrid';
 
 export default function OverviewPage() {
   const { onSelectCamera } = useLayoutContext();
+  const { cameraPetMap } = useCameraPetMap();
   const monitor = usePetMonitorDashboard({
     autoLoad: true,
     statsPollIntervalMs: 5000,
@@ -17,13 +19,21 @@ export default function OverviewPage() {
   const [filterType, setFilterType] = useState<'all' | 'online' | 'offline' | 'resting' | 'active'>('all');
 
   const cameraFeeds = useMemo(() => {
-    return toPetMonitorCameraFeeds(
+    const feeds = toPetMonitorCameraFeeds(
       monitor.stats.cameraSnapshots,
       monitor.activeCameras.activeCameras,
       null,
       monitor.urls.getVideoFeedUrl,
     );
+    return feeds.map((feed) => {
+      const petInfo = feed.deviceId ? cameraPetMap[feed.deviceId] : undefined;
+      if (petInfo) {
+        return { ...feed, bunnyName: petInfo.name, bunnyId: petInfo.petId };
+      }
+      return feed;
+    });
   }, [
+    cameraPetMap,
     monitor.activeCameras.activeCameras,
     monitor.stats.cameraSnapshots,
     monitor.urls.getVideoFeedUrl,

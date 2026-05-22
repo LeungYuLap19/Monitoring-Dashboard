@@ -1,5 +1,9 @@
 import { LoaderCircle, RefreshCcw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { usePetManagement } from '../hooks/pet';
+import { useUpdatePetProfile } from '../hooks/pet/useUpdatePetProfile';
+import { useCameraPetMap } from '../hooks/pet/useCameraPetMap';
+import { usePetMonitorStats } from '../hooks/monitoring';
 import { useTranslation } from '../lib/i18n';
 import PetSearchBar from '../components/pages/pets/PetSearchBar';
 import PetCardGrid from '../components/pages/pets/PetCardGrid';
@@ -7,6 +11,7 @@ import PetListView from '../components/pages/pets/PetListView';
 import PetDetailView from '../components/pages/pets/PetDetailView';
 import PetPagination from '../components/pages/pets/PetPagination';
 import { Button } from '../components/ui/button';
+import { useMemo, useCallback } from 'react';
 
 function LoadingState({ label }: { label: string }) {
   return (
@@ -50,6 +55,7 @@ function ErrorState({
 
 export default function PetsPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const {
     pets,
     selectedPet,
@@ -79,6 +85,35 @@ export default function PetsPage() {
     refreshSelectedPet,
   } = usePetManagement();
 
+  const monitorStats = usePetMonitorStats({ autoLoad: true });
+  const { updatePetProfile, isSubmitting: isUpdatingCamera } = useUpdatePetProfile();
+  const { cameraPetMap, refresh: refreshCameraPetMap } = useCameraPetMap();
+
+  const availableCameras = useMemo(() => {
+    return monitorStats.cameraSnapshots
+      .filter((cam) => cam.snapshot.stats.deviceId)
+      .map((cam) => ({
+        id: cam.snapshot.stats.deviceId!,
+        name: cam.snapshot.stats.name || `Camera ${cam.camId}`,
+        takenByPetId: cameraPetMap[cam.snapshot.stats.deviceId!]?.petId ?? null,
+      }))
+      .filter((cam) => !cam.takenByPetId || cam.takenByPetId === selectedPetId);
+  }, [cameraPetMap, monitorStats.cameraSnapshots, selectedPetId]);
+
+  const monitorBackendConnected = monitorStats.hasLoaded && !monitorStats.error;
+
+  const handleUpdateMonitorCamera = useCallback((cameraId: string | null) => {
+    if (!selectedPetId) return;
+    void updatePetProfile(
+      { monitorCameraId: cameraId },
+      { petId: selectedPetId },
+    ).then(() => { void refreshSelectedPet(); void refreshCameraPetMap(); }).catch(() => undefined);
+  }, [selectedPetId, updatePetProfile, refreshSelectedPet, refreshCameraPetMap]);
+
+  const handleNavigateToMonitoring = useCallback(() => {
+    navigate('/monitoring');
+  }, [navigate]);
+
   const isRefreshingPets = isPetsLoading && hasLoadedPets;
 
   return (
@@ -100,6 +135,11 @@ export default function PetsPage() {
             activeDetailTab={activeDetailTab}
             onSetActiveDetailTab={setActiveDetailTab}
             onBack={closePetDetails}
+            availableCameras={availableCameras}
+            onUpdateMonitorCamera={handleUpdateMonitorCamera}
+            isUpdatingCamera={isUpdatingCamera}
+            monitorBackendConnected={monitorBackendConnected}
+            onNavigateToMonitoring={handleNavigateToMonitoring}
           />
         ) : null
       ) : (

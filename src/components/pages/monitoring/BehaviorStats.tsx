@@ -95,7 +95,7 @@ export default function BehaviorStats({
           <div className="p-3.5 bg-emerald-50/40 rounded-xl text-xs text-slate-600 flex gap-2">
             <span className="text-teal-600 font-bold shrink-0">*</span>
             <span className="font-medium text-slate-600 leading-normal">
-              {isLoading ? 'Loading behavior telemetry from PetMonitor...' : error ? error.message : summary}
+              {isLoading ? t('monitoring.placeholders.loadingTelemetry') : error ? error.message : summary}
             </span>
           </div>
 
@@ -134,8 +134,8 @@ export default function BehaviorStats({
 
               <div className="space-y-4">
                 <span className="block text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('monitoring.stats.distributionLabel')}</span>
-                <div className="flex items-center justify-between gap-4">
-                  <ChartContainer config={pieChartConfig} className="size-[100px] shrink-0">
+                <div className="flex items-center justify-between gap-4 lg:flex-col lg:items-stretch xl:flex-row xl:items-center">
+                  <ChartContainer config={pieChartConfig} className="size-[100px] shrink-0 lg:w-full lg:h-[120px] xl:size-[100px]">
                     <PieChart>
                       <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={28} outerRadius={42} strokeWidth={2}>
                         {pieData.map((entry, index) => (
@@ -145,14 +145,14 @@ export default function BehaviorStats({
                       <ChartTooltip content={<ChartTooltipContent />} />
                     </PieChart>
                   </ChartContainer>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 shrink-0 select-none">
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-2 min-w-0 select-none">
                     {activeCategory.map((cat, idx) => (
-                      <div key={idx} className="flex flex-col">
-                        <div className="flex items-center gap-1.5">
+                      <div key={idx} className="flex flex-col min-w-0">
+                        <div className="flex items-center gap-1.5 min-w-0">
                           <span className="size-2.5 rounded-md shrink-0 block" style={{ backgroundColor: cat.color }} />
-                          <span className="text-xs font-bold text-slate-600">{t(cat.label)}</span>
+                          <span className="text-xs font-bold text-slate-600 truncate">{t(cat.label)}</span>
                         </div>
-                        <span className="text-[10px] text-slate-400 font-bold pl-4">{cat.value} {t('monitoring.stats.activityPerDay')}</span>
+                        <span className="text-[10px] text-slate-400 font-bold pl-4 truncate">{cat.value} {t('monitoring.stats.activityPerDay')}</span>
                       </div>
                     ))}
                   </div>

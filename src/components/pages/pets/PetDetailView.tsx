@@ -1,9 +1,10 @@
 import React from 'react';
-import { ArrowLeft, Heart, Info, Tag } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Heart, Info, Loader2, Tag, Video, VideoOff } from 'lucide-react';
 import type { PetDetailViewProps } from '../../../types';
 import { formatPetDate } from '../../../lib/utils/services/pet-service';
 import { useTranslation } from '../../../lib/i18n';
 import { Badge } from '../../ui/badge';
+import { Button } from '../../ui/button';
 
 function InfoRow({
   label,
@@ -44,6 +45,11 @@ export default function PetDetailView({
   activeDetailTab,
   onSetActiveDetailTab,
   onBack,
+  availableCameras = [],
+  onUpdateMonitorCamera,
+  isUpdatingCamera = false,
+  monitorBackendConnected = false,
+  onNavigateToMonitoring,
 }: PetDetailViewProps) {
   const { t, locale } = useTranslation();
 
@@ -157,6 +163,18 @@ export default function PetDetailView({
             >
               {t('pets.tabLineage')}
             </button>
+            {onUpdateMonitorCamera && (
+              <button
+                onClick={() => onSetActiveDetailTab('monitoring')}
+                className={`cursor-pointer px-4 py-3 text-xs font-black transition-all ${
+                  activeDetailTab === 'monitoring'
+                    ? 'border-b-2 border-teal-600 text-teal-600'
+                    : 'border-b-2 border-transparent text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                {t('pets.tabMonitoring')}
+              </button>
+            )}
           </div>
 
           <div className="flex-1 p-6 sm:p-8">
@@ -281,6 +299,58 @@ export default function PetDetailView({
                     <InfoRow label={t('pets.birthdayLabel')} value={displayFatherDob} />
                     <InfoRow label={t('pets.chipIdLabel')} value={pet.fatherChip || t('pets.notAvailable')} />
                     <InfoRow label={t('pets.placeOfBirthLabel')} value={pet.fatherPlaceOfBirth || t('pets.notAvailable')} />
+                  </div>
+                </div>
+              </div>
+            )}
+            {activeDetailTab === 'monitoring' && onUpdateMonitorCamera && (
+              <div className="space-y-6">
+                {!pet.monitorCameraId ? (
+                  <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-8 text-center space-y-3">
+                    <VideoOff className="size-9 text-slate-300 mx-auto" />
+                    <p className="text-sm font-bold text-slate-500">{t('pets.monitorCameraNoLink')}</p>
+                    <p className="text-xs text-slate-400">{t('pets.monitorCameraNoLinkHint')}</p>
+                  </div>
+                ) : !monitorBackendConnected ? (
+                  <div className="rounded-2xl border border-dashed border-rose-100 bg-rose-50/40 p-8 text-center space-y-3">
+                    <VideoOff className="size-9 text-rose-300 mx-auto" />
+                    <p className="text-sm font-bold text-rose-600">{t('pets.monitorCameraDisconnected')}</p>
+                    <p className="text-xs text-slate-400">{t('pets.monitorCameraDisconnectedHint')}</p>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-teal-100 bg-teal-50/40 p-5 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <span className="size-2.5 rounded-full bg-teal-500 animate-pulse" />
+                        <span className="text-sm font-bold text-teal-700">
+                          {availableCameras.find((c) => c.id === pet.monitorCameraId)?.name || `Camera ${pet.monitorCameraId}`}
+                        </span>
+                      </div>
+                      {onNavigateToMonitoring && (
+                        <Button variant="outline" size="sm" onClick={onNavigateToMonitoring} className="gap-1.5">
+                          <ExternalLink className="size-3.5" />
+                          {t('pets.monitorCameraGoLive')}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <h4 className="text-xs font-black uppercase tracking-widest text-slate-400">{t('pets.monitorCameraSelectLabel')}</h4>
+                  <div className="flex items-center gap-3">
+                    <select
+                      value={pet.monitorCameraId ?? ''}
+                      onChange={(e) => onUpdateMonitorCamera(e.target.value || null)}
+                      disabled={isUpdatingCamera}
+                      className="flex-1 rounded-xl bg-slate-50 px-4 py-3 text-xs font-bold text-slate-700 focus:outline-none disabled:opacity-50"
+                    >
+                      <option value="">{t('pets.monitorCameraNone')}</option>
+                      {availableCameras.map((cam) => (
+                        <option key={cam.id} value={cam.id}>{cam.name}</option>
+                      ))}
+                    </select>
+                    {isUpdatingCamera && <Loader2 className="size-4 animate-spin text-teal-600" />}
                   </div>
                 </div>
               </div>

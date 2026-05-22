@@ -38,6 +38,7 @@ export interface PetProfileSummary {
   updatedAt?: string;
   location?: string;
   position?: string;
+  monitorCameraId?: string | null;
 }
 
 export interface PetProfileBasic {
@@ -71,6 +72,7 @@ export interface PetProfileBasic {
   updatedAt?: string;
   location?: string;
   position?: string;
+  monitorCameraId?: string | null;
   latestPetLostId?: string | null;
 }
 
@@ -106,7 +108,7 @@ export interface PetProfileViewMap {
 }
 
 export type PetDisplaySex = 'male' | 'female' | null;
-export type PetManagementDetailTab = 'info' | 'photos' | 'lineage';
+export type PetManagementDetailTab = 'info' | 'photos' | 'lineage' | 'monitoring';
 
 export interface PetManagementListItem {
   id: string;
@@ -140,6 +142,7 @@ export interface PetManagementDetail extends PetManagementListItem {
   createdAt: string | null;
   updatedAt: string | null;
   latestPetLostId: string | null;
+  monitorCameraId: string | null;
   sterilizationDate: string | null;
   chipId: string | null;
   placeOfBirth: string | null;
@@ -206,6 +209,7 @@ export interface PetProfileUpdatePayload {
   fatherDOB?: string | null;
   fatherChip?: string | null;
   fatherPlaceOfBirth?: string | null;
+  monitorCameraId?: string | null;
   imageFiles?: File[];
 }
 

@@ -38,6 +38,7 @@ export interface CameraFeed {
   vibeText?: string;
   streamUrl?: string;
   camId?: number | null;
+  deviceId?: string | null;
 }
 
 export interface ActivityClip {
