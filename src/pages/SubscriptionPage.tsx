@@ -90,7 +90,7 @@ export default function SubscriptionPage() {
   ];
 
   return (
-    <div id="page-subscription" className="p-4 md:p-8 select-none space-y-8">
+    <div id="page-subscription" className="p-4 md:p-8 select-none space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-300">
       <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">

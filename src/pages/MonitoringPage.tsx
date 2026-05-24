@@ -257,7 +257,7 @@ export default function MonitoringPage() {
   ]);
 
   return (
-    <div id="page-monitoring" className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 select-none">
+    <div id="page-monitoring" className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 select-none animate-in fade-in slide-in-from-bottom-3 duration-300">
       <div id="monitoring-left" className="col-span-1 lg:col-span-8 space-y-6">
         {hasFeeds ? (
           <PetSelector

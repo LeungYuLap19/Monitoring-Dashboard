@@ -32,6 +32,8 @@
     "systemLabel": "System Notification"
   },
   "auth": {
+    "brandHeading": "Monitor. Manage. Protect.",
+    "brandSubheading": "A unified platform for pet health monitoring, profile management, and NGO coordination.",
     "signInTitle": "Sign in with OTP",
     "signInSubtitle": "Sign in securely and quickly using a one-time password (OTP)",
     "emailTab": "Email",

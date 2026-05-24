@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { Card, CardContent } from '../../ui/card';
-import { Badge } from '../../ui/badge';
 import { RadialBarChart, RadialBar, PolarAngleAxis } from 'recharts';
 import { ChartContainer, type ChartConfig } from '../../ui/chart';
 import { useTranslation } from '../../../lib/i18n';
@@ -24,13 +23,12 @@ export default function MetricsGrid({
   const gaugeData = [{ value: cameraCapacity, fill: '#0d9488' }];
 
   return (
-    <section id="metrics-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+    <section id="metrics-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
 
       <Card className="p-6 rounded-2xl gap-0">
         <CardContent className="p-0 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
             <span className="text-xs font-bold text-slate-400 tracking-wider">{t('overview.metrics.capacityLabel')}</span>
-            <Badge variant="outline" className="text-[10px] bg-slate-50 text-slate-500 font-semibold px-2 py-0.5 rounded-md font-mono border-0">Capacity</Badge>
           </div>
           <div className="flex items-center gap-4">
             <div className="relative size-16 shrink-0">
@@ -63,7 +61,6 @@ export default function MetricsGrid({
         <CardContent className="p-0 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
             <span className="text-xs font-bold text-slate-400 tracking-wider">{t('overview.metrics.arrivingLabel')}</span>
-            <Badge variant="outline" className="text-[10px] bg-sky-50 text-sky-600 font-bold px-2 py-0.5 rounded-md font-mono border-0">Arriving</Badge>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-extrabold text-slate-800 font-display">1</span>
@@ -77,7 +74,6 @@ export default function MetricsGrid({
         <CardContent className="p-0 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
             <span className="text-xs font-bold text-slate-400 tracking-wider">{t('overview.metrics.departingLabel')}</span>
-            <Badge variant="outline" className="text-[10px] bg-purple-50 text-purple-600 font-bold px-2 py-0.5 rounded-md font-mono border-0">Departing</Badge>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-extrabold text-slate-800 font-display">2</span>
@@ -90,7 +86,6 @@ export default function MetricsGrid({
         <CardContent className="p-0 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
             <span className="text-xs font-bold text-slate-400 tracking-wider">{t('overview.metrics.alertsLabel')}</span>
-            <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-600 font-bold px-2 py-0.5 rounded-md font-mono border-0">Alerts</Badge>
           </div>
           <div className="flex items-baseline gap-2">
             <span className={`text-2xl font-black font-display ${alertsToday ? 'text-rose-600' : 'text-emerald-600'}`}>
@@ -108,7 +103,6 @@ export default function MetricsGrid({
         <CardContent className="p-0 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
             <span className="text-xs font-bold text-slate-400 tracking-wider">{t('overview.metrics.camerasLabel')}</span>
-            <Badge variant="outline" className="text-[10px] bg-slate-50 text-slate-500 font-bold px-2 py-0.5 rounded-md font-mono border-0">Cameras</Badge>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-extrabold text-slate-800 font-display">{onlineCameras}</span>

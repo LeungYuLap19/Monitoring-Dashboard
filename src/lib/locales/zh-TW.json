@@ -32,6 +32,8 @@
     "systemLabel": "系統通知"
   },
   "auth": {
+    "brandHeading": "監控。管理。守護。",
+    "brandSubheading": "整合寵物健康監控、檔案管理與 NGO 協作的統一平台。",
     "signInTitle": "OTP 驗證碼登入",
     "signInSubtitle": "使用一次性驗證碼安全、快速地登入及觀察兔寶",
     "emailTab": "電子信箱",

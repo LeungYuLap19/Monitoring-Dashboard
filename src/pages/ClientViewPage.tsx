@@ -33,7 +33,7 @@ export default function ClientViewPage() {
   };
 
   return (
-    <div id="page-client-view" className="p-4 sm:p-8 max-w-4xl mx-auto space-y-6 sm:space-y-8 select-none">
+    <div id="page-client-view" className="p-4 sm:p-8 max-w-4xl mx-auto space-y-6 sm:space-y-8 select-none animate-in fade-in slide-in-from-bottom-3 duration-300">
       <ActivityLogBanner petName={activePet.name} />
       <div id="parent-letter-container" className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
         <ActivityLogHero petName={activePet.name} />

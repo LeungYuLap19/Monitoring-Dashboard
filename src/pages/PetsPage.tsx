@@ -117,7 +117,7 @@ export default function PetsPage() {
   const isRefreshingPets = isPetsLoading && hasLoadedPets;
 
   return (
-    <div id="page-pets" className="space-y-6 p-4 select-none md:space-y-8 md:p-8">
+    <div id="page-pets" className="space-y-6 p-4 select-none md:space-y-8 md:p-8 animate-in fade-in slide-in-from-bottom-3 duration-300">
       {selectedPetId ? (
         isPetLoading && !selectedPet ? (
           <LoadingState label={t('pets.loadingDetail')} />

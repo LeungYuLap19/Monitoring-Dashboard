@@ -67,7 +67,7 @@ export default function OverviewPage() {
   };
 
   return (
-    <div id="page-overview" className="p-4 md:p-8 space-y-6 md:space-y-8 select-none">
+    <div id="page-overview" className="p-4 md:p-8 space-y-6 md:space-y-8 select-none animate-in fade-in slide-in-from-bottom-3 duration-300">
       {isNgo && (
         <MetricsGrid
           onlineCameras={onlineCameraCount}

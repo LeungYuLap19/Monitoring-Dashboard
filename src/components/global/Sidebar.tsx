@@ -22,10 +22,8 @@ export default function Sidebar({ activeTab, setActiveTab, hasUnsentLogs, role =
         <span className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-4 px-2">{t('nav.menu')}</span>
 
         <nav id="sidebar-nav" className="flex flex-col gap-1.5">
-          {visibleNavItems.map(({ id, label, icon: Icon, badge }) => {
+          {visibleNavItems.map(({ id, label, icon: Icon }) => {
             const isActive = activeTab === id;
-            const showBadge = badge === 'dot' && hasUnsentLogs;
-            const showPulse = badge === 'pulse';
 
             return (
               <Button
@@ -42,15 +40,6 @@ export default function Sidebar({ activeTab, setActiveTab, hasUnsentLogs, role =
                   <Icon className="size-4.5 shrink-0" />
                   <span>{t(label)}</span>
                 </div>
-                {showPulse && (
-                  <span className="relative flex size-2">
-                    <span className="animate-ping absolute inline-flex size-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full size-2 bg-emerald-500"></span>
-                  </span>
-                )}
-                {showBadge && (
-                  <span className="size-2 rounded-full bg-cyan-500 animate-pulse" />
-                )}
               </Button>
             );
           })}

@@ -35,7 +35,7 @@ Pet profile creation, list/read, update, delete, and public tag lookup. The curr
 | Public tag lookup | Tag lookup returns a fixed public field set inside `data`; when no pet matches, it returns `404 common.notFound` |
 | View selector | `GET /pet/profile/{petId}` supports `?view=basic`, `?view=detail`, or `?view=full` with `full` as the default |
 | Update transport | PATCH uses multipart parsing, including typed normalization and optional file uploads |
-| List mode switch | `GET /pet/profile/me` scopes by `ngoId` when present, otherwise by `userId`; search and sort apply in both cases |
+| List mode switch | `GET /pet/profile/me` uses the NGO query/sort/search branch whenever the JWT includes `ngoId` |
 
 ---
 
@@ -86,6 +86,7 @@ Current multipart normalization includes:
   - `ownerContact2`: multipart text `null` maps to `null`
   - `motherDOB` / `fatherDOB`: empty string or multipart text `null` maps to `null`
   - `motherParity`: multipart text `null` maps to `null`
+  - `monitorCameraId`: empty string or multipart text `null` maps to `null`
 
 Current validation behavior:
 
@@ -198,6 +199,7 @@ Delete success:
 - `updatedAt`
 - `location`
 - `position`
+- `monitorCameraId`
 - `latestPetLostId`
 
 `latestPetLostId` is the newest linked lost-report id for this pet, selected by
@@ -393,11 +395,13 @@ List the caller's pets.
 | --- | --- | --- | --- |
 | `page` | integer | No | Shared pagination schema |
 | `limit` | integer | No | Shared pagination schema |
-| `search` | string | No | Filters the caller's scoped pet list by `name`, `animal`, `breed`, `ngoPetId`, `location`, and `owner` |
-| `sortBy` | string | No | Allowlist: `updatedAt`, `createdAt`, `name`, `animal`, `breed`, `birthday`, `receivedDate`, `ngoPetId` |
-| `sortOrder` | `asc` or `desc` | No | Defaults to `desc` when omitted or invalid |
+| `search` | string | No | NGO callers only; filters name, animal, breed, ngoPetId, location, owner |
+| `sortBy` | string | No | NGO callers only; allowlist: `updatedAt`, `createdAt`, `name`, `animal`, `breed`, `birthday`, `receivedDate`, `ngoPetId` |
+| `sortOrder` | `asc` or `desc` | No | NGO callers only |
 
-Current implementation note: the handler scopes the list by `ngoId` whenever the auth context contains `ngoId`; otherwise it scopes by `userId`. `search`, `sortBy`, and `sortOrder` work in either scope.
+For non-NGO callers, `search`, `sortBy`, and `sortOrder` are not used.
+
+Current implementation note: the handler switches into the NGO list branch whenever the auth context contains `ngoId`.
 
 #### List Success (200)
 
@@ -515,6 +519,7 @@ Any subset of these fields may be supplied:
 | `position` | string | No | |
 | `chipId` | string | No | |
 | `placeOfBirth` | string | No | |
+| `monitorCameraId` | string or `null` | No | PetMonitor camera identifier; patch reset accepts empty string or text `null` |
 | `motherName` | string | No | |
 | `motherBreed` | string | No | |
 | `motherDOB` | string or `null` | No | Flexible date string; patch reset accepts empty string or text `null` |
@@ -552,6 +557,7 @@ For the following resettable fields, use these multipart field values:
 | `fatherDOB` | `null` |
 | `fatherChip` | `""` |
 | `fatherPlaceOfBirth` | `""` |
+| `monitorCameraId` | `null` |
 
 `null` above means multipart text value `null` (for example via `formData.append('motherDOB', 'null')`).
 
@@ -599,6 +605,7 @@ If the multipart body contains no allowlisted changes, the current handler still
 | 404 | `petProfile.errors.petNotFound` | Pet does not exist or is deleted |
 | 409 | `petProfile.errors.duplicatePetTag` | `tagId` already belongs to another pet |
 | 409 | `petProfile.errors.duplicateNgoPetId` | Requested NGO pet id already belongs to another pet |
+| 409 | `petProfile.errors.duplicateMonitorCameraId` | Camera is already linked to another pet |
 | 413 | `petProfile.errors.fileTooLarge` | Uploaded file exceeds size limit |
 | 429 | `common.rateLimited` | Patch rate limit exceeded |
 | 500 | `common.internalError` | Unexpected internal error |

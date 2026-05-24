@@ -1,91 +1,52 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import type { ApiPagination, PetProfileListQuery, UseUserPetsOptions, UseUserPetsResult } from '../../types';
+import { useCallback, useRef, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import type { PetProfileListQuery, UseUserPetsOptions, UseUserPetsResult, UserPetListResult } from '../../types';
 import { fetchUserPets } from '../../lib/services/petService';
-
-function toError(error: unknown, fallbackMessage: string): Error {
-  return error instanceof Error ? error : new Error(fallbackMessage);
-}
+import { petQueryKeys } from './petQueryKeys';
 
 export function useUserPets(options: UseUserPetsOptions = {}): UseUserPetsResult {
   const { initialQuery = {}, autoLoad = true } = options;
 
-  const [pets, setPets] = useState<UseUserPetsResult['pets']>([]);
-  const [pagination, setPagination] = useState<ApiPagination | null>(null);
   const [query, setQuery] = useState<PetProfileListQuery>(initialQuery);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const requestSequenceRef = useRef(0);
   const queryRef = useRef<PetProfileListQuery>(initialQuery);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    queryRef.current = query;
-  }, [query]);
+  const queryResult = useQuery({
+    queryKey: petQueryKeys.list(query),
+    queryFn: () => fetchUserPets(query),
+    enabled: autoLoad,
+  });
 
-  const loadPets = useCallback(async (nextQuery?: PetProfileListQuery) => {
+  const pets = queryResult.data?.pets ?? [];
+  const pagination = queryResult.data?.pagination ?? null;
+  const isLoading = queryResult.isLoading || queryResult.isFetching;
+  const hasLoaded = queryResult.isFetched;
+  const error = queryResult.error instanceof Error ? queryResult.error : null;
+
+  const loadPets = useCallback(async (nextQuery?: PetProfileListQuery): Promise<UserPetListResult> => {
     const resolvedQuery = nextQuery ?? queryRef.current;
     if (nextQuery) {
       queryRef.current = nextQuery;
       setQuery(nextQuery);
     }
 
-    const requestSequence = ++requestSequenceRef.current;
-    setIsLoading(true);
-    setError(null);
+    const result = await queryClient.fetchQuery({
+      queryKey: petQueryKeys.list(resolvedQuery),
+      queryFn: () => fetchUserPets(resolvedQuery),
+    });
 
-    try {
-      const result = await fetchUserPets(resolvedQuery);
+    return result;
+  }, [queryClient]);
 
-      if (requestSequence === requestSequenceRef.current) {
-        setPets(result.pets);
-        setPagination(result.pagination);
-        setHasLoaded(true);
-      }
-
-      return result;
-    } catch (error) {
-      const normalizedError = toError(error, 'Failed to fetch user pets');
-
-      if (requestSequence === requestSequenceRef.current) {
-        setError(normalizedError);
-        setHasLoaded(true);
-      }
-
-      throw normalizedError;
-    } finally {
-      if (requestSequence === requestSequenceRef.current) {
-        setIsLoading(false);
-      }
-    }
-  }, []);
-
-  const refreshPets = useCallback(() => loadPets(queryRef.current), [loadPets]);
+  const refreshPets = useCallback(async (): Promise<UserPetListResult> => {
+    await queryClient.invalidateQueries({ queryKey: petQueryKeys.list(queryRef.current) });
+    const data = queryClient.getQueryData<UserPetListResult>(petQueryKeys.list(queryRef.current));
+    return data ?? { pets: [], pagination: null, message: undefined, requestId: undefined };
+  }, [queryClient]);
 
   const resetPets = useCallback(() => {
-    requestSequenceRef.current += 1;
-    setPets([]);
-    setPagination(null);
-    setError(null);
-    setIsLoading(false);
-    setHasLoaded(false);
-  }, []);
+    queryClient.removeQueries({ queryKey: petQueryKeys.lists() });
+  }, [queryClient]);
 
-  useEffect(() => {
-    if (!autoLoad) return;
-    void loadPets(queryRef.current);
-  }, [autoLoad, loadPets]);
-
-  return {
-    pets,
-    pagination,
-    query,
-    isLoading,
-    hasLoaded,
-    error,
-    setQuery,
-    loadPets,
-    refreshPets,
-    resetPets,
-  };
+  return { pets, pagination, query, isLoading, hasLoaded, error, setQuery, loadPets, refreshPets, resetPets };
 }

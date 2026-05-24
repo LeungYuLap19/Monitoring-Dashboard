@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
   PetProfileView,
   PetProfileViewMap,
@@ -6,10 +7,7 @@ import type {
   UsePetProfileResult,
 } from '../../types';
 import { fetchPetProfileById } from '../../lib/services/petService';
-
-function toError(error: unknown, fallbackMessage: string): Error {
-  return error instanceof Error ? error : new Error(fallbackMessage);
-}
+import { petQueryKeys } from './petQueryKeys';
 
 export function usePetProfile<TView extends PetProfileView = 'full'>(
   options: UsePetProfileOptions<TView> = {},
@@ -20,81 +18,56 @@ export function usePetProfile<TView extends PetProfileView = 'full'>(
     autoLoad = Boolean(initialPetId),
   } = options;
 
-  const [pet, setPet] = useState<PetProfileViewMap[TView] | null>(null);
   const [petId, setPetId] = useState<string | null>(initialPetId);
   const [view, setView] = useState<TView>(initialView);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  const requestSequenceRef = useRef(0);
   const petIdRef = useRef<string | null>(initialPetId);
   const viewRef = useRef<TView>(initialView);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    petIdRef.current = petId;
-  }, [petId]);
+  const queryResult = useQuery({
+    queryKey: petQueryKeys.detail(petId ?? '', view),
+    queryFn: () => fetchPetProfileById<TView>(petId!, { view }),
+    enabled: autoLoad && Boolean(petId),
+  });
 
-  useEffect(() => {
-    viewRef.current = view;
-  }, [view]);
+  const pet = (queryResult.data as PetProfileViewMap[TView] | undefined) ?? null;
+  const isLoading = queryResult.isLoading || queryResult.isFetching;
+  const hasLoaded = queryResult.isFetched;
+  const error = queryResult.error instanceof Error ? queryResult.error : null;
 
-  const loadPetProfile = useCallback(async (nextPetId: string, loadOptions?: { view?: TView }) => {
+  const loadPetProfile = useCallback(async (
+    nextPetId: string,
+    loadOptions?: { view?: TView },
+  ): Promise<PetProfileViewMap[TView]> => {
     const resolvedView = loadOptions?.view ?? viewRef.current;
-
     petIdRef.current = nextPetId;
     viewRef.current = resolvedView;
     setPetId(nextPetId);
     setView(resolvedView);
 
-    const requestSequence = ++requestSequenceRef.current;
-    setIsLoading(true);
-    setError(null);
+    const result = await queryClient.fetchQuery({
+      queryKey: petQueryKeys.detail(nextPetId, resolvedView),
+      queryFn: () => fetchPetProfileById<TView>(nextPetId, { view: resolvedView }),
+    });
 
-    try {
-      const result = await fetchPetProfileById<TView>(nextPetId, { view: resolvedView });
+    return result as PetProfileViewMap[TView];
+  }, [queryClient]);
 
-      if (requestSequence === requestSequenceRef.current) {
-        setPet(result);
-        setHasLoaded(true);
-      }
-
-      return result;
-    } catch (error) {
-      const normalizedError = toError(error, 'Failed to fetch pet profile');
-
-      if (requestSequence === requestSequenceRef.current) {
-        setError(normalizedError);
-        setHasLoaded(true);
-      }
-
-      throw normalizedError;
-    } finally {
-      if (requestSequence === requestSequenceRef.current) {
-        setIsLoading(false);
-      }
-    }
-  }, []);
-
-  const refreshPetProfile = useCallback(async () => {
+  const refreshPetProfile = useCallback(async (): Promise<PetProfileViewMap[TView] | null> => {
     if (!petIdRef.current) return null;
-    return loadPetProfile(petIdRef.current, { view: viewRef.current });
-  }, [loadPetProfile]);
+    await queryClient.invalidateQueries({
+      queryKey: petQueryKeys.detail(petIdRef.current, viewRef.current),
+    });
+    const data = queryClient.getQueryData<PetProfileViewMap[TView]>(
+      petQueryKeys.detail(petIdRef.current, viewRef.current),
+    );
+    return data ?? null;
+  }, [queryClient]);
 
   const clearPetProfile = useCallback(() => {
-    requestSequenceRef.current += 1;
     petIdRef.current = null;
-    setPet(null);
     setPetId(null);
-    setError(null);
-    setIsLoading(false);
-    setHasLoaded(false);
   }, []);
-
-  useEffect(() => {
-    if (!autoLoad || !initialPetId) return;
-    void loadPetProfile(initialPetId, { view: initialView });
-  }, [autoLoad, initialPetId, initialView, loadPetProfile]);
 
   return {
     pet,

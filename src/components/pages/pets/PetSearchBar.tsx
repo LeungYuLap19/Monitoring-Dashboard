@@ -4,7 +4,6 @@ import { PetSearchBarProps } from '../../../types';
 import { useTranslation } from '../../../lib/i18n';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
-import { Badge } from '../../ui/badge';
 
 export default function PetSearchBar({
   searchTerm,
@@ -21,11 +20,8 @@ export default function PetSearchBar({
     <div id="pets-list-view-header" className="space-y-6">
       <div className="flex flex-col justify-between items-start gap-4 sm:flex-row sm:items-center">
         <div>
-          <h2 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-            <span>{t('pets.heading')}</span>
-            <Badge variant="outline" className="text-xs font-bold px-2 py-0.5 bg-teal-50 text-teal-600 font-mono uppercase">
-              {t('pets.badge')}
-            </Badge>
+          <h2 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight">
+            {t('pets.heading')}
           </h2>
           <p className="text-xs text-slate-400 font-medium mt-0.5">
             {t('pets.description')}

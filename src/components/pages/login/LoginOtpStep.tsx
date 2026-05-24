@@ -129,9 +129,9 @@ export default function LoginOtpStep({
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-3.5 shadow-lg shadow-teal-950/10 font-black text-xs sm:text-sm tracking-wide uppercase"
+          className="w-full py-3 rounded-lg bg-teal-600 hover:bg-teal-700 font-semibold text-sm"
         >
-          <LogIn className="size-4.5" />
+          <LogIn className="size-4" />
           <span>{isSubmitting ? t('auth.loading') : t('auth.verifyOtp')}</span>
         </Button>
 
