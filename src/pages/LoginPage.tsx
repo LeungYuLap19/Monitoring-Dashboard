@@ -160,7 +160,7 @@ export default function LoginPage() {
                 </div>
 
                 {ngo.error && (
-                  <p className="text-xs text-rose-600 font-medium">{t(ngo.error)}</p>
+                  <p className="text-xs text-rose-600 font-medium">{ngo.error}</p>
                 )}
 
                 <Button

@@ -1,0 +1,1 @@
+- [ ] server side jwt revocation after a new login

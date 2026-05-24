@@ -21,9 +21,9 @@ export function useNgoAuth() {
       navigate('/', { replace: true });
     } catch (err) {
       if (isAuthApiError(err)) {
-        setError(err.errorKey ?? err.message);
+        setError(err.message);
       } else {
-        setError('auth.ngo.errors.unknown');
+        setError('Login failed. Please try again.');
       }
     } finally {
       setIsLoading(false);
