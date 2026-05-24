@@ -1,6 +1,6 @@
 import { LucideIcon } from 'lucide-react';
 
-export type TabId = 'overview' | 'monitoring' | 'client-view' | 'pets';
+export type TabId = 'overview' | 'monitoring' | 'client-view' | 'pets' | 'none';
 
 export interface PetGuest {
   id: string;

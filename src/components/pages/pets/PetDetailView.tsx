@@ -101,7 +101,7 @@ export default function PetDetailView({
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
         <div className="col-span-1 space-y-6 lg:col-span-4">
-          <div className="overflow-hidden rounded-3xl bg-white shadow-md">
+          <div className="overflow-hidden rounded-2xl bg-white shadow-md">
             <div className="relative aspect-square w-full bg-slate-100">
               {pet.primaryImageUrl ? (
                 <img src={pet.primaryImageUrl} alt={pet.name} className="size-full object-cover" />
@@ -131,7 +131,7 @@ export default function PetDetailView({
           </div>
         </div>
 
-        <div className="col-span-1 flex min-h-[480px] flex-col overflow-hidden rounded-3xl bg-white shadow-md lg:col-span-8">
+        <div className="col-span-1 flex min-h-[480px] flex-col overflow-hidden rounded-2xl bg-white shadow-md lg:col-span-8">
           <div className="flex flex-wrap gap-2 border-b border-slate-100 bg-slate-50/20 px-6 py-2">
             <button
               onClick={() => onSetActiveDetailTab('info')}
@@ -240,8 +240,8 @@ export default function PetDetailView({
 
             {activeDetailTab === 'photos' && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2 rounded-xl bg-sky-50 p-3 text-xs text-sky-850">
-                  <Info className="size-4 shrink-0 text-sky-500" />
+                <div className="flex items-center gap-2 rounded-xl bg-slate-50 p-3 text-xs text-slate-700">
+                  <Info className="size-4 shrink-0 text-teal-600" />
                   <span>{t('pets.photoComplianceNote')}</span>
                 </div>
                 {pet.imageUrls.length > 0 ? (

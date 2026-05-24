@@ -16,6 +16,10 @@ export interface SidebarProps {
   role?: 'user' | 'ngo';
   isOpen?: boolean;
   onClose?: () => void;
+  adminName?: string;
+  userEmail?: string;
+  onLogout?: () => void;
+  onMenuClick?: () => void;
 }
 
 export interface HeaderProps {

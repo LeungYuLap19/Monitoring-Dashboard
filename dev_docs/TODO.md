@@ -1,5 +1,0 @@
-- [x] SoC
-- [x] locales
-- [ ] wire apis
-- [x] middleware
-- [x] routing

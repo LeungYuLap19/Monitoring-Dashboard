@@ -50,8 +50,8 @@ export default function BehaviorStats({
   const lineChartConfig: ChartConfig = {
     restingCount: { label: t('monitoring.behavior.resting'), color: '#94a3b8' },
     eatingCount: { label: t('monitoring.behavior.eating'), color: '#0d9488' },
-    drinkingCount: { label: t('monitoring.behavior.drinking'), color: '#06b6d4' },
-    activityCount: { label: t('monitoring.behavior.active'), color: '#f97316' },
+    drinkingCount: { label: t('monitoring.behavior.drinking'), color: '#10b981' },
+    activityCount: { label: t('monitoring.behavior.active'), color: '#f59e0b' },
   };
 
   return (

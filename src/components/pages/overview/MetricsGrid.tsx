@@ -25,7 +25,7 @@ export default function MetricsGrid({
   return (
     <section id="metrics-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
 
-      <Card className="p-6 rounded-2xl gap-0">
+      <Card className="p-6 rounded-2xl gap-0 transition-shadow hover:shadow-md">
         <CardContent className="p-0 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
             <span className="text-xs font-bold text-slate-400 tracking-wider">{t('overview.metrics.capacityLabel')}</span>
@@ -49,7 +49,7 @@ export default function MetricsGrid({
                 <span className="text-slate-500 font-medium">{t('overview.metrics.largeCage')} {onlineCameras}/{totalCameras || '-'}</span>
               </div>
               <div className="flex items-center gap-1.5 text-xs">
-                <span className="size-2 rounded-full bg-orange-400" />
+                <span className="size-2 rounded-full bg-amber-500" />
                 <span className="text-slate-400 font-medium font-mono">{t('overview.metrics.luxSuite')} 0/10</span>
               </div>
             </div>
@@ -57,7 +57,7 @@ export default function MetricsGrid({
         </CardContent>
       </Card>
 
-      <Card className="p-6 rounded-2xl gap-0">
+      <Card className="p-6 rounded-2xl gap-0 transition-shadow hover:shadow-md">
         <CardContent className="p-0 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
             <span className="text-xs font-bold text-slate-400 tracking-wider">{t('overview.metrics.arrivingLabel')}</span>
@@ -70,7 +70,7 @@ export default function MetricsGrid({
       </Card>
 
 
-      <Card className="p-6 rounded-2xl gap-0">
+      <Card className="p-6 rounded-2xl gap-0 transition-shadow hover:shadow-md">
         <CardContent className="p-0 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
             <span className="text-xs font-bold text-slate-400 tracking-wider">{t('overview.metrics.departingLabel')}</span>
@@ -82,7 +82,7 @@ export default function MetricsGrid({
         </CardContent>
       </Card>
 
-      <Card className="p-6 rounded-2xl gap-0">
+      <Card className="p-6 rounded-2xl gap-0 transition-shadow hover:shadow-md">
         <CardContent className="p-0 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
             <span className="text-xs font-bold text-slate-400 tracking-wider">{t('overview.metrics.alertsLabel')}</span>
@@ -99,7 +99,7 @@ export default function MetricsGrid({
         </CardContent>
       </Card>
 
-      <Card className="p-6 rounded-2xl gap-0">
+      <Card className="p-6 rounded-2xl gap-0 transition-shadow hover:shadow-md">
         <CardContent className="p-0 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-4">
             <span className="text-xs font-bold text-slate-400 tracking-wider">{t('overview.metrics.camerasLabel')}</span>

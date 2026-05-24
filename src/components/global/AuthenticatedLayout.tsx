@@ -1,9 +1,12 @@
+import { lazy, Suspense } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
+import { Menu } from 'lucide-react';
 import Sidebar from './Sidebar';
-import Header from './Header';
-import ClipSelectorModal from '../pages/monitoring/ClipSelectorModal';
-import ActivityLogPreviewModal from '../pages/monitoring/ActivityLogPreviewModal';
 import { useAuthenticatedLayout } from '../../hooks/layout';
+import { Button } from '../ui/button';
+
+const ClipSelectorModal = lazy(() => import('../pages/monitoring/ClipSelectorModal'));
+const ActivityLogPreviewModal = lazy(() => import('../pages/monitoring/ActivityLogPreviewModal'));
 
 export default function AuthenticatedLayout() {
   const state = useAuthenticatedLayout();
@@ -21,16 +24,24 @@ export default function AuthenticatedLayout() {
         role={state.currentUser.role}
         isOpen={state.isSidebarOpen}
         onClose={() => state.setIsSidebarOpen(false)}
+        adminName={`${state.currentUser.lastName}${state.currentUser.firstName}`}
+        userEmail={state.currentUser.email ?? state.currentUser.phoneNumber ?? state.currentUser.emailOrPhone}
+        onLogout={state.handleLogout}
+        onMenuClick={() => state.setIsSidebarOpen(true)}
       />
 
       <div id="main-scroller" className="flex-1 flex flex-col min-h-screen min-w-0 relative">
-        <Header
-          adminName={`${state.currentUser.lastName}${state.currentUser.firstName} (${state.currentUser.role})`}
-          userEmail={state.currentUser.email ?? state.currentUser.phoneNumber ?? state.currentUser.emailOrPhone}
-          role={state.currentUser.role}
-          onMenuClick={() => state.setIsSidebarOpen(true)}
-          onLogout={state.handleLogout}
-        />
+        {/* Mobile top bar */}
+        <div className="lg:hidden sticky top-0 z-40 flex items-center gap-3 bg-white/80 backdrop-blur-sm border-b border-slate-100 px-4 py-3">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => state.setIsSidebarOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu className="size-5" />
+          </Button>
+        </div>
 
         <main id="app-main-viewport" className="flex-1 overflow-y-auto pb-16">
           <Outlet
@@ -51,20 +62,24 @@ export default function AuthenticatedLayout() {
       </div>
 
       {state.isClipsOpen && (
-        <ClipSelectorModal
-          petName={state.activePetObj.name}
-          clips={state.monitorClips}
-          getVideoUrl={(clip) => clip.videoUrl ? state.getMonitorClipVideoUrl(clip.videoUrl) : null}
-          onClose={() => state.setIsClipsOpen(false)}
-        />
+        <Suspense fallback={null}>
+          <ClipSelectorModal
+            petName={state.activePetObj.name}
+            clips={state.monitorClips}
+            getVideoUrl={(clip) => clip.videoUrl ? state.getMonitorClipVideoUrl(clip.videoUrl) : null}
+            onClose={() => state.setIsClipsOpen(false)}
+          />
+        </Suspense>
       )}
 
       {state.isLogPreviewOpen && (
-        <ActivityLogPreviewModal
-          petId={state.selectedPetId}
-          onClose={() => state.setIsLogPreviewOpen(false)}
-          onSendSuccess={() => state.handleLogSendSuccess()}
-        />
+        <Suspense fallback={null}>
+          <ActivityLogPreviewModal
+            petId={state.selectedPetId}
+            onClose={() => state.setIsLogPreviewOpen(false)}
+            onSendSuccess={() => state.handleLogSendSuccess()}
+          />
+        </Suspense>
       )}
     </div>
   );

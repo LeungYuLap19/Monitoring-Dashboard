@@ -1,30 +1,57 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronDown, CreditCard, LogOut, User } from 'lucide-react';
 import { TabId, SidebarProps } from '../../types';
 import { NAV_ITEMS } from '../../constants';
 import { useTranslation } from '../../lib/i18n';
 import HKBRIcon from './HKBRIcon';
 import PHealthIcon from './PHealthIcon';
+import LanguageSwitcher from './LanguageSwitcher';
 import { Button } from '../ui/button';
 import { Sheet, SheetContent } from '../ui/sheet';
 
-export default function Sidebar({ activeTab, setActiveTab, hasUnsentLogs, role = 'user', isOpen, onClose }: SidebarProps) {
+export default function Sidebar({
+  activeTab,
+  setActiveTab,
+  role = 'user',
+  isOpen,
+  onClose,
+  adminName,
+  userEmail,
+  onLogout,
+  onMenuClick,
+}: SidebarProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
   const handleTabClick = (tab: TabId) => {
     setActiveTab(tab);
     if (onClose) onClose();
   };
 
-  const visibleNavItems = NAV_ITEMS.filter((item) => !item.roles || item.roles.includes(role));
+  const visibleNavItems = NAV_ITEMS.filter(
+    (item) => !item.roles || item.roles.includes(role),
+  );
 
   const sidebarContent = (
     <>
       <div id="sidebar-upper" className="flex flex-col p-6 space-y-8">
-        <div>{role === 'user' ? <PHealthIcon size="small" /> : <HKBRIcon />}</div>
-        <span className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-4 px-2">{t('nav.menu')}</span>
+        <div className="flex items-center gap-2.5">
+          {role === 'user' ? <PHealthIcon size="small" /> : (
+            <>
+              <HKBRIcon />
+              <span className="text-sm font-bold text-slate-800">{t('header.orgName')}</span>
+            </>
+          )}
+        </div>
+        <span className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-4 px-2">
+          {t('nav.menu')}
+        </span>
 
         <nav id="sidebar-nav" className="flex flex-col gap-1.5">
           {visibleNavItems.map(({ id, label, icon: Icon }) => {
             const isActive = activeTab === id;
-
             return (
               <Button
                 key={id}
@@ -46,8 +73,56 @@ export default function Sidebar({ activeTab, setActiveTab, hasUnsentLogs, role =
         </nav>
       </div>
 
-      <div id="sidebar-footer" className="p-6 flex flex-col items-center justify-center w-full">
-        {role === 'ngo' ? <PHealthIcon size={'small'} /> : null}
+      <div id="sidebar-footer" className="p-4 space-y-3 border-t border-slate-100">
+        <div className="px-2">
+          <LanguageSwitcher />
+        </div>
+
+        {adminName && (
+          <div className="relative">
+            {userMenuOpen && (
+              <div className="absolute bottom-full left-0 right-0 mb-1 bg-white border border-slate-100 rounded-xl shadow-md p-1.5">
+                {role === 'user' && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => { setUserMenuOpen(false); navigate('/subscription'); }}
+                    className="w-full justify-start gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-800"
+                  >
+                    <CreditCard className="size-3.5" />
+                    <span>{t('nav.subscription')}</span>
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => { setUserMenuOpen(false); onLogout?.(); }}
+                  className="w-full justify-start gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-rose-500 hover:bg-rose-50 hover:text-rose-600"
+                >
+                  <LogOut className="size-3.5" />
+                  <span>{t('nav.logout')}</span>
+                </Button>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
+              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-colors"
+            >
+              <div className="size-7 rounded-full bg-teal-600/10 flex items-center justify-center shrink-0">
+                <User className="size-3.5 text-teal-600" />
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <p className="text-xs font-semibold text-slate-700 truncate">{adminName}</p>
+                {userEmail && (
+                  <p className="text-[10px] text-slate-400 truncate">{userEmail}</p>
+                )}
+              </div>
+              <ChevronDown className={`size-3.5 text-slate-400 shrink-0 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

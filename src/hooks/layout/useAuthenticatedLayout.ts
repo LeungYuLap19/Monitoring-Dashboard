@@ -43,6 +43,7 @@ export function useAuthenticatedLayout() {
     if (path.startsWith('/monitoring')) return 'monitoring';
     if (path.startsWith('/pets')) return 'pets';
     if (path.startsWith('/client-view')) return 'client-view';
+    if (path.startsWith('/subscription')) return 'none';
     return 'overview';
   }, [location.pathname]);
 

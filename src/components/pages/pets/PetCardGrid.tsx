@@ -33,7 +33,7 @@ export default function PetCardGrid({ pets, onSelectPet }: PetCardGridProps) {
         return (
           <Card
             key={pet.id}
-            className="group overflow-hidden rounded-3xl p-0 gap-0 transition-all hover:shadow-md"
+            className="group overflow-hidden rounded-2xl p-0 gap-0 transition-shadow hover:shadow-md"
           >
             <div className="relative aspect-video bg-slate-100">
               {pet.primaryImageUrl ? (

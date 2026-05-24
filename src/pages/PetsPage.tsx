@@ -11,20 +11,46 @@ import PetListView from '../components/pages/pets/PetListView';
 import PetDetailView from '../components/pages/pets/PetDetailView';
 import PetPagination from '../components/pages/pets/PetPagination';
 import { Button } from '../components/ui/button';
+import { Skeleton } from '../components/ui/skeleton';
 import { useMemo, useCallback } from 'react';
 
-function LoadingState({ label }: { label: string }) {
+function PetListSkeleton() {
   return (
-    <div className="rounded-3xl border border-slate-100 bg-white py-16 text-center text-slate-400 shadow-sm">
-      <LoaderCircle className="mx-auto mb-3 size-8 animate-spin text-teal-600" />
-      <p className="text-xs font-semibold">{label}</p>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="rounded-2xl border border-slate-100 bg-white p-4 space-y-3">
+          <Skeleton className="h-32 w-full rounded-xl" />
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-3 w-1/2" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PetDetailSkeleton() {
+  return (
+    <div className="rounded-2xl border border-slate-100 bg-white p-6 space-y-6">
+      <div className="flex gap-6">
+        <Skeleton className="size-24 rounded-xl shrink-0" />
+        <div className="flex-1 space-y-3">
+          <Skeleton className="h-6 w-1/3" />
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-4 w-2/5" />
+        </div>
+      </div>
+      <div className="space-y-3">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-4/5" />
+        <Skeleton className="h-4 w-3/5" />
+      </div>
     </div>
   );
 }
 
 function InlineLoadingState({ label }: { label: string }) {
   return (
-    <div className="pointer-events-none absolute inset-0 z-10 flex items-start justify-end rounded-3xl bg-white/45 p-4 backdrop-blur-[1px]">
+    <div className="pointer-events-none absolute inset-0 z-10 flex items-start justify-end rounded-2xl bg-white/45 p-4 backdrop-blur-[1px]">
       <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm">
         <LoaderCircle className="size-4 animate-spin text-teal-600" />
         <span>{label}</span>
@@ -43,7 +69,7 @@ function ErrorState({
   onRetry: () => void;
 }) {
   return (
-    <div className="rounded-3xl border border-rose-100 bg-white py-16 text-center text-slate-400 shadow-sm">
+    <div className="rounded-2xl border border-rose-100 bg-white py-16 text-center text-slate-400 shadow-sm">
       <p className="mb-4 text-xs font-semibold text-rose-600">{label}</p>
       <Button type="button" variant="outline" onClick={onRetry} className="gap-2">
         <RefreshCcw className="size-4" />
@@ -120,7 +146,7 @@ export default function PetsPage() {
     <div id="page-pets" className="space-y-6 p-4 select-none md:space-y-8 md:p-8 animate-in fade-in slide-in-from-bottom-3 duration-300">
       {selectedPetId ? (
         isPetLoading && !selectedPet ? (
-          <LoadingState label={t('pets.loadingDetail')} />
+          <PetDetailSkeleton />
         ) : petError && !selectedPet ? (
           <ErrorState
             label={t('pets.loadError')}
@@ -156,7 +182,7 @@ export default function PetsPage() {
           />
 
           {isPetsLoading && !hasLoadedPets ? (
-            <LoadingState label={t('pets.loadingList')} />
+            <PetListSkeleton />
           ) : petsError && pets.length === 0 ? (
             <ErrorState
               label={t('pets.loadError')}
@@ -192,7 +218,7 @@ export default function PetsPage() {
               {isRefreshingPets ? <InlineLoadingState label={t('pets.refreshingList')} /> : null}
             </div>
           ) : (
-            <div className="space-y-2 rounded-3xl border border-slate-100 bg-white py-16 text-center text-xs font-semibold text-slate-400 shadow-sm">
+            <div className="space-y-2 rounded-2xl border border-slate-100 bg-white py-16 text-center text-xs font-semibold text-slate-400 shadow-sm">
               <p>{t('pets.emptyState')}</p>
               <button onClick={() => setSearchTerm('')} className="cursor-pointer text-teal-600 hover:underline">
                 {t('pets.clearFilter')}

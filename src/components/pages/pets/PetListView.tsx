@@ -15,7 +15,7 @@ export default function PetListView({ pets, onSelectPet }: PetListViewProps) {
   const { t, locale } = useTranslation();
 
   return (
-    <div id="pets-list-flow" className="overflow-hidden rounded-3xl bg-white shadow-sm select-none">
+    <div id="pets-list-flow" className="overflow-hidden rounded-2xl bg-white shadow-sm select-none">
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead>
@@ -30,7 +30,7 @@ export default function PetListView({ pets, onSelectPet }: PetListViewProps) {
           </thead>
           <tbody className="divide-y divide-slate-100 text-xs font-semibold text-slate-650">
             {pets.map((pet) => (
-              <tr key={pet.id} className="transition-colors hover:bg-slate-50/50">
+              <tr key={pet.id} className="transition-shadow hover:shadow-md transition-colors hover:bg-slate-50/50">
                 <td className="flex items-center gap-3 px-6 py-4">
                   <div className="size-9 shrink-0 overflow-hidden rounded-xl bg-teal-50">
                     {pet.primaryImageUrl ? (
