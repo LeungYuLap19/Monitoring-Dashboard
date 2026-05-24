@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { PET_GUESTS } from '../../constants';
 import { useTranslation } from '../../lib/i18n';
 import { clearAuthSession, getCurrentSessionUser, logoutAuthSession } from '../../lib/services/authService';
-import { AUTH_STORAGE_KEYS, isManualSignOutActive } from '../../lib/utils/auth';
+import { AUTH_STORAGE_KEYS, getRoleFromToken, isManualSignOutActive } from '../../lib/utils/auth';
 import { toActivityClips } from '../../lib/utils/services/pet-monitor-ui';
 import type { AuthUser, TabId } from '../../types';
 import { usePetMonitorRecords } from '../monitoring';
@@ -15,7 +15,13 @@ export function useAuthenticatedLayout() {
   const location = useLocation();
   const { t } = useTranslation();
 
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => getCurrentSessionUser());
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => {
+    const user = getCurrentSessionUser();
+    if (!user) return null;
+    const tokenRole = getRoleFromToken();
+    if (tokenRole) user.role = tokenRole;
+    return user;
+  });
   const [petsList, setPetsList] = useState(PET_GUESTS);
   const [selectedPetId, setSelectedPetId] = useState<string>('momo');
   const [isClipsOpen, setIsClipsOpen] = useState(false);

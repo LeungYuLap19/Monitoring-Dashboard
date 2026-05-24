@@ -138,3 +138,13 @@ export function toAuthUser(data: UserMeResponseData, fallbackRole?: string, ngoI
     ngoId,
   };
 }
+
+export function getRoleFromToken(): AuthUser['role'] | null {
+  const token = getStoredAccessToken();
+  if (!token) return null;
+  const payload = decodeJwtPayload(token);
+  if (!payload) return null;
+  const role = payload.userRole ?? payload.role;
+  if (role === 'user' || role === 'ngo') return role;
+  return null;
+}

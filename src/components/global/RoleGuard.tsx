@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import type { AppRole } from '../../types/lib/auth';
-import { getCurrentSessionUser } from '../../lib/services/authService';
+import { getRoleFromToken } from '../../lib/utils/auth';
 
 interface RoleGuardProps {
   allow: AppRole[];
@@ -8,8 +8,8 @@ interface RoleGuardProps {
 }
 
 export default function RoleGuard({ allow, children }: RoleGuardProps) {
-  const user = getCurrentSessionUser();
-  if (!user || !allow.includes(user.role)) {
+  const tokenRole = getRoleFromToken();
+  if (!tokenRole || !allow.includes(tokenRole)) {
     return <Navigate to="/" replace />;
   }
   return <>{children}</>;
