@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { PET_GUESTS } from '../../constants';
 import { useTranslation } from '../../lib/i18n';
 import { clearAuthSession, getCurrentSessionUser, logoutAuthSession } from '../../lib/services/authService';
@@ -14,6 +15,7 @@ export function useAuthenticatedLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
 
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => {
     const user = getCurrentSessionUser();
@@ -83,14 +85,16 @@ export function useAuthenticatedLayout() {
   }, [navigate, showToast]);
 
   const handleLogout = useCallback(() => {
+    queryClient.clear();
     logoutAuthSession();
     redirectToLogin(t('auth.toasts.loggedOut'));
-  }, [redirectToLogin, t]);
+  }, [queryClient, redirectToLogin, t]);
 
   const handleSessionExpired = useCallback(() => {
+    queryClient.clear();
     clearAuthSession();
     redirectToLogin(t('auth.errors.sessionExpired'));
-  }, [redirectToLogin, t]);
+  }, [queryClient, redirectToLogin, t]);
 
   useEffect(() => {
     const handleStorage = (event: StorageEvent) => {

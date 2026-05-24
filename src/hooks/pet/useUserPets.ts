@@ -8,13 +8,14 @@ export function useUserPets(options: UseUserPetsOptions = {}): UseUserPetsResult
   const { initialQuery = {}, autoLoad = true } = options;
 
   const [query, setQuery] = useState<PetProfileListQuery>(initialQuery);
+  const [hasInitiated, setHasInitiated] = useState(autoLoad);
   const queryRef = useRef<PetProfileListQuery>(initialQuery);
   const queryClient = useQueryClient();
 
   const queryResult = useQuery({
     queryKey: petQueryKeys.list(query),
     queryFn: () => fetchUserPets(query),
-    enabled: autoLoad,
+    enabled: hasInitiated,
   });
 
   const pets = queryResult.data?.pets ?? [];
@@ -29,6 +30,7 @@ export function useUserPets(options: UseUserPetsOptions = {}): UseUserPetsResult
       queryRef.current = nextQuery;
       setQuery(nextQuery);
     }
+    setHasInitiated(true);
 
     const result = await queryClient.fetchQuery({
       queryKey: petQueryKeys.list(resolvedQuery),
