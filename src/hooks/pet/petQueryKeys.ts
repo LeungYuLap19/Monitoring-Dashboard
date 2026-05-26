@@ -6,4 +6,5 @@ export const petQueryKeys = {
   list: (query: PetProfileListQuery) => [...petQueryKeys.lists(), query] as const,
   details: () => [...petQueryKeys.all, 'detail'] as const,
   detail: (petId: string, view: PetProfileView) => [...petQueryKeys.details(), petId, view] as const,
+  cameraMap: () => [...petQueryKeys.all, 'camera-map'] as const,
 };

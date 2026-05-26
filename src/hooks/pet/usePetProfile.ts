@@ -55,13 +55,10 @@ export function usePetProfile<TView extends PetProfileView = 'full'>(
 
   const refreshPetProfile = useCallback(async (): Promise<PetProfileViewMap[TView] | null> => {
     if (!petIdRef.current) return null;
-    await queryClient.invalidateQueries({
+    return queryClient.fetchQuery({
       queryKey: petQueryKeys.detail(petIdRef.current, viewRef.current),
+      queryFn: () => fetchPetProfileById<TView>(petIdRef.current!, { view: viewRef.current }),
     });
-    const data = queryClient.getQueryData<PetProfileViewMap[TView]>(
-      petQueryKeys.detail(petIdRef.current, viewRef.current),
-    );
-    return data ?? null;
   }, [queryClient]);
 
   const clearPetProfile = useCallback(() => {

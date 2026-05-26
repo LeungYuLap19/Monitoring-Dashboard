@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { PetProfileSummary } from '../../types/lib/pet';
 import { fetchUserPets } from '../../lib/services/petService';
+import { petQueryKeys } from './petQueryKeys';
 
 export interface CameraPetInfo {
   petId: string;
@@ -14,20 +16,16 @@ export interface CameraPetInfo {
 export type CameraPetMap = Record<string, CameraPetInfo>;
 
 export function useCameraPetMap() {
-  const [pets, setPets] = useState<PetProfileSummary[]>([]);
-  const [hasLoaded, setHasLoaded] = useState(false);
-  const loadedRef = useRef(false);
-
-  useEffect(() => {
-    if (loadedRef.current) return;
-    loadedRef.current = true;
-    void fetchUserPets({ limit: 100 })
-      .then((result) => {
-        setPets(result.pets);
-        setHasLoaded(true);
-      })
-      .catch(() => setHasLoaded(true));
-  }, []);
+  const queryClient = useQueryClient();
+  const queryResult = useQuery({
+    queryKey: petQueryKeys.cameraMap(),
+    queryFn: async () => {
+      const result = await fetchUserPets({ limit: 100 });
+      return result.pets;
+    },
+  });
+  const pets = queryResult.data ?? [];
+  const hasLoaded = queryResult.isFetched;
 
   const cameraPetMap = useMemo<CameraPetMap>(() => {
     const map: CameraPetMap = {};
@@ -47,9 +45,15 @@ export function useCameraPetMap() {
   }, [pets]);
 
   const refresh = useCallback(async () => {
-    const result = await fetchUserPets({ limit: 100 });
-    setPets(result.pets);
-  }, []);
+    await queryClient.invalidateQueries({ queryKey: petQueryKeys.cameraMap() });
+    return queryClient.fetchQuery({
+      queryKey: petQueryKeys.cameraMap(),
+      queryFn: async () => {
+        const result = await fetchUserPets({ limit: 100 });
+        return result.pets;
+      },
+    });
+  }, [queryClient]);
 
   return { cameraPetMap, hasLoaded, refresh };
 }

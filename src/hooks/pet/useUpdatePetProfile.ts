@@ -1,10 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import type {
+  PetProfileSummary,
   UseUpdatePetProfileOptions,
   UseUpdatePetProfileRequestOptions,
   UseUpdatePetProfileResult,
+  PetProfileFull,
+  UserPetListResult,
 } from '../../types';
 import { updatePetProfileById } from '../../lib/services/petService';
+import { petQueryKeys } from './petQueryKeys';
 
 function toError(error: unknown, fallbackMessage: string): Error {
   return error instanceof Error ? error : new Error(fallbackMessage);
@@ -15,6 +20,7 @@ export function useUpdatePetProfile(
 ): UseUpdatePetProfileResult {
   const { initialPetId = null } = options;
 
+  const queryClient = useQueryClient();
   const [petId, setPetId] = useState<string | null>(initialPetId);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -59,6 +65,58 @@ export function useUpdatePetProfile(
         setRequestId(result.requestId ?? null);
       }
 
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: petQueryKeys.cameraMap() }),
+        queryClient.invalidateQueries({ queryKey: petQueryKeys.lists() }),
+        queryClient.invalidateQueries({ queryKey: petQueryKeys.detail(resolvedPetId, 'basic') }),
+        queryClient.invalidateQueries({ queryKey: petQueryKeys.detail(resolvedPetId, 'detail') }),
+        queryClient.invalidateQueries({ queryKey: petQueryKeys.detail(resolvedPetId, 'full') }),
+      ]);
+
+      const updatedMonitorCameraId = Object.prototype.hasOwnProperty.call(payload, 'monitorCameraId')
+        ? (payload.monitorCameraId ?? null)
+        : undefined;
+
+      if (updatedMonitorCameraId !== undefined) {
+        queryClient.setQueryData<PetProfileSummary[] | undefined>(
+          petQueryKeys.cameraMap(),
+          (current) => current?.map((pet) => {
+            if (pet._id === resolvedPetId) {
+              return { ...pet, monitorCameraId: updatedMonitorCameraId };
+            }
+            if (pet.monitorCameraId === updatedMonitorCameraId) {
+              return { ...pet, monitorCameraId: null };
+            }
+            return pet;
+          }),
+        );
+
+        queryClient.setQueriesData<UserPetListResult>(
+          { queryKey: petQueryKeys.lists() },
+          (current) => {
+            if (!current) return current;
+
+            return {
+              ...current,
+              pets: current.pets.map((pet) => {
+                if (pet._id === resolvedPetId) {
+                  return { ...pet, monitorCameraId: updatedMonitorCameraId };
+                }
+                if (pet.monitorCameraId === updatedMonitorCameraId) {
+                  return { ...pet, monitorCameraId: null };
+                }
+                return pet;
+              }),
+            };
+          },
+        );
+
+        queryClient.setQueryData<PetProfileFull | undefined>(
+          petQueryKeys.detail(resolvedPetId, 'full'),
+          (current) => (current ? { ...current, monitorCameraId: updatedMonitorCameraId } : current),
+        );
+      }
+
       return result;
     } catch (error) {
       const normalizedError = toError(error, 'Failed to update pet profile');
@@ -74,7 +132,7 @@ export function useUpdatePetProfile(
         setIsSubmitting(false);
       }
     }
-  }, []);
+  }, [queryClient]);
 
   const resetUpdateState = useCallback(() => {
     requestSequenceRef.current += 1;

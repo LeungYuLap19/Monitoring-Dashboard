@@ -52,6 +52,9 @@ export default function PetDetailView({
   onNavigateToMonitoring,
 }: PetDetailViewProps) {
   const { t, locale } = useTranslation();
+  const linkedCamera = availableCameras.find((camera) => camera.id === pet.monitorCameraId);
+  const hasOnlineAssignableCamera = availableCameras.some((camera) => camera.isOnline);
+  const showCameraSelector = monitorBackendConnected && hasOnlineAssignableCamera;
 
   const displayBirthday = formatPetDate(pet.birthday, locale) || t('pets.notAvailable');
   const displayReceivedDate = formatPetDate(pet.receivedDate, locale) || t('pets.notAvailable');
@@ -311,48 +314,67 @@ export default function PetDetailView({
                     <p className="text-sm font-bold text-slate-500">{t('pets.monitorCameraNoLink')}</p>
                     <p className="text-xs text-slate-400">{t('pets.monitorCameraNoLinkHint')}</p>
                   </div>
-                ) : !monitorBackendConnected ? (
-                  <div className="rounded-2xl border border-dashed border-rose-100 bg-rose-50/40 p-8 text-center space-y-3">
-                    <VideoOff className="size-9 text-rose-300 mx-auto" />
-                    <p className="text-sm font-bold text-rose-600">{t('pets.monitorCameraDisconnected')}</p>
-                    <p className="text-xs text-slate-400">{t('pets.monitorCameraDisconnectedHint')}</p>
-                  </div>
                 ) : (
-                  <div className="rounded-2xl border border-teal-100 bg-teal-50/40 p-5 space-y-4">
-                    <div className="flex items-center justify-between">
+                  <div
+                    className={`rounded-2xl p-5 space-y-4 ${
+                      monitorBackendConnected
+                        ? 'border border-teal-100 bg-teal-50/40'
+                        : 'border border-rose-100 bg-rose-50/40'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2.5">
-                        <span className="size-2.5 rounded-full bg-teal-500 animate-pulse" />
-                        <span className="text-sm font-bold text-teal-700">
-                          {availableCameras.find((c) => c.id === pet.monitorCameraId)?.name || `Camera ${pet.monitorCameraId}`}
-                        </span>
+                        <span
+                          className={`size-2.5 rounded-full ${
+                            monitorBackendConnected ? 'bg-teal-500 animate-pulse' : 'bg-rose-400'
+                          }`}
+                        />
+                        <div className="space-y-1">
+                          <span className={`block text-sm font-bold ${monitorBackendConnected ? 'text-teal-700' : 'text-rose-700'}`}>
+                            {linkedCamera?.name || `Camera ${pet.monitorCameraId}`}
+                          </span>
+                          <span className="block text-[11px] font-semibold text-slate-500">
+                            {monitorBackendConnected ? t('pets.monitorCameraGoLive') : t('pets.monitorCameraDisconnected')}
+                          </span>
+                        </div>
                       </div>
-                      {onNavigateToMonitoring && (
+                      {onNavigateToMonitoring && monitorBackendConnected ? (
                         <Button variant="outline" size="sm" onClick={onNavigateToMonitoring} className="gap-1.5">
                           <ExternalLink className="size-3.5" />
                           {t('pets.monitorCameraGoLive')}
                         </Button>
-                      )}
+                      ) : null}
                     </div>
+                    {!monitorBackendConnected ? (
+                      <div className="flex items-start gap-2 rounded-xl bg-white/70 px-3 py-2 text-xs text-slate-500">
+                        <Video className="mt-0.5 size-4 shrink-0 text-rose-400" />
+                        <span>{t('pets.monitorCameraDisconnectedHint')}</span>
+                      </div>
+                    ) : null}
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <h4 className="text-xs font-black uppercase tracking-widest text-slate-400">{t('pets.monitorCameraSelectLabel')}</h4>
-                  <div className="flex items-center gap-3">
-                    <select
-                      value={pet.monitorCameraId ?? ''}
-                      onChange={(e) => onUpdateMonitorCamera(e.target.value || null)}
-                      disabled={isUpdatingCamera}
-                      className="flex-1 rounded-xl bg-slate-50 px-4 py-3 text-xs font-bold text-slate-700 focus:outline-none disabled:opacity-50"
-                    >
-                      <option value="">{t('pets.monitorCameraNone')}</option>
-                      {availableCameras.map((cam) => (
-                        <option key={cam.id} value={cam.id}>{cam.name}</option>
-                      ))}
-                    </select>
-                    {isUpdatingCamera && <Loader2 className="size-4 animate-spin text-teal-600" />}
+                {showCameraSelector ? (
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-black uppercase tracking-widest text-slate-400">{t('pets.monitorCameraSelectLabel')}</h4>
+                    <div className="flex items-center gap-3">
+                      <select
+                        value={pet.monitorCameraId ?? ''}
+                        onChange={(e) => onUpdateMonitorCamera(e.target.value || null)}
+                        disabled={isUpdatingCamera}
+                        className="flex-1 rounded-xl bg-slate-50 px-4 py-3 text-xs font-bold text-slate-700 focus:outline-none disabled:opacity-50"
+                      >
+                        <option value="">{t('pets.monitorCameraNone')}</option>
+                        {availableCameras
+                          .filter((camera) => camera.isOnline || camera.id === pet.monitorCameraId)
+                          .map((cam) => (
+                            <option key={cam.id} value={cam.id}>{cam.name}</option>
+                          ))}
+                      </select>
+                      {isUpdatingCamera && <Loader2 className="size-4 animate-spin text-teal-600" />}
+                    </div>
                   </div>
-                </div>
+                ) : null}
               </div>
             )}
           </div>

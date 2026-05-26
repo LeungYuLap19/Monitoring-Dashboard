@@ -113,7 +113,7 @@ export default function PetsPage() {
 
   const monitorStats = usePetMonitorStats({ autoLoad: true });
   const { updatePetProfile, isSubmitting: isUpdatingCamera } = useUpdatePetProfile();
-  const { cameraPetMap, refresh: refreshCameraPetMap } = useCameraPetMap();
+  const { cameraPetMap } = useCameraPetMap();
 
   const availableCameras = useMemo(() => {
     return monitorStats.cameraSnapshots
@@ -121,6 +121,7 @@ export default function PetsPage() {
       .map((cam) => ({
         id: cam.snapshot.stats.deviceId!,
         name: cam.snapshot.stats.name || `Camera ${cam.camId}`,
+        isOnline: cam.snapshot.stats.status !== 'offline' && cam.snapshot.stats.status !== 'error',
         takenByPetId: cameraPetMap[cam.snapshot.stats.deviceId!]?.petId ?? null,
       }))
       .filter((cam) => !cam.takenByPetId || cam.takenByPetId === selectedPetId);
@@ -133,8 +134,8 @@ export default function PetsPage() {
     void updatePetProfile(
       { monitorCameraId: cameraId },
       { petId: selectedPetId },
-    ).then(() => { void refreshSelectedPet(); void refreshCameraPetMap(); }).catch(() => undefined);
-  }, [selectedPetId, updatePetProfile, refreshSelectedPet, refreshCameraPetMap]);
+    ).then(() => { void refreshSelectedPet(); }).catch(() => undefined);
+  }, [selectedPetId, updatePetProfile, refreshSelectedPet]);
 
   const handleNavigateToMonitoring = useCallback(() => {
     navigate('/monitoring');

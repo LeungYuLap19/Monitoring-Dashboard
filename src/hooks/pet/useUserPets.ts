@@ -41,9 +41,11 @@ export function useUserPets(options: UseUserPetsOptions = {}): UseUserPetsResult
   }, [queryClient]);
 
   const refreshPets = useCallback(async (): Promise<UserPetListResult> => {
-    await queryClient.invalidateQueries({ queryKey: petQueryKeys.list(queryRef.current) });
-    const data = queryClient.getQueryData<UserPetListResult>(petQueryKeys.list(queryRef.current));
-    return data ?? { pets: [], pagination: null, message: undefined, requestId: undefined };
+    setHasInitiated(true);
+    return queryClient.fetchQuery({
+      queryKey: petQueryKeys.list(queryRef.current),
+      queryFn: () => fetchUserPets(queryRef.current),
+    });
   }, [queryClient]);
 
   const resetPets = useCallback(() => {

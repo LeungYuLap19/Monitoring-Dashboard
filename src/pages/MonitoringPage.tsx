@@ -182,9 +182,25 @@ export default function MonitoringPage() {
     () => toActivityCounts(behavior.behaviorStats, selectedSnapshot),
     [behavior.behaviorStats, selectedSnapshot],
   );
+  const hasBehaviorStatsData = useMemo(
+    () => Object.keys(behavior.behaviorStats?.stats ?? {}).length > 0,
+    [behavior.behaviorStats?.stats],
+  );
+  const hasTimelineData = useMemo(
+    () => (behavior.timeline?.points?.length ?? 0) > 0,
+    [behavior.timeline?.points],
+  );
   const statsByTime = useMemo(
-    () => (behavior.timeline?.points?.length ? toStatsByTime(behavior.timeline, backendActivityCounts) : []),
-    [backendActivityCounts, behavior.timeline],
+    () => {
+      if (hasTimelineData) {
+        return toStatsByTime(behavior.timeline, backendActivityCounts);
+      }
+      if (hasBehaviorStatsData) {
+        return toStatsByTime(null, backendActivityCounts);
+      }
+      return [];
+    },
+    [backendActivityCounts, behavior.timeline, hasBehaviorStatsData, hasTimelineData],
   );
   const trendStatsByTime = useMemo(
     () => (trendTimeline?.points?.length ? toStatsByTime(trendTimeline, []) : []),
@@ -194,6 +210,7 @@ export default function MonitoringPage() {
     () => backendActivityCounts.reduce((acc, curr) => acc + curr.value, 0),
     [backendActivityCounts],
   );
+  const isBehaviorLoading = behavior.isLoadingStats || behavior.isLoadingTimeline;
   const avgOver3Days = useMemo(() => {
     if (!statsByTime.length) return 0;
     const total = statsByTime.reduce((sum, item) => sum + item.activityCount, 0);
@@ -239,7 +256,7 @@ export default function MonitoringPage() {
         message: t('monitoring.placeholders.noCameraSelectedMsg'),
       };
     }
-    if (!backendActivityCounts.length || !statsByTime.length) {
+    if (!isBehaviorLoading && !hasBehaviorStatsData && !hasTimelineData) {
       return {
         title: t('monitoring.placeholders.noData'),
         message: t('monitoring.placeholders.noDataMsg'),
@@ -247,12 +264,13 @@ export default function MonitoringPage() {
     }
     return null;
   }, [
-    backendActivityCounts.length,
     behavior.statsError,
     behavior.timelineError,
+    hasBehaviorStatsData,
     hasCameraSelection,
     hasMonitorError,
-    statsByTime.length,
+    hasTimelineData,
+    isBehaviorLoading,
     t,
   ]);
 
@@ -320,7 +338,7 @@ export default function MonitoringPage() {
         activeCategory={backendActivityCounts}
         totalActivities={totalActivities}
         onGenerateLog={onGenerateLog}
-        isLoading={behavior.isLoadingStats || behavior.isLoadingTimeline || monitor.stats.isLoading}
+        isLoading={isBehaviorLoading || monitor.stats.isLoading}
         error={behavior.statsError ?? behavior.timelineError ?? monitor.error}
         placeholder={statsPlaceholder}
       />
