@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { usePetManagement } from '../hooks/pet';
 import { useUpdatePetProfile } from '../hooks/pet/useUpdatePetProfile';
 import { useCameraPetMap } from '../hooks/pet/useCameraPetMap';
-import { usePetMonitorStats } from '../hooks/monitoring';
+import { useBehaviorSSE } from '../hooks/monitoring/useBehaviorSSE';
 import { useTranslation } from '../lib/i18n';
 import PetSearchBar from '../components/pages/pets/PetSearchBar';
 import PetCardGrid from '../components/pages/pets/PetCardGrid';
@@ -111,23 +111,23 @@ export default function PetsPage() {
     refreshSelectedPet,
   } = usePetManagement();
 
-  const monitorStats = usePetMonitorStats({ autoLoad: true });
+  const monitorSSE = useBehaviorSSE();
   const { updatePetProfile, isSubmitting: isUpdatingCamera } = useUpdatePetProfile();
   const { cameraPetMap } = useCameraPetMap();
 
   const availableCameras = useMemo(() => {
-    return monitorStats.cameraSnapshots
-      .filter((cam) => cam.snapshot.stats.deviceId)
+    return [...monitorSSE.cameraStats.values()]
+      .filter((cam) => cam.deviceId)
       .map((cam) => ({
-        id: cam.snapshot.stats.deviceId!,
-        name: cam.snapshot.stats.name || `Camera ${cam.camId}`,
-        isOnline: cam.snapshot.stats.status !== 'offline' && cam.snapshot.stats.status !== 'error',
-        takenByPetId: cameraPetMap[cam.snapshot.stats.deviceId!]?.petId ?? null,
+        id: cam.deviceId!,
+        name: cam.name || `Camera ${cam.cam_id}`,
+        isOnline: cam.status !== 'offline' && cam.status !== 'error',
+        takenByPetId: cameraPetMap[cam.deviceId!]?.petId ?? null,
       }))
       .filter((cam) => !cam.takenByPetId || cam.takenByPetId === selectedPetId);
-  }, [cameraPetMap, monitorStats.cameraSnapshots, selectedPetId]);
+  }, [cameraPetMap, monitorSSE.cameraStats, selectedPetId]);
 
-  const monitorBackendConnected = monitorStats.hasLoaded && !monitorStats.error;
+  const monitorBackendConnected = monitorSSE.connected;
 
   const handleUpdateMonitorCamera = useCallback((cameraId: string | null) => {
     if (!selectedPetId) return;

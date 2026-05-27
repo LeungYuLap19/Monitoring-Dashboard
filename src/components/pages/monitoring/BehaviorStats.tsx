@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, ChevronDown, FileText, Sparkles } from 'lucide-react';
+import { AlertTriangle, ChevronDown, FileText, RefreshCw, Sparkles } from 'lucide-react';
 import { BehaviorStatsProps } from '../../../types';
 import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '../../ui/chart';
@@ -17,6 +17,7 @@ export default function BehaviorStats({
   activeCategory,
   totalActivities,
   onGenerateLog,
+  onRefresh,
   isLoading = false,
   error = null,
   placeholder = null,
@@ -24,7 +25,7 @@ export default function BehaviorStats({
   const { t } = useTranslation();
 
   const barChartConfig: ChartConfig = {
-    activityCount: { label: t('monitoring.stats.perDay'), color: '#0d9488' },
+    activityCount: { label: timeFilter === '1' ? t('monitoring.stats.countAxis') : t('monitoring.stats.perDay'), color: '#0d9488' },
   };
 
   const barData = statsByTime.map((item, idx) => ({
@@ -44,8 +45,9 @@ export default function BehaviorStats({
     return acc;
   }, {} as ChartConfig);
 
+  const todayTotal = statsByTime.reduce((sum, item) => sum + item.activityCount, 0);
   const todayStats = statsByTime[statsByTime.length - 1];
-  const trendData = trendStatsByTime.slice(-7);
+  const trendData = trendStatsByTime;
 
   const lineChartConfig: ChartConfig = {
     restingCount: { label: t('monitoring.behavior.resting'), color: '#94a3b8' },
@@ -63,19 +65,16 @@ export default function BehaviorStats({
               <Sparkles className="size-4 text-teal-600" />
               <span>{t('monitoring.stats.title')}</span>
             </h4>
-            <div className="relative">
-              <select
-                id="stats-time-filter"
-                value={timeFilter}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setTimeFilter(e.target.value as '1' | '3' | '7')}
-                className="appearance-none bg-slate-50 rounded-lg px-3 py-1 pr-6 text-[10px] font-extrabold text-slate-500 focus:outline-none cursor-pointer"
+            {onRefresh && (
+              <button
+                onClick={onRefresh}
+                disabled={isLoading}
+                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors disabled:opacity-50"
+                title={t('monitoring.stats.refresh')}
               >
-                <option value="1">{t('monitoring.stats.filter1Day')}</option>
-                <option value="3">{t('monitoring.stats.filter3Days')}</option>
-                <option value="7">{t('monitoring.stats.filter7Days')}</option>
-              </select>
-              <ChevronDown className="size-3 text-slate-400 absolute right-1.5 top-2 pointer-events-none" />
-            </div>
+                <RefreshCw className={`size-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+              </button>
+            )}
           </div>
 
           <div className="p-3.5 bg-emerald-50/40 rounded-xl text-xs text-slate-600 flex gap-2">
@@ -95,29 +94,6 @@ export default function BehaviorStats({
             </div>
           ) : (
             <>
-              <div className="space-y-3">
-                <span className="block text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('monitoring.stats.avgLabel')}</span>
-                <div className="bg-slate-50/50 p-4 rounded-2xl">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="space-y-0.5">
-                      <span className="block text-2xl font-black text-slate-800 tracking-tight">{todayStats?.activityCount ?? 0} <span className="text-[10px] text-slate-400 font-bold">{t('monitoring.stats.perDay')}</span></span>
-                      <span className="text-[10px] text-slate-400 font-bold">{t('monitoring.stats.yesterdayAvg')} {avgOver3Days}{t('monitoring.stats.perDay')}</span>
-                    </div>
-                  </div>
-                  <ChartContainer config={barChartConfig} className="h-[100px] w-full">
-                    <BarChart data={barData} margin={{ top: 15, right: 0, left: 0, bottom: 0 }}>
-                      <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 700 }} />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="activityCount" radius={[4, 4, 0, 0]} fill="#0d9488">
-                        {barData.map((entry, index) => (
-                          <Cell key={index} fill={entry.fill} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ChartContainer>
-                </div>
-              </div>
-
               <div className="space-y-4">
                 <span className="block text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('monitoring.stats.distributionLabel')}</span>
                 <div className="flex items-center justify-between gap-4 lg:flex-col lg:items-stretch xl:flex-row xl:items-center">
@@ -145,8 +121,52 @@ export default function BehaviorStats({
                 </div>
               </div>
 
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="block text-[11px] font-black text-slate-400 uppercase tracking-widest">{t(`monitoring.stats.avgLabel${timeFilter}`)}</span>
+                  <div className="relative">
+                    <select
+                      id="stats-time-filter"
+                      value={timeFilter}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setTimeFilter(e.target.value as '1' | '3' | '7')}
+                      className="appearance-none bg-slate-50 rounded-lg px-3 py-1 pr-6 text-[10px] font-extrabold text-slate-500 focus:outline-none cursor-pointer"
+                    >
+                      <option value="1">{t('monitoring.stats.filter1Day')}</option>
+                      <option value="3">{t('monitoring.stats.filter3Days')}</option>
+                      <option value="7">{t('monitoring.stats.filter7Days')}</option>
+                    </select>
+                    <ChevronDown className="size-3 text-slate-400 absolute right-1.5 top-2 pointer-events-none" />
+                  </div>
+                </div>
+                <div className="bg-slate-50/50 p-4 rounded-2xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="space-y-0.5">
+                      <span className="block text-2xl font-black text-slate-800 tracking-tight">
+                        {timeFilter === '1' ? todayTotal : (todayStats?.activityCount ?? 0)} <span className="text-[10px] text-slate-400 font-bold">{t('monitoring.stats.perToday')}</span>
+                      </span>
+                      {timeFilter === '1' ? (
+                        <span className="text-[10px] text-slate-400 font-bold">{t('monitoring.stats.yesterdayAvg')} {statsByTime.length ? Math.round(todayTotal / statsByTime.length) : 0}{t('monitoring.stats.perHour')}</span>
+                      ) : (
+                        <span className="text-[10px] text-slate-400 font-bold">{timeFilter}-day {t('monitoring.stats.yesterdayAvg')} {avgOver3Days}{t('monitoring.stats.perDay')}</span>
+                      )}
+                    </div>
+                  </div>
+                  <ChartContainer config={barChartConfig} className="h-[100px] w-full">
+                    <BarChart data={barData} margin={{ top: 15, right: 0, left: 0, bottom: 0 }}>
+                      <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 700 }} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="activityCount" radius={[4, 4, 0, 0]} fill="#0d9488">
+                        {barData.map((entry, index) => (
+                          <Cell key={index} fill={entry.fill} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ChartContainer>
+                </div>
+              </div>
+
               <div className="space-y-4">
-                <span className="block text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('monitoring.stats.comparisonLabel')}</span>
+                <span className="block text-[11px] font-black text-slate-400 uppercase tracking-widest">{t(`monitoring.stats.comparisonLabel${timeFilter}`)}</span>
                 <ChartContainer config={lineChartConfig} className="h-[120px] w-full">
                   <LineChart data={trendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -159,10 +179,10 @@ export default function BehaviorStats({
                       tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 700 }}
                     />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Line type="monotone" dataKey="restingCount" stroke="var(--color-restingCount)" strokeWidth={1.75} dot={{ r: 2.5, fill: 'var(--color-restingCount)' }} />
-                    <Line type="monotone" dataKey="eatingCount" stroke="var(--color-eatingCount)" strokeWidth={1.75} dot={{ r: 2.5, fill: 'var(--color-eatingCount)' }} />
-                    <Line type="monotone" dataKey="drinkingCount" stroke="var(--color-drinkingCount)" strokeWidth={1.75} dot={{ r: 2.5, fill: 'var(--color-drinkingCount)' }} />
-                    <Line type="monotone" dataKey="activityCount" stroke="var(--color-activityCount)" strokeWidth={2} dot={{ r: 3, fill: 'var(--color-activityCount)' }} />
+                    <Line type="monotone" dataKey="restingCount" stroke="var(--color-restingCount)" strokeWidth={1.75} dot={false} />
+                    <Line type="monotone" dataKey="eatingCount" stroke="var(--color-eatingCount)" strokeWidth={1.75} dot={false} />
+                    <Line type="monotone" dataKey="drinkingCount" stroke="var(--color-drinkingCount)" strokeWidth={1.75} dot={false} />
+                    <Line type="monotone" dataKey="activityCount" stroke="var(--color-activityCount)" strokeWidth={2} dot={false} />
                   </LineChart>
                 </ChartContainer>
                 <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px] font-bold text-slate-400">

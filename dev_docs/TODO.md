@@ -1,3 +1,0 @@
-- [ ] lambda template include throttling rate limit
-- [ ] lambda atomic operations to all critical non-indexed db crud
-- [ ] mongodb store behaviour data, interval normal user 6 hrs, ngo and hotels 1hrs interval

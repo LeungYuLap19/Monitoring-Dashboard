@@ -12,6 +12,7 @@ import type {
   PetMonitorCameraSnapshot,
   PetMonitorVideoRecord,
 } from '../../../types/lib/monitoring';
+import type { BehaviorSSEEvent, CameraStatsSSEEvent } from '../../../types/lib/behaviorSSE';
 
 export interface PetMonitorCameraSnapshotItem {
   cameraKey: string;
@@ -148,6 +149,48 @@ export function toPetMonitorCameraFeeds(
   });
 }
 
+export function buildCameraFeedsFromSSE(
+  cameraStats: Map<number, CameraStatsSSEEvent>,
+  behaviors: BehaviorSSEEvent[],
+  getVideoFeedUrl?: (camId: number) => string,
+): CameraFeed[] {
+  const behaviorByCam = new Map<number, BehaviorSSEEvent>();
+  for (const evt of behaviors) {
+    if (!behaviorByCam.has(evt.cam_id)) {
+      behaviorByCam.set(evt.cam_id, evt);
+    }
+  }
+
+  return [...cameraStats.entries()]
+    .sort(([a], [b]) => a - b)
+    .map(([camId, stats]) => {
+      const status = normalizeBehaviorKey(stats.status);
+      const isOnline = status !== 'offline' && status !== 'error';
+      const behaviorEvt = behaviorByCam.get(camId);
+      const currentBehavior = behaviorEvt
+        ? toDisplayBehavior(behaviorEvt.behavior)
+        : (isOnline ? '監測中' : '離線');
+
+      const fpsText = `${stats.fps.toFixed(1)} fps`;
+      const yoloText = `AI ${stats.yoloMs}ms`;
+      const vibeText = [fpsText, yoloText, stats.isRecording ? 'recording' : null].filter(Boolean).join(' · ');
+
+      return {
+        id: `cam-${camId}`,
+        name: stats.name || `Camera ${camId}`,
+        isOnline,
+        currentBehavior,
+        petId: `cam-${camId}`,
+        petName: stats.name || `Camera ${camId}`,
+        isLive: isOnline,
+        vibeText,
+        streamUrl: getVideoFeedUrl?.(camId),
+        camId,
+        deviceId: stats.deviceId,
+      };
+    });
+}
+
 export function toPetMonitorGuests(
   feeds: CameraFeed[],
   fallbackGuests: PetGuest[],
@@ -200,9 +243,12 @@ export function toStatsByTime(
     return timeline.points.map((point) => {
       const counts = toTimelineBehaviorCounts(point.counts ?? {});
       const activityCount = counts.moving ?? 0;
+      const label = point.label.includes('T')
+        ? String(new Date(point.label + ':00Z').getHours())
+        : point.label.slice(5);
 
       return {
-        date: point.label,
+        date: label,
         activityCount,
         restingCount: counts.resting ?? 0,
         eatingCount: counts.eating ?? counts.eat ?? 0,

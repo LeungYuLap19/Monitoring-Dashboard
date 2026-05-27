@@ -3,7 +3,7 @@ import { useLayoutContext } from '../hooks/layout';
 import { useCameraPetMap } from '../hooks/pet';
 import { usePetMonitorDashboard } from '../hooks/monitoring';
 import { getCurrentSessionUser } from '../lib/services/authService';
-import { toPetMonitorCameraFeeds } from '../lib/utils/services/pet-monitor-ui';
+import { buildCameraFeedsFromSSE } from '../lib/utils/services/pet-monitor-ui';
 import MetricsGrid from '../components/pages/overview/MetricsGrid';
 import MonitoringHeader from '../components/pages/overview/MonitoringHeader';
 import CameraFeedGrid from '../components/pages/overview/CameraFeedGrid';
@@ -15,17 +15,15 @@ export default function OverviewPage() {
   const isNgo = currentUser?.role === 'ngo';
   const monitor = usePetMonitorDashboard({
     autoLoad: true,
-    statsPollIntervalMs: 5000,
   });
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'online' | 'offline' | 'resting' | 'active'>('all');
 
   const cameraFeeds = useMemo(() => {
-    const feeds = toPetMonitorCameraFeeds(
-      monitor.stats.cameraSnapshots,
-      monitor.activeCameras.activeCameras,
-      null,
+    const feeds = buildCameraFeedsFromSSE(
+      monitor.sse.cameraStats,
+      monitor.sse.behaviors,
       monitor.urls.getVideoFeedUrl,
     );
     return feeds.map((feed) => {
@@ -37,8 +35,8 @@ export default function OverviewPage() {
     });
   }, [
     cameraPetMap,
-    monitor.activeCameras.activeCameras,
-    monitor.stats.cameraSnapshots,
+    monitor.sse.cameraStats,
+    monitor.sse.behaviors,
     monitor.urls.getVideoFeedUrl,
   ]);
 
