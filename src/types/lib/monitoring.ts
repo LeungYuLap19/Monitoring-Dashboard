@@ -147,3 +147,34 @@ export interface PetMonitorDeleteVideoRecordResponse {
   success: boolean;
   error?: string;
 }
+
+export interface AwsBehaviorSummaryResponse {
+  petId: string;
+  from: string;
+  to: string;
+  stats: Record<string, number>;
+}
+
+export interface AwsBehaviorTimelinePoint {
+  label: string;
+  counts: Record<string, number>;
+}
+
+export interface AwsBehaviorTimelineResponse {
+  petId: string;
+  bucket: '5m' | '1h' | '1d';
+  points: AwsBehaviorTimelinePoint[];
+}
+
+export interface AwsBehaviorEvent {
+  timestamp: string;
+  did: string;
+  behavior: string;
+  behaviors: string[];
+  petId: string;
+}
+
+export interface AwsBehaviorEventsResponse {
+  data: AwsBehaviorEvent[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}

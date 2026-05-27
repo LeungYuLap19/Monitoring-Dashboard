@@ -38,6 +38,7 @@ export interface BehaviorStatsProps {
   activeCategory: ActivityCount[];
   totalActivities: number;
   onGenerateLog: () => void;
+  onRefresh?: () => void;
   isLoading?: boolean;
   error?: Error | null;
   placeholder?: {

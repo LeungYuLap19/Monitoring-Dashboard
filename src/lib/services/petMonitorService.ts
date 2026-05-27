@@ -1,11 +1,6 @@
 import type { AxiosRequestConfig } from 'axios';
 import type {
   PetMonitorActiveCamerasResponse,
-  PetMonitorBackendStatsResponse,
-  PetMonitorBehaviorLogStatsResponse,
-  PetMonitorBehaviorLogsQuery,
-  PetMonitorBehaviorTimelineQuery,
-  PetMonitorBehaviorTimelineResponse,
   PetMonitorCameraConfigUpdateResponse,
   PetMonitorCameraIndex,
   PetMonitorCameraRuntimeConfig,
@@ -46,6 +41,10 @@ export function buildPetMonitorUrl(path: string): string {
   return buildPetMonitorUrlWithBase(PET_MONITOR_API_BASE_URL, path);
 }
 
+export function getPetMonitorBehaviorSSEUrl(): string {
+  return buildPetMonitorUrlWithBase(PET_MONITOR_API_BASE_URL, '/api/stream/behavior');
+}
+
 export function getPetMonitorVideoFeedUrl(camId: PetMonitorCameraIndex): string {
   return buildPetMonitorVideoFeedUrl(PET_MONITOR_API_BASE_URL, camId);
 }
@@ -56,15 +55,6 @@ export function getPetMonitorRecordVideoUrl(filename: string): string {
 
 export function getPetMonitorRecordThumbnailUrl(filename: string): string {
   return buildPetMonitorRecordThumbnailUrl(PET_MONITOR_API_BASE_URL, filename);
-}
-
-export async function fetchPetMonitorCameraStats(): Promise<PetMonitorBackendStatsResponse> {
-  const response = await requestPetMonitor<PetMonitorBackendStatsResponse>({
-    method: 'GET',
-    url: '/stats',
-  });
-
-  return requireSuccessStatus(response, 'Failed to fetch PetMonitor camera stats');
 }
 
 export async function getPetMonitorActiveCameras(): Promise<PetMonitorCameraIndex[]> {
@@ -120,46 +110,6 @@ export async function updatePetMonitorCameraConfig(
     success: isSuccessStatus(response.status) && data.success !== false,
     error: data.error ?? (!isSuccessStatus(response.status)
       ? readErrorMessage(data, `Failed to update PetMonitor config for camera ${camId}`)
-      : undefined),
-  };
-}
-
-export async function getPetMonitorBehaviorLogs(
-  query: PetMonitorBehaviorLogsQuery,
-): Promise<PetMonitorBehaviorLogStatsResponse> {
-  const response = await requestPetMonitor<PetMonitorBehaviorLogStatsResponse>({
-    method: 'GET',
-    url: '/api/behavior_logs',
-    params: query,
-  });
-
-  const data = (response.data ?? {}) as PetMonitorBehaviorLogStatsResponse;
-  return {
-    success: isSuccessStatus(response.status) && data.success !== false,
-    stats: isObjectRecord(data.stats) ? data.stats : {},
-    error: data.error ?? (!isSuccessStatus(response.status)
-      ? readErrorMessage(data, 'Failed to fetch PetMonitor behavior logs')
-      : undefined),
-  };
-}
-
-export async function getPetMonitorBehaviorTimeline(
-  query: PetMonitorBehaviorTimelineQuery,
-): Promise<PetMonitorBehaviorTimelineResponse> {
-  const response = await requestPetMonitor<PetMonitorBehaviorTimelineResponse>({
-    method: 'GET',
-    url: '/api/behavior_logs_timeline',
-    params: query,
-  });
-
-  const data = (response.data ?? {}) as PetMonitorBehaviorTimelineResponse;
-  return {
-    success: isSuccessStatus(response.status) && data.success !== false,
-    cam_id: typeof data.cam_id === 'number' ? data.cam_id : query.cam_id,
-    bucket: data.bucket ?? query.bucket,
-    points: Array.isArray(data.points) ? data.points : [],
-    error: data.error ?? (!isSuccessStatus(response.status)
-      ? readErrorMessage(data, 'Failed to fetch PetMonitor behavior timeline')
       : undefined),
   };
 }

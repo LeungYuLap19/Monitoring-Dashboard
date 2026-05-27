@@ -19,11 +19,6 @@ export interface RunPetMonitorRequestOptions<TData> {
   onError?: (error: Error) => void;
 }
 
-export interface UsePetMonitorStatsOptions {
-  autoLoad?: boolean;
-  pollIntervalMs?: number;
-}
-
 export interface UsePetMonitorActiveCamerasOptions {
   autoLoad?: boolean;
 }
@@ -47,8 +42,5 @@ export interface UsePetMonitorRecordsOptions {
 
 export interface UsePetMonitorDashboardOptions {
   autoLoad?: boolean;
-  statsPollIntervalMs?: number;
-  behaviorLogsQuery?: PetMonitorBehaviorLogsQuery | null;
-  behaviorTimelineQuery?: PetMonitorBehaviorTimelineQuery | null;
   recordsQuery?: PetMonitorVideoRecordsQuery;
 }

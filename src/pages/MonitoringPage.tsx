@@ -1,33 +1,27 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Database, WifiOff } from 'lucide-react';
 import { useLayoutContext } from '../hooks/layout';
 import { useTranslation } from '../lib/i18n';
 import { useCameraPetMap } from '../hooks/pet';
 import {
-  usePetMonitorBehavior,
   usePetMonitorCameraConfig,
   usePetMonitorDashboard,
   usePetMonitorRecords,
 } from '../hooks/monitoring';
 import {
+  buildCameraFeedsFromSSE,
   getCameraIdFromMonitorId,
   toActivityCounts,
   toBehaviorSummary,
-  toPetMonitorCameraFeeds,
   toStatsByTime,
 } from '../lib/utils/services/pet-monitor-ui';
-import { getPetMonitorBehaviorTimeline } from '../lib/services/petMonitorService';
-import type { PetMonitorBehaviorTimelineResponse } from '../types/lib/monitoring';
+import { getBehaviorSummary, getBehaviorTimeline } from '../lib/services/behaviorHistoryService';
 import PetSelector from '../components/pages/monitoring/PetSelector';
 import PetProfileCard from '../components/pages/monitoring/PetProfileCard';
 import LiveStreamView from '../components/pages/monitoring/LiveStreamView';
 import BehaviorStats from '../components/pages/monitoring/BehaviorStats';
 import { Button } from '../components/ui/button';
-
-function formatPetMonitorDateTime(date: Date): string {
-  const pad = (value: number) => String(value).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-}
 
 function MonitoringPlaceholder({
   icon,
@@ -63,28 +57,21 @@ function MonitoringPlaceholder({
 export default function MonitoringPage() {
   const { selectedPetId, setSelectedPetId, onOpenClipsModal, onGenerateLog } = useLayoutContext();
   const { t } = useTranslation();
-
   const [timeFilter, setTimeFilter] = useState<'1' | '3' | '7'>('3');
   const [streamActive, setStreamActive] = useState(true);
-  const [trendTimeline, setTrendTimeline] = useState<PetMonitorBehaviorTimelineResponse | null>(null);
   const monitor = usePetMonitorDashboard({
     autoLoad: true,
-    statsPollIntervalMs: 5000,
   });
-  const behavior = usePetMonitorBehavior({ autoLoadLogs: false, autoLoadTimeline: false });
   const records = usePetMonitorRecords({ autoLoad: false });
   const cameraConfig = usePetMonitorCameraConfig({ autoLoad: false });
   const { cameraPetMap } = useCameraPetMap();
-  const { loadBehaviorStats, loadBehaviorTimeline } = behavior;
   const { loadRecords } = records;
   const { loadCameraConfig } = cameraConfig;
-  const { getCameraSnapshot } = monitor.stats;
 
   const cameraFeeds = useMemo(() => {
-    const feeds = toPetMonitorCameraFeeds(
-      monitor.stats.cameraSnapshots,
-      monitor.activeCameras.activeCameras,
-      null,
+    const feeds = buildCameraFeedsFromSSE(
+      monitor.sse.cameraStats,
+      monitor.sse.behaviors,
       monitor.urls.getVideoFeedUrl,
     );
     return feeds.map((feed) => {
@@ -103,8 +90,8 @@ export default function MonitoringPage() {
     });
   }, [
     cameraPetMap,
-    monitor.activeCameras.activeCameras,
-    monitor.stats.cameraSnapshots,
+    monitor.sse.cameraStats,
+    monitor.sse.behaviors,
     monitor.urls.getVideoFeedUrl,
   ]);
 
@@ -118,12 +105,12 @@ export default function MonitoringPage() {
     [activeFeed?.id],
   );
 
-  const selectedSnapshot = useMemo(() => {
+  const selectedCameraStats = useMemo(() => {
     if (selectedCamId === null) return null;
-    return getCameraSnapshot(selectedCamId);
-  }, [getCameraSnapshot, selectedCamId]);
+    return monitor.sse.getStatsForCam(selectedCamId);
+  }, [monitor.sse, selectedCamId]);
 
-  const hasMonitorError = Boolean(monitor.stats.error || monitor.activeCameras.error);
+  const hasMonitorError = Boolean(!monitor.sse.connected && monitor.activeCameras.error);
   const hasFeeds = cameraFeeds.length > 0;
   const hasCameraSelection = activeFeed !== null;
 
@@ -135,82 +122,94 @@ export default function MonitoringPage() {
 
   useEffect(() => {
     if (selectedCamId === null) return;
-
-    const now = new Date();
-    const start = new Date(now);
-    start.setDate(now.getDate() - (Number(timeFilter) - 1));
-    start.setHours(0, 0, 0, 0);
-    const startText = formatPetMonitorDateTime(start);
-    const endText = formatPetMonitorDateTime(now);
-
-    void loadBehaviorStats({
-      cam_id: selectedCamId,
-      start: startText,
-      end: endText,
-    }).catch(() => undefined);
-
-    void loadBehaviorTimeline({
-      cam_id: selectedCamId,
-      start: startText,
-      end: endText,
-      bucket: timeFilter === '1' ? '1h' : '1d',
-    }).catch(() => undefined);
-
     void loadRecords({ cam_id: selectedCamId }).catch(() => undefined);
     void loadCameraConfig(selectedCamId).catch(() => undefined);
-  }, [loadBehaviorStats, loadBehaviorTimeline, loadCameraConfig, loadRecords, selectedCamId, timeFilter]);
+  }, [loadCameraConfig, loadRecords, selectedCamId]);
 
-  useEffect(() => {
-    if (selectedCamId === null) return;
+  const linkedPetId = useMemo(() => {
+    const id = activeFeed?.petId;
+    if (!id || id.startsWith('cam-')) return null;
+    return id;
+  }, [activeFeed?.petId]);
 
+  const dateRange = useMemo(() => {
     const now = new Date();
-    const start = new Date(now);
-    start.setDate(now.getDate() - 6);
-    start.setHours(0, 0, 0, 0);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const toDateStr = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
-    void getPetMonitorBehaviorTimeline({
-      cam_id: selectedCamId,
-      start: formatPetMonitorDateTime(start),
-      end: formatPetMonitorDateTime(now),
-      bucket: '1d',
-    })
-      .then(setTrendTimeline)
-      .catch(() => setTrendTimeline(null));
-  }, [selectedCamId]);
+    if (timeFilter === '1') {
+      const start = new Date(now);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(now);
+      end.setDate(now.getDate() + 1);
+      end.setHours(0, 0, 0, 0);
+      return { from: start.toISOString(), to: end.toISOString() };
+    }
+
+    const start = new Date(now);
+    start.setDate(now.getDate() - (Number(timeFilter) - 1));
+    return { from: toDateStr(start), to: toDateStr(now) };
+  }, [timeFilter]);
+
+  const { data: awsSummary, isLoading: isSummaryLoading, refetch: refetchSummary } = useQuery({
+    queryKey: ['behavior-summary', linkedPetId, dateRange.from, dateRange.to],
+    queryFn: () => getBehaviorSummary(linkedPetId!, dateRange.from, dateRange.to),
+    enabled: !!linkedPetId,
+    staleTime: 60_000,
+    refetchInterval: 60_000,
+  });
+
+  const { data: awsTimeline, isLoading: isTimelineLoading, refetch: refetchTimeline } = useQuery({
+    queryKey: ['behavior-timeline', linkedPetId, dateRange.from, dateRange.to, timeFilter],
+    queryFn: () => getBehaviorTimeline(linkedPetId!, dateRange.from, dateRange.to, timeFilter === '1' ? '1h' : '1d'),
+    enabled: !!linkedPetId,
+    staleTime: 60_000,
+    refetchInterval: 60_000,
+  });
+
+  const refreshBehaviorData = () => {
+    void refetchSummary();
+    void refetchTimeline();
+  };
 
   const backendActivityCounts = useMemo(
-    () => toActivityCounts(behavior.behaviorStats, selectedSnapshot),
-    [behavior.behaviorStats, selectedSnapshot],
+    () => toActivityCounts({ success: true, stats: awsSummary?.stats ?? {} }, null),
+    [awsSummary?.stats],
   );
   const hasBehaviorStatsData = useMemo(
-    () => Object.keys(behavior.behaviorStats?.stats ?? {}).length > 0,
-    [behavior.behaviorStats?.stats],
+    () => Object.keys(awsSummary?.stats ?? {}).length > 0,
+    [awsSummary?.stats],
   );
   const hasTimelineData = useMemo(
-    () => (behavior.timeline?.points?.length ?? 0) > 0,
-    [behavior.timeline?.points],
+    () => (awsTimeline?.points?.length ?? 0) > 0,
+    [awsTimeline?.points],
   );
   const statsByTime = useMemo(
     () => {
-      if (hasTimelineData) {
-        return toStatsByTime(behavior.timeline, backendActivityCounts);
+      if (hasTimelineData && awsTimeline) {
+        const asLocal = { success: true, cam_id: selectedCamId ?? 0, bucket: awsTimeline.bucket, points: awsTimeline.points };
+        return toStatsByTime(asLocal, backendActivityCounts);
       }
       if (hasBehaviorStatsData) {
         return toStatsByTime(null, backendActivityCounts);
       }
       return [];
     },
-    [backendActivityCounts, behavior.timeline, hasBehaviorStatsData, hasTimelineData],
+    [awsTimeline, backendActivityCounts, hasBehaviorStatsData, hasTimelineData, selectedCamId],
   );
   const trendStatsByTime = useMemo(
-    () => (trendTimeline?.points?.length ? toStatsByTime(trendTimeline, []) : []),
-    [trendTimeline],
+    () => {
+      if (!awsTimeline?.points?.length) return [];
+      const asLocal = { success: true, cam_id: selectedCamId ?? 0, bucket: awsTimeline.bucket, points: awsTimeline.points };
+      return toStatsByTime(asLocal, []);
+    },
+    [awsTimeline, selectedCamId],
   );
   const totalActivities = useMemo(
     () => backendActivityCounts.reduce((acc, curr) => acc + curr.value, 0),
     [backendActivityCounts],
   );
-  const isBehaviorLoading = behavior.isLoadingStats || behavior.isLoadingTimeline;
+  const isBehaviorLoading = isSummaryLoading || isTimelineLoading;
   const avgOver3Days = useMemo(() => {
     if (!statsByTime.length) return 0;
     const total = statsByTime.reduce((sum, item) => sum + item.activityCount, 0);
@@ -244,7 +243,7 @@ export default function MonitoringPage() {
   }, [activeFeed, hasCameraSelection, hasMonitorError, t]);
 
   const statsPlaceholder = useMemo(() => {
-    if (behavior.statsError || behavior.timelineError || hasMonitorError) {
+    if (hasMonitorError) {
       return {
         title: t('monitoring.placeholders.behaviorUnavailable'),
         message: t('monitoring.placeholders.behaviorUnavailableMsg'),
@@ -256,6 +255,12 @@ export default function MonitoringPage() {
         message: t('monitoring.placeholders.noCameraSelectedMsg'),
       };
     }
+    if (!linkedPetId) {
+      return {
+        title: t('monitoring.placeholders.noPetLinked'),
+        message: t('monitoring.placeholders.noPetLinkedMsg'),
+      };
+    }
     if (!isBehaviorLoading && !hasBehaviorStatsData && !hasTimelineData) {
       return {
         title: t('monitoring.placeholders.noData'),
@@ -264,13 +269,12 @@ export default function MonitoringPage() {
     }
     return null;
   }, [
-    behavior.statsError,
-    behavior.timelineError,
     hasBehaviorStatsData,
     hasCameraSelection,
     hasMonitorError,
     hasTimelineData,
     isBehaviorLoading,
+    linkedPetId,
     t,
   ]);
 
@@ -305,7 +309,7 @@ export default function MonitoringPage() {
           <>
             <PetProfileCard
               activeFeed={activeFeed}
-              snapshot={selectedSnapshot}
+              snapshot={null}
               onOpenClipsModal={onOpenClipsModal}
             />
             <LiveStreamView
@@ -338,8 +342,9 @@ export default function MonitoringPage() {
         activeCategory={backendActivityCounts}
         totalActivities={totalActivities}
         onGenerateLog={onGenerateLog}
-        isLoading={isBehaviorLoading || monitor.stats.isLoading}
-        error={behavior.statsError ?? behavior.timelineError ?? monitor.error}
+        onRefresh={refreshBehaviorData}
+        isLoading={isBehaviorLoading}
+        error={monitor.error}
         placeholder={statsPlaceholder}
       />
     </div>

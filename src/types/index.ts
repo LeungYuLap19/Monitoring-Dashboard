@@ -12,4 +12,5 @@ export * from './lib/trpc';
 export * from './lib/api';
 export * from './lib/auth';
 export * from './lib/monitoring';
+export * from './lib/behaviorSSE';
 export * from './lib/pet';
