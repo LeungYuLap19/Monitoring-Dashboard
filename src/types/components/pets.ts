@@ -10,22 +10,24 @@ import type { ApiPagination } from '../lib/api';
 export interface PetFormState {
   formId: string;
   formName: string;
+  formAnimal: string;
   formBreed: string;
-  formGender: '公' | '母';
-  formAge: number;
+  formSex: string;
   formWeight: number;
-  formVaccinated: boolean;
-  formColor: string;
   formBirthday: string;
-  formStatus: string;
-  formNotes: string;
-  formExtraServices: string;
+  formSterilization: boolean;
+  formSterilizationDate: string;
+  formAdoptionStatus: string;
+  formBloodType: string;
 }
 
 export interface PetFormModalProps {
   mode: 'add' | 'edit';
   formState: PetFormState;
+  imageFiles?: File[];
+  isSubmitting?: boolean;
   onFieldChange: (field: keyof PetFormState, value: string | number | boolean) => void;
+  onImageFilesChange?: (files: File[]) => void;
   onSubmit: (e: React.FormEvent) => void;
   onClose: () => void;
 }
@@ -56,6 +58,7 @@ export interface PetDetailViewProps {
   activeDetailTab: PetManagementDetailTab;
   onSetActiveDetailTab: (tab: PetManagementDetailTab) => void;
   onBack: () => void;
+  onEdit?: () => void;
   availableCameras?: { id: string; name: string; isOnline: boolean }[];
   onUpdateMonitorCamera?: (cameraId: string | null) => void;
   isUpdatingCamera?: boolean;

@@ -1,7 +1,9 @@
-import { LoaderCircle, RefreshCcw } from 'lucide-react';
+import { LoaderCircle, Plus, RefreshCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { usePetManagement } from '../hooks/pet';
 import { useUpdatePetProfile } from '../hooks/pet/useUpdatePetProfile';
+import { useCreatePetProfile } from '../hooks/pet/useCreatePetProfile';
 import { useCameraPetMap } from '../hooks/pet/useCameraPetMap';
 import { useBehaviorSSE } from '../hooks/monitoring/useBehaviorSSE';
 import { useTranslation } from '../lib/i18n';
@@ -9,10 +11,12 @@ import PetSearchBar from '../components/pages/pets/PetSearchBar';
 import PetCardGrid from '../components/pages/pets/PetCardGrid';
 import PetListView from '../components/pages/pets/PetListView';
 import PetDetailView from '../components/pages/pets/PetDetailView';
+import PetFormModal from '../components/pages/pets/PetFormModal';
 import PetPagination from '../components/pages/pets/PetPagination';
 import { Button } from '../components/ui/button';
 import { Skeleton } from '../components/ui/skeleton';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
+import type { PetFormState } from '../types';
 
 function PetListSkeleton() {
   return (
@@ -79,6 +83,22 @@ function ErrorState({
   );
 }
 
+function getEmptyFormState(): PetFormState {
+  return {
+    formId: '',
+    formName: '',
+    formAnimal: '',
+    formBreed: '',
+    formSex: 'Male',
+    formWeight: 0,
+    formBirthday: '',
+    formSterilization: false,
+    formSterilizationDate: '',
+    formAdoptionStatus: '',
+    formBloodType: '',
+  };
+}
+
 export default function PetsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -112,7 +132,8 @@ export default function PetsPage() {
   } = usePetManagement();
 
   const monitorSSE = useBehaviorSSE();
-  const { updatePetProfile, isSubmitting: isUpdatingCamera } = useUpdatePetProfile();
+  const { updatePetProfile, isSubmitting: isUpdatingPet } = useUpdatePetProfile();
+  const { createPet, isSubmitting: isCreatingPet, resetCreateState } = useCreatePetProfile();
   const { cameraPetMap } = useCameraPetMap();
 
   const availableCameras = useMemo(() => {
@@ -141,6 +162,102 @@ export default function PetsPage() {
     navigate('/monitoring');
   }, [navigate]);
 
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addFormState, setAddFormState] = useState<PetFormState>(getEmptyFormState);
+  const [addImageFiles, setAddImageFiles] = useState<File[]>([]);
+
+  const handleOpenAddModal = useCallback(() => {
+    setAddFormState(getEmptyFormState());
+    setAddImageFiles([]);
+    resetCreateState();
+    setShowAddModal(true);
+  }, [resetCreateState]);
+
+  const handleCloseAddModal = useCallback(() => {
+    setShowAddModal(false);
+  }, []);
+
+  const handleAddFieldChange = useCallback((field: keyof PetFormState, value: string | number | boolean) => {
+    setAddFormState((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handleAddSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    void createPet({
+      name: addFormState.formName.trim(),
+      animal: addFormState.formAnimal.trim(),
+      sex: addFormState.formSex,
+      birthday: addFormState.formBirthday,
+      breed: addFormState.formBreed.trim() || undefined,
+      weight: addFormState.formWeight > 0 ? addFormState.formWeight : undefined,
+      sterilization: addFormState.formSterilization || undefined,
+      sterilizationDate: addFormState.formSterilizationDate || undefined,
+      adoptionStatus: addFormState.formAdoptionStatus.trim() || undefined,
+      bloodType: addFormState.formBloodType.trim() || undefined,
+      imageFiles: addImageFiles.length > 0 ? addImageFiles : undefined,
+    }).then(() => {
+      setShowAddModal(false);
+      toast.success(t('pets.toasts.added', { name: addFormState.formName.trim() }));
+    }).catch(() => {
+      toast.error(t('pets.toasts.addFailed'));
+    });
+  }, [addFormState, addImageFiles, createPet, t]);
+
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editFormState, setEditFormState] = useState<PetFormState>(getEmptyFormState);
+  const [editImageFiles, setEditImageFiles] = useState<File[]>([]);
+
+  const handleOpenEditModal = useCallback(() => {
+    if (!selectedPet) return;
+    setEditFormState({
+      formId: selectedPet.id,
+      formName: selectedPet.name,
+      formAnimal: selectedPet.animal || '',
+      formBreed: selectedPet.breed || '',
+      formSex: selectedPet.sex === 'female' ? 'Female' : 'Male',
+      formWeight: selectedPet.weight ?? 0,
+      formBirthday: selectedPet.birthday ? selectedPet.birthday.split('T')[0] : '',
+      formSterilization: selectedPet.sterilization ?? false,
+      formSterilizationDate: selectedPet.sterilizationDate ? selectedPet.sterilizationDate.split('T')[0] : '',
+      formAdoptionStatus: selectedPet.adoptionStatus || '',
+      formBloodType: selectedPet.bloodType || '',
+    });
+    setEditImageFiles([]);
+    setShowEditModal(true);
+  }, [selectedPet]);
+
+  const handleCloseEditModal = useCallback(() => {
+    setShowEditModal(false);
+  }, []);
+
+  const handleEditFieldChange = useCallback((field: keyof PetFormState, value: string | number | boolean) => {
+    setEditFormState((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handleEditSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedPetId) return;
+    void updatePetProfile({
+      name: editFormState.formName.trim(),
+      animal: editFormState.formAnimal.trim(),
+      sex: editFormState.formSex,
+      birthday: editFormState.formBirthday,
+      breed: editFormState.formBreed.trim() || undefined,
+      weight: editFormState.formWeight > 0 ? editFormState.formWeight : null,
+      sterilization: editFormState.formSterilization,
+      sterilizationDate: editFormState.formSterilizationDate || undefined,
+      adoptionStatus: editFormState.formAdoptionStatus.trim() || undefined,
+      bloodType: editFormState.formBloodType.trim() || undefined,
+      imageFiles: editImageFiles.length > 0 ? editImageFiles : undefined,
+    }, { petId: selectedPetId }).then(() => {
+      setShowEditModal(false);
+      toast.success(t('pets.toasts.updated', { name: editFormState.formName.trim() }));
+      void refreshSelectedPet();
+    }).catch(() => {
+      toast.error(t('pets.toasts.updateFailed'));
+    });
+  }, [editFormState, editImageFiles, selectedPetId, updatePetProfile, refreshSelectedPet, t]);
+
   const isRefreshingPets = isPetsLoading && hasLoadedPets;
 
   return (
@@ -162,15 +279,23 @@ export default function PetsPage() {
             activeDetailTab={activeDetailTab}
             onSetActiveDetailTab={setActiveDetailTab}
             onBack={closePetDetails}
+            onEdit={handleOpenEditModal}
             availableCameras={availableCameras}
             onUpdateMonitorCamera={handleUpdateMonitorCamera}
-            isUpdatingCamera={isUpdatingCamera}
+            isUpdatingCamera={isUpdatingPet}
             monitorBackendConnected={monitorBackendConnected}
             onNavigateToMonitoring={handleNavigateToMonitoring}
           />
         ) : null
       ) : (
         <div id="pets-list-view" className="space-y-6">
+          <div className="flex items-center justify-end">
+            <Button onClick={handleOpenAddModal} className="gap-2">
+              <Plus className="size-4" />
+              <span>{t('pets.addPetButton')}</span>
+            </Button>
+          </div>
+
           <PetSearchBar
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
@@ -227,6 +352,32 @@ export default function PetsPage() {
             </div>
           )}
         </div>
+      )}
+
+      {showAddModal && (
+        <PetFormModal
+          mode="add"
+          formState={addFormState}
+          imageFiles={addImageFiles}
+          isSubmitting={isCreatingPet}
+          onFieldChange={handleAddFieldChange}
+          onImageFilesChange={setAddImageFiles}
+          onSubmit={handleAddSubmit}
+          onClose={handleCloseAddModal}
+        />
+      )}
+
+      {showEditModal && (
+        <PetFormModal
+          mode="edit"
+          formState={editFormState}
+          imageFiles={editImageFiles}
+          isSubmitting={isUpdatingPet}
+          onFieldChange={handleEditFieldChange}
+          onImageFilesChange={setEditImageFiles}
+          onSubmit={handleEditSubmit}
+          onClose={handleCloseEditModal}
+        />
       )}
     </div>
   );

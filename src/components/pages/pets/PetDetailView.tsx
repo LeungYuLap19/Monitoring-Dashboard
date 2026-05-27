@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, ExternalLink, Heart, Info, Loader2, Tag, Video, VideoOff } from 'lucide-react';
+import { ArrowLeft, Edit3, ExternalLink, Heart, Info, Loader2, Tag, Video, VideoOff } from 'lucide-react';
 import type { PetDetailViewProps } from '../../../types';
 import { formatPetDate } from '../../../lib/utils/services/pet-service';
 import { useTranslation } from '../../../lib/i18n';
@@ -45,6 +45,7 @@ export default function PetDetailView({
   activeDetailTab,
   onSetActiveDetailTab,
   onBack,
+  onEdit,
   availableCameras = [],
   onUpdateMonitorCamera,
   isUpdatingCamera = false,
@@ -74,9 +75,17 @@ export default function PetDetailView({
           <ArrowLeft className="size-4 text-slate-400" />
           <span>{t('pets.backToList')}</span>
         </button>
-        <Badge className="border-0 bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-slate-700">
-          {pet.status || t('pets.notAvailable')}
-        </Badge>
+        <div className="flex items-center gap-2">
+          {onEdit && (
+            <Button variant="outline" size="sm" onClick={onEdit} className="gap-1.5">
+              <Edit3 className="size-3.5" />
+              {t('common.edit')}
+            </Button>
+          )}
+          <Badge className="border-0 bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-slate-700">
+            {pet.status || t('pets.notAvailable')}
+          </Badge>
+        </div>
       </div>
 
       <div className="mb-4 flex flex-col items-start gap-4 sm:flex-row">

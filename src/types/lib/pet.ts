@@ -213,6 +213,38 @@ export interface PetProfileUpdatePayload {
   imageFiles?: File[];
 }
 
+export interface PetProfileCreatePayload {
+  name: string;
+  animal: string;
+  sex: string;
+  birthday: string;
+  breed?: string;
+  weight?: number;
+  sterilization?: boolean;
+  sterilizationDate?: string;
+  adoptionStatus?: string;
+  bloodType?: string;
+  features?: string;
+  info?: string;
+  status?: string;
+  owner?: string;
+  ownerContact1?: number;
+  ownerContact2?: number;
+  contact1Show?: boolean;
+  contact2Show?: boolean;
+  receivedDate?: string;
+  location?: string;
+  position?: string;
+  tagId?: string;
+  imageFiles?: File[];
+}
+
+export interface PetProfileCreateResult {
+  id: string;
+  message?: string;
+  requestId?: string;
+}
+
 export interface UserPetListResult {
   pets: PetProfileSummary[];
   pagination: ApiPagination | null;

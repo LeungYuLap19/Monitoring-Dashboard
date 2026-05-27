@@ -1,5 +1,7 @@
 import type {
   PetProfileBasic,
+  PetProfileCreatePayload,
+  PetProfileCreateResult,
   PetProfileDetail,
   PetProfileFull,
   PetProfileListQuery,
@@ -12,6 +14,7 @@ import type {
   UserPetListResult,
 } from '../../types/lib/pet';
 import {
+  buildPetProfileCreateFormData,
   buildPetProfileUpdateFormData,
   normalizePetProfileView,
   toPetProfileListQueryParams,
@@ -75,6 +78,24 @@ export async function updatePetProfileById(
   });
 
   return {
+    message: response.message,
+    requestId: response.requestId,
+  };
+}
+
+export async function createPetProfile(
+  payload: PetProfileCreatePayload,
+  options: PetProfileMultipartOptions = {},
+): Promise<PetProfileCreateResult> {
+  const formData = buildPetProfileCreateFormData(payload, options);
+  const response = await requestProtectedApiResult<{ id: string }>({
+    method: 'POST',
+    url: '/pet/profile',
+    data: formData,
+  });
+
+  return {
+    id: response.data.id,
     message: response.message,
     requestId: response.requestId,
   };
