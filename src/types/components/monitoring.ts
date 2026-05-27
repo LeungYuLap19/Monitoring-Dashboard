@@ -7,6 +7,7 @@ export interface PetSelectorProps {
   selectedPetId: string;
   setSelectedPetId: (id: string) => void;
   cameraFeeds: CameraFeed[];
+  onLinkPet?: () => void;
 }
 
 export interface PetProfileCardProps {

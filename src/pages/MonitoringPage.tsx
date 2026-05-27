@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Database, WifiOff } from 'lucide-react';
 import { useLayoutContext } from '../hooks/layout';
 import { useTranslation } from '../lib/i18n';
 import { useCameraPetMap } from '../hooks/pet';
+import { useUpdatePetProfile } from '../hooks/pet/useUpdatePetProfile';
 import {
   usePetMonitorCameraConfig,
   usePetMonitorDashboard,
@@ -21,6 +22,7 @@ import PetSelector from '../components/pages/monitoring/PetSelector';
 import PetProfileCard from '../components/pages/monitoring/PetProfileCard';
 import LiveStreamView from '../components/pages/monitoring/LiveStreamView';
 import BehaviorStats from '../components/pages/monitoring/BehaviorStats';
+import LinkPetModal from '../components/pages/monitoring/LinkPetModal';
 import { Button } from '../components/ui/button';
 
 function MonitoringPlaceholder({
@@ -65,6 +67,8 @@ export default function MonitoringPage() {
   const records = usePetMonitorRecords({ autoLoad: false });
   const cameraConfig = usePetMonitorCameraConfig({ autoLoad: false });
   const { cameraPetMap } = useCameraPetMap();
+  const { updatePetProfile, isSubmitting: isLinkingPet } = useUpdatePetProfile();
+  const [showLinkPetModal, setShowLinkPetModal] = useState(false);
   const { loadRecords } = records;
   const { loadCameraConfig } = cameraConfig;
 
@@ -131,6 +135,17 @@ export default function MonitoringPage() {
     if (!id || id.startsWith('cam-')) return null;
     return id;
   }, [activeFeed?.petId]);
+
+  const activeDeviceId = activeFeed?.deviceId ?? null;
+
+  const handleLinkPet = useCallback((petId: string) => {
+    if (!activeDeviceId) return;
+    void updatePetProfile({ monitorCameraId: activeDeviceId }, { petId });
+  }, [activeDeviceId, updatePetProfile]);
+
+  const handleUnlinkPet = useCallback((petId: string) => {
+    void updatePetProfile({ monitorCameraId: null }, { petId });
+  }, [updatePetProfile]);
 
   const dateRange = useMemo(() => {
     const now = new Date();
@@ -286,6 +301,7 @@ export default function MonitoringPage() {
             selectedPetId={activeFeed?.id ?? selectedPetId}
             setSelectedPetId={setSelectedPetId}
             cameraFeeds={cameraFeeds}
+            onLinkPet={activeDeviceId ? () => setShowLinkPetModal(true) : undefined}
           />
         ) : hasMonitorError ? (
           <MonitoringPlaceholder
@@ -347,6 +363,18 @@ export default function MonitoringPage() {
         error={monitor.error}
         placeholder={statsPlaceholder}
       />
+
+      {showLinkPetModal && activeDeviceId && (
+        <LinkPetModal
+          activeDeviceId={activeDeviceId}
+          activeCameraName={activeFeed?.name ?? activeDeviceId}
+          cameraPetMap={cameraPetMap}
+          onLink={handleLinkPet}
+          onUnlink={handleUnlinkPet}
+          isUpdating={isLinkingPet}
+          onClose={() => setShowLinkPetModal(false)}
+        />
+      )}
     </div>
   );
 }

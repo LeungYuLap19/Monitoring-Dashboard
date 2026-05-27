@@ -323,6 +323,18 @@
       "send": "Send Log",
       "sending": "Sending..."
     },
+    "linkPet": {
+      "button": "Link Pet",
+      "title": "Link Pet to Camera",
+      "description": "Select a pet to link to the current camera.",
+      "searchPlaceholder": "Search pets...",
+      "connect": "Link",
+      "disconnect": "Unlink",
+      "linkedTo": "Linked to {{camera}}",
+      "linkedHere": "Linked here",
+      "notLinked": "Not linked",
+      "empty": "No pets found."
+    },
     "toasts": {
       "cameraSwitch": "Camera switched — loading pet monitoring data."
     },

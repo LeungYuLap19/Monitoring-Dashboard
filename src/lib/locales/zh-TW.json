@@ -323,6 +323,18 @@
       "send": "發送日誌",
       "sending": "發送中..."
     },
+    "linkPet": {
+      "button": "連結寵物",
+      "title": "連結寵物至攝影機",
+      "description": "選擇要連結至目前攝影機的寵物。",
+      "searchPlaceholder": "搜尋寵物...",
+      "connect": "連結",
+      "disconnect": "取消連結",
+      "linkedTo": "已連結至 {{camera}}",
+      "linkedHere": "已連結此攝影機",
+      "notLinked": "未連結",
+      "empty": "找不到寵物。"
+    },
     "toasts": {
       "cameraSwitch": "已自動打開監測鏡頭並載入對應寵物住客數據"
     },
