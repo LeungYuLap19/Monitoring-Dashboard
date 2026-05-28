@@ -37,6 +37,13 @@ export async function getSubscription(): Promise<SubscriptionEntitlement> {
   return json.data;
 }
 
+export async function getMonitoringSettings(): Promise<MonitoringSettings> {
+  const res = await fetch(`${API_BASE_URL}/user/subscription/monitoring`, { headers: authHeaders() });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  return json.data;
+}
+
 export async function patchMonitoringSettings(body: {
   selectedCameraIds: string[];
   selectedAiModelKeys: string[];

@@ -11,7 +11,7 @@ import {
 } from '../../lib/services/go2rtcService';
 import axios from 'axios';
 import { PET_MONITOR_API_BASE_URL } from '../../lib/services/petMonitorService';
-import { getSubscription, patchMonitoringSettings } from '../../lib/services/subscriptionService';
+import { getMonitoringSettings, getSubscription, patchMonitoringSettings } from '../../lib/services/subscriptionService';
 import { getRoleFromToken } from '../../lib/utils/auth';
 
 export type XiaomiLoginStep = 'credentials' | 'verify' | 'cameras' | 'done';
@@ -57,14 +57,29 @@ export function useXiaomiLogin(options?: {
         const r = localStorage.getItem('xiaomi_region') || 'sg';
         setLoading(true);
         try {
-          const [cams, streams] = await Promise.all([
+          const [cams, streams, monitoringSettings] = await Promise.all([
             getXiaomiSources(id, r),
             getActiveStreams(),
+            role === 'user'
+              ? getMonitoringSettings().catch(() => null)
+              : Promise.resolve(null),
           ]);
           setSources(cams);
           const preSelected = new Set<number>();
-          for (let i = 0; i < Math.min(streams.length, cams.length); i++) {
-            preSelected.add(i);
+          const savedDeviceIds = new Set(monitoringSettings?.selectedCameraIds ?? []);
+          const activeDeviceIds = savedDeviceIds.size > 0
+            ? savedDeviceIds
+            : new Set(streams.deviceIds);
+          cams.forEach((cam, index) => {
+            const match = cam.url.match(/[?&]did=(\d+)/);
+            if (match && activeDeviceIds.has(match[1])) {
+              preSelected.add(index);
+            }
+          });
+          if (preSelected.size === 0 && role !== 'user') {
+            for (let i = 0; i < Math.min(streams.names.length, cams.length); i++) {
+              preSelected.add(i);
+            }
           }
           setSelectedIndices(preSelected);
           setStep('cameras');
