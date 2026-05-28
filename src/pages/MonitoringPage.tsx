@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Database, WifiOff } from 'lucide-react';
 import { useLayoutContext } from '../hooks/layout';
 import { useTranslation } from '../lib/i18n';
 import { useCameraPetMap } from '../hooks/pet';
+import { useUpdatePetProfile } from '../hooks/pet/useUpdatePetProfile';
 import {
   usePetMonitorCameraConfig,
   usePetMonitorDashboard,
@@ -21,6 +22,7 @@ import PetSelector from '../components/pages/monitoring/PetSelector';
 import PetProfileCard from '../components/pages/monitoring/PetProfileCard';
 import LiveStreamView from '../components/pages/monitoring/LiveStreamView';
 import BehaviorStats from '../components/pages/monitoring/BehaviorStats';
+import LinkPetModal from '../components/pages/monitoring/LinkPetModal';
 import { Button } from '../components/ui/button';
 
 function MonitoringPlaceholder({
@@ -65,6 +67,8 @@ export default function MonitoringPage() {
   const records = usePetMonitorRecords({ autoLoad: false });
   const cameraConfig = usePetMonitorCameraConfig({ autoLoad: false });
   const { cameraPetMap } = useCameraPetMap();
+  const { updatePetProfile, isSubmitting: isLinkingPet } = useUpdatePetProfile();
+  const [showLinkPetModal, setShowLinkPetModal] = useState(false);
   const { loadRecords } = records;
   const { loadCameraConfig } = cameraConfig;
 
@@ -132,6 +136,17 @@ export default function MonitoringPage() {
     return id;
   }, [activeFeed?.petId]);
 
+  const activeDeviceId = activeFeed?.deviceId ?? null;
+
+  const handleLinkPet = useCallback((petId: string) => {
+    if (!activeDeviceId) return;
+    void updatePetProfile({ monitorCameraId: activeDeviceId }, { petId });
+  }, [activeDeviceId, updatePetProfile]);
+
+  const handleUnlinkPet = useCallback((petId: string) => {
+    void updatePetProfile({ monitorCameraId: null }, { petId });
+  }, [updatePetProfile]);
+
   const dateRange = useMemo(() => {
     const now = new Date();
     const pad = (n: number) => String(n).padStart(2, '0');
@@ -151,9 +166,27 @@ export default function MonitoringPage() {
     return { from: toDateStr(start), to: toDateStr(now) };
   }, [timeFilter]);
 
+  const todayDateRange = useMemo(() => {
+    const now = new Date();
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(now);
+    end.setDate(now.getDate() + 1);
+    end.setHours(0, 0, 0, 0);
+    return { from: start.toISOString(), to: end.toISOString() };
+  }, []);
+
   const { data: awsSummary, isLoading: isSummaryLoading, refetch: refetchSummary } = useQuery({
     queryKey: ['behavior-summary', linkedPetId, dateRange.from, dateRange.to],
     queryFn: () => getBehaviorSummary(linkedPetId!, dateRange.from, dateRange.to),
+    enabled: !!linkedPetId,
+    staleTime: 60_000,
+    refetchInterval: 60_000,
+  });
+
+  const { data: awsTodaySummary, isLoading: isTodaySummaryLoading, refetch: refetchTodaySummary } = useQuery({
+    queryKey: ['behavior-summary-today', linkedPetId, todayDateRange.from, todayDateRange.to],
+    queryFn: () => getBehaviorSummary(linkedPetId!, todayDateRange.from, todayDateRange.to),
     enabled: !!linkedPetId,
     staleTime: 60_000,
     refetchInterval: 60_000,
@@ -169,12 +202,17 @@ export default function MonitoringPage() {
 
   const refreshBehaviorData = () => {
     void refetchSummary();
+    void refetchTodaySummary();
     void refetchTimeline();
   };
 
   const backendActivityCounts = useMemo(
     () => toActivityCounts({ success: true, stats: awsSummary?.stats ?? {} }, null),
     [awsSummary?.stats],
+  );
+  const todayActivityCounts = useMemo(
+    () => toActivityCounts({ success: true, stats: awsTodaySummary?.stats ?? {} }, null),
+    [awsTodaySummary?.stats],
   );
   const hasBehaviorStatsData = useMemo(
     () => Object.keys(awsSummary?.stats ?? {}).length > 0,
@@ -209,7 +247,7 @@ export default function MonitoringPage() {
     () => backendActivityCounts.reduce((acc, curr) => acc + curr.value, 0),
     [backendActivityCounts],
   );
-  const isBehaviorLoading = isSummaryLoading || isTimelineLoading;
+  const isBehaviorLoading = isSummaryLoading || isTodaySummaryLoading || isTimelineLoading;
   const avgOver3Days = useMemo(() => {
     if (!statsByTime.length) return 0;
     const total = statsByTime.reduce((sum, item) => sum + item.activityCount, 0);
@@ -286,6 +324,7 @@ export default function MonitoringPage() {
             selectedPetId={activeFeed?.id ?? selectedPetId}
             setSelectedPetId={setSelectedPetId}
             cameraFeeds={cameraFeeds}
+            onLinkPet={activeDeviceId ? () => setShowLinkPetModal(true) : undefined}
           />
         ) : hasMonitorError ? (
           <MonitoringPlaceholder
@@ -339,7 +378,7 @@ export default function MonitoringPage() {
         avgOver3Days={avgOver3Days}
         statsByTime={statsByTime}
         trendStatsByTime={trendStatsByTime}
-        activeCategory={backendActivityCounts}
+        activeCategory={todayActivityCounts}
         totalActivities={totalActivities}
         onGenerateLog={onGenerateLog}
         onRefresh={refreshBehaviorData}
@@ -347,6 +386,18 @@ export default function MonitoringPage() {
         error={monitor.error}
         placeholder={statsPlaceholder}
       />
+
+      {showLinkPetModal && activeDeviceId && (
+        <LinkPetModal
+          activeDeviceId={activeDeviceId}
+          activeCameraName={activeFeed?.name ?? activeDeviceId}
+          cameraPetMap={cameraPetMap}
+          onLink={handleLinkPet}
+          onUnlink={handleUnlinkPet}
+          isUpdating={isLinkingPet}
+          onClose={() => setShowLinkPetModal(false)}
+        />
+      )}
     </div>
   );
 }

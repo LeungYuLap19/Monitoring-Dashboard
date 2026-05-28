@@ -15,6 +15,8 @@ export interface MonitoringHeaderProps {
   onClearFilters: () => void;
   onReconnect?: () => void;
   reconnectDisabled?: boolean;
+  xiaomiConnected?: boolean;
+  onOpenXiaomiLogin?: () => void;
 }
 
 export interface CameraFeedGridProps {

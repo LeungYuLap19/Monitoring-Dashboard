@@ -5,6 +5,8 @@ import type {
   PetProfileListQuery,
   PetProfileListSortBy,
   PetProfileFull,
+  PetProfileCreatePayload,
+  PetProfileCreateResult,
   PetProfileMultipartOptions,
   PetProfileMutationResult,
   PetProfileSummary,
@@ -104,4 +106,16 @@ export interface UsePetManagementResult {
   goToPreviousPage: () => Promise<UserPetListResult | null>;
   refreshPets: () => Promise<UserPetListResult>;
   refreshSelectedPet: () => Promise<PetProfileFull | null>;
+}
+
+export interface UseCreatePetProfileResult {
+  isSubmitting: boolean;
+  hasSubmitted: boolean;
+  error: Error | null;
+  message: string | null;
+  createPet: (
+    payload: PetProfileCreatePayload,
+    options?: PetProfileMultipartOptions,
+  ) => Promise<PetProfileCreateResult>;
+  resetCreateState: () => void;
 }

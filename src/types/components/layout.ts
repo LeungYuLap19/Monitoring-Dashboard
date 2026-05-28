@@ -20,6 +20,8 @@ export interface SidebarProps {
   userEmail?: string;
   onLogout?: () => void;
   onMenuClick?: () => void;
+  xiaomiConnected?: boolean;
+  onXiaomiLogout?: () => void;
 }
 
 export interface HeaderProps {

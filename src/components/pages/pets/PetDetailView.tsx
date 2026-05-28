@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, ExternalLink, Heart, Info, Loader2, Tag, Video, VideoOff } from 'lucide-react';
+import { ArrowLeft, Edit3, ExternalLink, Heart, Info, Loader2, Tag, Video, VideoOff } from 'lucide-react';
 import type { PetDetailViewProps } from '../../../types';
 import { formatPetDate } from '../../../lib/utils/services/pet-service';
 import { useTranslation } from '../../../lib/i18n';
@@ -45,6 +45,7 @@ export default function PetDetailView({
   activeDetailTab,
   onSetActiveDetailTab,
   onBack,
+  onEdit,
   availableCameras = [],
   onUpdateMonitorCamera,
   isUpdatingCamera = false,
@@ -54,7 +55,7 @@ export default function PetDetailView({
   const { t, locale } = useTranslation();
   const linkedCamera = availableCameras.find((camera) => camera.id === pet.monitorCameraId);
   const hasOnlineAssignableCamera = availableCameras.some((camera) => camera.isOnline);
-  const showCameraSelector = monitorBackendConnected && hasOnlineAssignableCamera;
+  const showCameraSelector = monitorBackendConnected && (hasOnlineAssignableCamera || !linkedCamera);
 
   const displayBirthday = formatPetDate(pet.birthday, locale) || t('pets.notAvailable');
   const displayReceivedDate = formatPetDate(pet.receivedDate, locale) || t('pets.notAvailable');
@@ -74,9 +75,17 @@ export default function PetDetailView({
           <ArrowLeft className="size-4 text-slate-400" />
           <span>{t('pets.backToList')}</span>
         </button>
-        <Badge className="border-0 bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-slate-700">
-          {pet.status || t('pets.notAvailable')}
-        </Badge>
+        <div className="flex items-center gap-2">
+          {onEdit && (
+            <Button variant="outline" size="sm" onClick={onEdit} className="gap-1.5">
+              <Edit3 className="size-3.5" />
+              {t('common.edit')}
+            </Button>
+          )}
+          <Badge className="border-0 bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-slate-700">
+            {pet.status || t('pets.notAvailable')}
+          </Badge>
+        </div>
       </div>
 
       <div className="mb-4 flex flex-col items-start gap-4 sm:flex-row">
@@ -317,7 +326,7 @@ export default function PetDetailView({
                 ) : (
                   <div
                     className={`rounded-2xl p-5 space-y-4 ${
-                      monitorBackendConnected
+                      linkedCamera?.isOnline
                         ? 'border border-teal-100 bg-teal-50/40'
                         : 'border border-rose-100 bg-rose-50/40'
                     }`}
@@ -326,19 +335,19 @@ export default function PetDetailView({
                       <div className="flex items-center gap-2.5">
                         <span
                           className={`size-2.5 rounded-full ${
-                            monitorBackendConnected ? 'bg-teal-500 animate-pulse' : 'bg-rose-400'
+                            linkedCamera?.isOnline ? 'bg-teal-500 animate-pulse' : 'bg-rose-400'
                           }`}
                         />
                         <div className="space-y-1">
-                          <span className={`block text-sm font-bold ${monitorBackendConnected ? 'text-teal-700' : 'text-rose-700'}`}>
+                          <span className={`block text-sm font-bold ${linkedCamera?.isOnline ? 'text-teal-700' : 'text-rose-700'}`}>
                             {linkedCamera?.name || `Camera ${pet.monitorCameraId}`}
                           </span>
                           <span className="block text-[11px] font-semibold text-slate-500">
-                            {monitorBackendConnected ? t('pets.monitorCameraGoLive') : t('pets.monitorCameraDisconnected')}
+                            {linkedCamera?.isOnline ? t('pets.monitorCameraGoLive') : t('pets.monitorCameraDisconnected')}
                           </span>
                         </div>
                       </div>
-                      {onNavigateToMonitoring && monitorBackendConnected ? (
+                      {onNavigateToMonitoring && monitorBackendConnected && linkedCamera?.isOnline ? (
                         <Button variant="outline" size="sm" onClick={onNavigateToMonitoring} className="gap-1.5">
                           <ExternalLink className="size-3.5" />
                           {t('pets.monitorCameraGoLive')}

@@ -48,6 +48,12 @@ export interface PetMonitorXiaomiCamera {
   raw?: unknown;
 }
 
+export interface Go2rtcXiaomiSource {
+  name: string;
+  info: string;
+  url: string;
+}
+
 export interface PetMonitorSelectedCamera extends PetMonitorXiaomiCamera {
   url: string;
   subtype?: PetMonitorStreamSubtype;

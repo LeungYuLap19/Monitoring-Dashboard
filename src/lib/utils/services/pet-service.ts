@@ -2,6 +2,7 @@ import type {
   PetDisplaySex,
   PetManagementDetail,
   PetManagementListItem,
+  PetProfileCreatePayload,
   PetProfileFull,
   PetProfileListQuery,
   PetProfileMultipartOptions,
@@ -330,6 +331,44 @@ export function buildPetProfileUpdateFormData(
       appendStringField(formData, fieldName, 'null');
     }
   }
+
+  if (payload.imageFiles?.length) {
+    appendFiles(formData, fileFieldName, payload.imageFiles);
+  }
+
+  return formData;
+}
+
+export function buildPetProfileCreateFormData(
+  payload: PetProfileCreatePayload,
+  options: PetProfileMultipartOptions = {},
+): FormData {
+  const formData = new FormData();
+  const fileFieldName = options.fileFieldName?.trim() || 'file';
+
+  appendStringField(formData, 'name', payload.name);
+  appendStringField(formData, 'animal', payload.animal);
+  appendStringField(formData, 'sex', payload.sex);
+  appendStringField(formData, 'birthday', payload.birthday);
+
+  if (payload.breed) appendStringField(formData, 'breed', payload.breed);
+  if (typeof payload.weight === 'number') appendNumberField(formData, 'weight', payload.weight);
+  if (typeof payload.sterilization === 'boolean') appendBooleanField(formData, 'sterilization', payload.sterilization);
+  if (payload.sterilizationDate) appendStringField(formData, 'sterilizationDate', payload.sterilizationDate);
+  if (payload.adoptionStatus) appendStringField(formData, 'adoptionStatus', payload.adoptionStatus);
+  if (payload.bloodType) appendStringField(formData, 'bloodType', payload.bloodType);
+  if (payload.features) appendStringField(formData, 'features', payload.features);
+  if (payload.info) appendStringField(formData, 'info', payload.info);
+  if (payload.status) appendStringField(formData, 'status', payload.status);
+  if (payload.owner) appendStringField(formData, 'owner', payload.owner);
+  if (typeof payload.ownerContact1 === 'number') appendNumberField(formData, 'ownerContact1', payload.ownerContact1);
+  if (typeof payload.ownerContact2 === 'number') appendNumberField(formData, 'ownerContact2', payload.ownerContact2);
+  if (typeof payload.contact1Show === 'boolean') appendBooleanField(formData, 'contact1Show', payload.contact1Show);
+  if (typeof payload.contact2Show === 'boolean') appendBooleanField(formData, 'contact2Show', payload.contact2Show);
+  if (payload.receivedDate) appendStringField(formData, 'receivedDate', payload.receivedDate);
+  if (payload.location) appendStringField(formData, 'location', payload.location);
+  if (payload.position) appendStringField(formData, 'position', payload.position);
+  if (payload.tagId) appendStringField(formData, 'tagId', payload.tagId);
 
   if (payload.imageFiles?.length) {
     appendFiles(formData, fileFieldName, payload.imageFiles);

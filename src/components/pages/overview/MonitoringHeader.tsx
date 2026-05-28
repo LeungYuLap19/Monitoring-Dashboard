@@ -4,10 +4,11 @@
  */
 
 import React from 'react';
-import { Search, SlidersHorizontal, RefreshCw, Video } from 'lucide-react';
+import { Search, SlidersHorizontal, RefreshCw, Video, Plus } from 'lucide-react';
 import { MonitoringHeaderProps } from '../../../types';
 import { useTranslation } from '../../../lib/i18n';
 import { Button } from '../../ui/button';
+import xiaomiIcon from '../../../assets/icons/xiaomi.svg';
 
 export default function MonitoringHeader({
   searchQuery,
@@ -17,6 +18,8 @@ export default function MonitoringHeader({
   onClearFilters,
   onReconnect,
   reconnectDisabled = false,
+  xiaomiConnected,
+  onOpenXiaomiLogin,
 }: MonitoringHeaderProps) {
   const { t } = useTranslation();
   return (
@@ -85,6 +88,17 @@ export default function MonitoringHeader({
           >
             <RefreshCw className="size-3.5" />
             <span>Reconnect</span>
+          </Button>
+        )}
+
+        {onOpenXiaomiLogin && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onOpenXiaomiLogin}
+          >
+            <img src={xiaomiIcon} alt="" className="size-3.5" />
+            <span>{xiaomiConnected ? t('xiaomi.connectCamera') : t('xiaomi.signIn')}</span>
           </Button>
         )}
       </div>
