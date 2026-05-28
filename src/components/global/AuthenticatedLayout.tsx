@@ -7,6 +7,7 @@ import { Button } from '../ui/button';
 
 const ClipSelectorModal = lazy(() => import('../pages/monitoring/ClipSelectorModal'));
 const ActivityLogPreviewModal = lazy(() => import('../pages/monitoring/ActivityLogPreviewModal'));
+const XiaomiLoginModal = lazy(() => import('../pages/monitoring/XiaomiLoginModal'));
 
 export default function AuthenticatedLayout() {
   const state = useAuthenticatedLayout();
@@ -28,6 +29,8 @@ export default function AuthenticatedLayout() {
         userEmail={state.currentUser.email ?? state.currentUser.phoneNumber ?? state.currentUser.emailOrPhone}
         onLogout={state.handleLogout}
         onMenuClick={() => state.setIsSidebarOpen(true)}
+        xiaomiConnected={state.xiaomiConnected}
+        onXiaomiLogout={state.handleXiaomiLogout}
       />
 
       <div id="main-scroller" className="flex-1 flex flex-col min-h-screen min-w-0 relative">
@@ -54,6 +57,8 @@ export default function AuthenticatedLayout() {
               onSelectPet: state.handleSelectPetFromOverview,
               onOpenClipsModal: () => state.setIsClipsOpen(true),
               onGenerateLog: () => state.setIsLogPreviewOpen(true),
+              onOpenXiaomiLogin: () => state.setIsXiaomiLoginOpen(true),
+              xiaomiConnected: state.xiaomiConnected,
               showToast: state.showToast,
               navigate: state.navigate,
             }}
@@ -78,6 +83,17 @@ export default function AuthenticatedLayout() {
             petId={state.selectedPetId}
             onClose={() => state.setIsLogPreviewOpen(false)}
             onSendSuccess={() => state.handleLogSendSuccess()}
+          />
+        </Suspense>
+      )}
+
+      {state.isXiaomiLoginOpen && (
+        <Suspense fallback={null}>
+          <XiaomiLoginModal
+            open={state.isXiaomiLoginOpen}
+            onClose={() => state.setIsXiaomiLoginOpen(false)}
+            onSuccess={() => { state.setIsXiaomiLoginOpen(false); state.refreshXiaomiStatus(); }}
+            onStatusChange={() => state.refreshXiaomiStatus()}
           />
         </Suspense>
       )}

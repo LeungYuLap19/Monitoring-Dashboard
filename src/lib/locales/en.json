@@ -518,5 +518,24 @@
       "exportReport": "Export activity reports",
       "prioritySupport": "Priority support"
     }
+  },
+  "xiaomi": {
+    "title": "Connect Xiaomi Camera",
+    "description": "Sign in with your Xiaomi account to connect cameras",
+    "username": "Xiaomi Account",
+    "usernamePlaceholder": "Email or phone number",
+    "password": "Password",
+    "region": "Region",
+    "sendCode": "Send Verification Code",
+    "verifyHint": "A verification code has been sent to your email. Enter it below.",
+    "verifyCode": "Verification Code",
+    "verify": "Verify",
+    "selectCameras": "Select cameras to connect",
+    "addCameras": "Add Cameras",
+    "signIn": "Sign in to Xiaomi",
+    "connectCamera": "Connect Camera",
+    "logout": "Xiaomi Logout",
+    "disconnected": "Xiaomi cameras disconnected",
+    "disconnectFailed": "Failed to disconnect Xiaomi"
   }
 }

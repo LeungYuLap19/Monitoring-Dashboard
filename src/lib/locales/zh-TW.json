@@ -518,5 +518,24 @@
       "exportReport": "匯出活動報告",
       "prioritySupport": "優先客服支援"
     }
+  },
+  "xiaomi": {
+    "title": "連接小米攝影機",
+    "description": "使用小米帳號登入以連接攝影機",
+    "username": "小米帳號",
+    "usernamePlaceholder": "電郵或手機號碼",
+    "password": "密碼",
+    "region": "地區",
+    "sendCode": "發送驗證碼",
+    "verifyHint": "驗證碼已發送至你的電郵，請在下方輸入。",
+    "verifyCode": "驗證碼",
+    "verify": "驗證",
+    "selectCameras": "選擇要連接的攝影機",
+    "addCameras": "新增攝影機",
+    "signIn": "登入小米",
+    "connectCamera": "連接攝影機",
+    "logout": "登出小米",
+    "disconnected": "已斷開小米攝影機",
+    "disconnectFailed": "斷開小米連接失敗"
   }
 }

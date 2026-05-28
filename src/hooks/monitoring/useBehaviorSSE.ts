@@ -49,6 +49,8 @@ export function useBehaviorSSE() {
 
   const reconnect = useCallback(() => {
     disconnect();
+    setCameraStats(new Map());
+    setBehaviors([]);
     connect();
   }, [disconnect, connect]);
 

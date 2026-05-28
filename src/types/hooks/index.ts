@@ -14,6 +14,8 @@ export interface LayoutContext {
   onSelectPet: (petId: string) => void;
   onOpenClipsModal: () => void;
   onGenerateLog: () => void;
+  onOpenXiaomiLogin: () => void;
+  xiaomiConnected: boolean;
   showToast: (message: string) => void;
   navigate: NavigateFunction;
 }

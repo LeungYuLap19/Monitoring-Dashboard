@@ -9,6 +9,7 @@ import PHealthIcon from './PHealthIcon';
 import LanguageSwitcher from './LanguageSwitcher';
 import { Button } from '../ui/button';
 import { Sheet, SheetContent } from '../ui/sheet';
+import xiaomiIcon from '../../assets/icons/xiaomi.svg';
 
 export default function Sidebar({
   activeTab,
@@ -20,6 +21,8 @@ export default function Sidebar({
   userEmail,
   onLogout,
   onMenuClick,
+  xiaomiConnected,
+  onXiaomiLogout,
 }: SidebarProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -91,6 +94,17 @@ export default function Sidebar({
                   >
                     <CreditCard className="size-3.5" />
                     <span>{t('nav.subscription')}</span>
+                  </Button>
+                )}
+                {xiaomiConnected && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => { setUserMenuOpen(false); onXiaomiLogout?.(); }}
+                    className="w-full justify-start gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-amber-600 hover:bg-amber-50 hover:text-amber-700"
+                  >
+                    <img src={xiaomiIcon} alt="" className="size-3.5" />
+                    <span>{t('xiaomi.logout')}</span>
                   </Button>
                 )}
                 <Button

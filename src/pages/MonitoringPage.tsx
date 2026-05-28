@@ -166,9 +166,27 @@ export default function MonitoringPage() {
     return { from: toDateStr(start), to: toDateStr(now) };
   }, [timeFilter]);
 
+  const todayDateRange = useMemo(() => {
+    const now = new Date();
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(now);
+    end.setDate(now.getDate() + 1);
+    end.setHours(0, 0, 0, 0);
+    return { from: start.toISOString(), to: end.toISOString() };
+  }, []);
+
   const { data: awsSummary, isLoading: isSummaryLoading, refetch: refetchSummary } = useQuery({
     queryKey: ['behavior-summary', linkedPetId, dateRange.from, dateRange.to],
     queryFn: () => getBehaviorSummary(linkedPetId!, dateRange.from, dateRange.to),
+    enabled: !!linkedPetId,
+    staleTime: 60_000,
+    refetchInterval: 60_000,
+  });
+
+  const { data: awsTodaySummary, isLoading: isTodaySummaryLoading, refetch: refetchTodaySummary } = useQuery({
+    queryKey: ['behavior-summary-today', linkedPetId, todayDateRange.from, todayDateRange.to],
+    queryFn: () => getBehaviorSummary(linkedPetId!, todayDateRange.from, todayDateRange.to),
     enabled: !!linkedPetId,
     staleTime: 60_000,
     refetchInterval: 60_000,
@@ -184,12 +202,17 @@ export default function MonitoringPage() {
 
   const refreshBehaviorData = () => {
     void refetchSummary();
+    void refetchTodaySummary();
     void refetchTimeline();
   };
 
   const backendActivityCounts = useMemo(
     () => toActivityCounts({ success: true, stats: awsSummary?.stats ?? {} }, null),
     [awsSummary?.stats],
+  );
+  const todayActivityCounts = useMemo(
+    () => toActivityCounts({ success: true, stats: awsTodaySummary?.stats ?? {} }, null),
+    [awsTodaySummary?.stats],
   );
   const hasBehaviorStatsData = useMemo(
     () => Object.keys(awsSummary?.stats ?? {}).length > 0,
@@ -224,7 +247,7 @@ export default function MonitoringPage() {
     () => backendActivityCounts.reduce((acc, curr) => acc + curr.value, 0),
     [backendActivityCounts],
   );
-  const isBehaviorLoading = isSummaryLoading || isTimelineLoading;
+  const isBehaviorLoading = isSummaryLoading || isTodaySummaryLoading || isTimelineLoading;
   const avgOver3Days = useMemo(() => {
     if (!statsByTime.length) return 0;
     const total = statsByTime.reduce((sum, item) => sum + item.activityCount, 0);
@@ -355,7 +378,7 @@ export default function MonitoringPage() {
         avgOver3Days={avgOver3Days}
         statsByTime={statsByTime}
         trendStatsByTime={trendStatsByTime}
-        activeCategory={backendActivityCounts}
+        activeCategory={todayActivityCounts}
         totalActivities={totalActivities}
         onGenerateLog={onGenerateLog}
         onRefresh={refreshBehaviorData}

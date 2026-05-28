@@ -39,6 +39,13 @@ export default defineConfig(() => {
       hmr: process.env.DISABLE_HMR !== 'true',
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
+      proxy: {
+        '/go2rtc': {
+          target: 'http://127.0.0.1:1984',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/go2rtc/, ''),
+        },
+      },
     },
   };
 });

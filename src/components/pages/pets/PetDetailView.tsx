@@ -55,7 +55,7 @@ export default function PetDetailView({
   const { t, locale } = useTranslation();
   const linkedCamera = availableCameras.find((camera) => camera.id === pet.monitorCameraId);
   const hasOnlineAssignableCamera = availableCameras.some((camera) => camera.isOnline);
-  const showCameraSelector = monitorBackendConnected && hasOnlineAssignableCamera;
+  const showCameraSelector = monitorBackendConnected && (hasOnlineAssignableCamera || !linkedCamera);
 
   const displayBirthday = formatPetDate(pet.birthday, locale) || t('pets.notAvailable');
   const displayReceivedDate = formatPetDate(pet.receivedDate, locale) || t('pets.notAvailable');
@@ -326,7 +326,7 @@ export default function PetDetailView({
                 ) : (
                   <div
                     className={`rounded-2xl p-5 space-y-4 ${
-                      monitorBackendConnected
+                      linkedCamera?.isOnline
                         ? 'border border-teal-100 bg-teal-50/40'
                         : 'border border-rose-100 bg-rose-50/40'
                     }`}
@@ -335,19 +335,19 @@ export default function PetDetailView({
                       <div className="flex items-center gap-2.5">
                         <span
                           className={`size-2.5 rounded-full ${
-                            monitorBackendConnected ? 'bg-teal-500 animate-pulse' : 'bg-rose-400'
+                            linkedCamera?.isOnline ? 'bg-teal-500 animate-pulse' : 'bg-rose-400'
                           }`}
                         />
                         <div className="space-y-1">
-                          <span className={`block text-sm font-bold ${monitorBackendConnected ? 'text-teal-700' : 'text-rose-700'}`}>
+                          <span className={`block text-sm font-bold ${linkedCamera?.isOnline ? 'text-teal-700' : 'text-rose-700'}`}>
                             {linkedCamera?.name || `Camera ${pet.monitorCameraId}`}
                           </span>
                           <span className="block text-[11px] font-semibold text-slate-500">
-                            {monitorBackendConnected ? t('pets.monitorCameraGoLive') : t('pets.monitorCameraDisconnected')}
+                            {linkedCamera?.isOnline ? t('pets.monitorCameraGoLive') : t('pets.monitorCameraDisconnected')}
                           </span>
                         </div>
                       </div>
-                      {onNavigateToMonitoring && monitorBackendConnected ? (
+                      {onNavigateToMonitoring && monitorBackendConnected && linkedCamera?.isOnline ? (
                         <Button variant="outline" size="sm" onClick={onNavigateToMonitoring} className="gap-1.5">
                           <ExternalLink className="size-3.5" />
                           {t('pets.monitorCameraGoLive')}
