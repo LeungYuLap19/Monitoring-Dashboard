@@ -463,6 +463,7 @@
       "badge": "使用中",
       "planName": "免費試用",
       "duration": "90 天免費試用期",
+      "active": "使用中",
       "startLabel": "開始日期",
       "endLabel": "到期日期",
       "billingLabel": "付款方式",
@@ -535,6 +536,7 @@
     "signIn": "登入小米",
     "connectCamera": "連接攝影機",
     "logout": "登出小米",
+    "cameraLimitReached": "已達攝影機上限，升級方案以新增更多。",
     "disconnected": "已斷開小米攝影機",
     "disconnectFailed": "斷開小米連接失敗"
   }

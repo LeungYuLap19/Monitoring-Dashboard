@@ -463,6 +463,7 @@
       "badge": "Active",
       "planName": "Free Trial",
       "duration": "90-day free trial period",
+      "active": "Active",
       "startLabel": "Started",
       "endLabel": "Expires",
       "billingLabel": "Payment method",
@@ -535,6 +536,7 @@
     "signIn": "Sign in to Xiaomi",
     "connectCamera": "Connect Camera",
     "logout": "Xiaomi Logout",
+    "cameraLimitReached": "Camera limit reached for your plan. Upgrade to add more.",
     "disconnected": "Xiaomi cameras disconnected",
     "disconnectFailed": "Failed to disconnect Xiaomi"
   }

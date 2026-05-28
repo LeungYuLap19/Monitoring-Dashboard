@@ -1,13 +1,23 @@
-import { CalendarDays, CreditCard, FileText, XCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { CalendarDays, CreditCard, FileText, Loader2, XCircle } from 'lucide-react';
 import { useTranslation } from '../lib/i18n';
 import { Button } from '../components/ui/button';
 import PlanCard from '../components/pages/subscription/PlanCard';
+import { getSubscription, type SubscriptionEntitlement } from '../lib/services/subscriptionService';
 
 export default function SubscriptionPage() {
   const { t } = useTranslation();
+  const [entitlement, setEntitlement] = useState<SubscriptionEntitlement | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const trialStart = '2025-05-01';
-  const trialEnd = '2025-07-30';
+  useEffect(() => {
+    getSubscription()
+      .then(setEntitlement)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const currentTier = entitlement?.tier ?? 'free';
 
   const plans = [
     {
@@ -18,9 +28,9 @@ export default function SubscriptionPage() {
       price: t('subscription.plans.free.price'),
       priceUnit: '',
       priceNote: t('subscription.plans.free.priceNote'),
-      ctaLabel: t('subscription.current.currentPlan'),
+      ctaLabel: currentTier === 'free' ? t('subscription.current.currentPlan') : t('subscription.plans.free.cta'),
       highlighted: false,
-      current: true,
+      current: currentTier === 'free',
       features: [
         { text: t('subscription.features.liveCam1'), included: true },
         { text: t('subscription.features.behaviorAi'), included: true },
@@ -37,8 +47,9 @@ export default function SubscriptionPage() {
       price: t('subscription.plans.basic.price'),
       priceUnit: t('subscription.plans.basic.priceUnit'),
       priceNote: t('subscription.plans.basic.priceNote'),
-      ctaLabel: t('subscription.plans.basic.cta'),
+      ctaLabel: currentTier === 'basic' ? t('subscription.current.currentPlan') : t('subscription.plans.basic.cta'),
       highlighted: false,
+      current: currentTier === 'basic',
       features: [
         { text: t('subscription.features.liveCam1'), included: true },
         { text: t('subscription.features.behaviorAi'), included: true },
@@ -57,8 +68,9 @@ export default function SubscriptionPage() {
       price: t('subscription.plans.pro.price'),
       priceUnit: t('subscription.plans.pro.priceUnit'),
       priceNote: t('subscription.plans.pro.priceNote'),
-      ctaLabel: t('subscription.plans.pro.cta'),
-      highlighted: true,
+      ctaLabel: currentTier === 'pro' ? t('subscription.current.currentPlan') : t('subscription.plans.pro.cta'),
+      highlighted: currentTier !== 'pro',
+      current: currentTier === 'pro',
       features: [
         { text: t('subscription.features.liveCam3'), included: true },
         { text: t('subscription.features.behaviorAi'), included: true },
@@ -75,8 +87,9 @@ export default function SubscriptionPage() {
       price: t('subscription.plans.travel.price'),
       priceUnit: t('subscription.plans.travel.priceUnit'),
       priceNote: t('subscription.plans.travel.priceNote'),
-      ctaLabel: t('subscription.plans.travel.cta'),
+      ctaLabel: currentTier === 'travel' ? t('subscription.current.currentPlan') : t('subscription.plans.travel.cta'),
       highlighted: false,
+      current: currentTier === 'travel',
       features: [
         { text: t('subscription.features.liveCam1'), included: true },
         { text: t('subscription.features.behaviorAi'), included: true },
@@ -91,6 +104,12 @@ export default function SubscriptionPage() {
 
   return (
     <div id="page-subscription" className="p-4 md:p-8 select-none space-y-8 animate-in fade-in slide-in-from-bottom-3 duration-300">
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="size-6 animate-spin text-slate-400" />
+        </div>
+      ) : (
+      <>
       <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm space-y-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
@@ -99,18 +118,20 @@ export default function SubscriptionPage() {
                 {t('subscription.current.badge')}
               </span>
             </div>
-            <h2 className="text-base font-extrabold text-slate-800">{t('subscription.current.planName')}</h2>
-            <p className="text-xs text-slate-400">{t('subscription.current.duration')}</p>
+            <h2 className="text-base font-extrabold text-slate-800">{t(`subscription.plans.${currentTier}.title`)}</h2>
+            <p className="text-xs text-slate-400">{entitlement?.status === 'active' ? t('subscription.current.active') : t('subscription.current.duration')}</p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" className="gap-2 rounded-xl">
               <FileText className="size-3.5" />
               {t('subscription.billingHistory')}
             </Button>
-            <Button variant="outline" size="sm" className="gap-2 rounded-xl border-rose-200 text-rose-500 hover:bg-rose-50 hover:text-rose-600">
-              <XCircle className="size-3.5" />
-              {t('subscription.current.cancel')}
-            </Button>
+            {currentTier !== 'free' && (
+              <Button variant="outline" size="sm" className="gap-2 rounded-xl border-rose-200 text-rose-500 hover:bg-rose-50 hover:text-rose-600">
+                <XCircle className="size-3.5" />
+                {t('subscription.current.cancel')}
+              </Button>
+            )}
           </div>
         </div>
 
@@ -119,14 +140,14 @@ export default function SubscriptionPage() {
             <CalendarDays className="size-4 text-teal-600 shrink-0" />
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t('subscription.current.startLabel')}</p>
-              <p className="text-xs font-bold text-slate-700">{trialStart}</p>
+              <p className="text-xs font-bold text-slate-700">{entitlement?.startedAt ? new Date(entitlement.startedAt).toLocaleDateString() : '—'}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3">
             <CalendarDays className="size-4 text-slate-400 shrink-0" />
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t('subscription.current.endLabel')}</p>
-              <p className="text-xs font-bold text-slate-700">{trialEnd}</p>
+              <p className="text-xs font-bold text-slate-700">{entitlement?.endsAt ? new Date(entitlement.endsAt).toLocaleDateString() : '—'}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3">
@@ -155,6 +176,8 @@ export default function SubscriptionPage() {
       <p className="text-center text-[10px] text-slate-400">
         {t('subscription.disclaimer')}
       </p>
+      </>
+      )}
     </div>
   );
 }
