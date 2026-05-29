@@ -19,7 +19,7 @@ interface LinkPetModalProps {
   activeDeviceId: string;
   activeCameraName: string;
   cameraPetMap: CameraPetMap;
-  onLink: (petId: string) => void;
+  onLink: (petId: string, petAnimal?: string | null) => void;
   onUnlink: (petId: string) => void;
   isUpdating: boolean;
   onClose: () => void;
@@ -175,7 +175,7 @@ export default function LinkPetModal({
                         variant="outline"
                         size="sm"
                         disabled={isUpdating}
-                        onClick={() => onLink(pet.id)}
+                        onClick={() => onLink(pet.id, pet.animal)}
                         className="gap-1.5"
                       >
                         <Link2 className="size-3.5" />

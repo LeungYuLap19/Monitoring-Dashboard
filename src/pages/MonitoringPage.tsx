@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Database, WifiOff } from 'lucide-react';
+import { Database, WifiOff, Settings2 } from 'lucide-react';
 import { useLayoutContext } from '../hooks/layout';
 import { useTranslation } from '../lib/i18n';
 import { useCameraPetMap } from '../hooks/pet';
@@ -18,11 +18,15 @@ import {
   toStatsByTime,
 } from '../lib/utils/services/pet-monitor-ui';
 import { getBehaviorSummary, getBehaviorTimeline } from '../lib/services/behaviorHistoryService';
+import { getMonitoringSettings, patchMonitoringSettings } from '../lib/services/subscriptionService';
+import { syncMonitoringModels, getMonitoringSettingsLocal, setPetMonitorActiveCameras, PET_MONITOR_API_BASE_URL } from '../lib/services/petMonitorService';
+import { getRoleFromToken } from '../lib/utils/auth';
 import PetSelector from '../components/pages/monitoring/PetSelector';
 import PetProfileCard from '../components/pages/monitoring/PetProfileCard';
 import LiveStreamView from '../components/pages/monitoring/LiveStreamView';
 import BehaviorStats from '../components/pages/monitoring/BehaviorStats';
 import LinkPetModal from '../components/pages/monitoring/LinkPetModal';
+import ModelSelectorModal from '../components/pages/monitoring/ModelSelectorModal';
 import { Button } from '../components/ui/button';
 
 function MonitoringPlaceholder({
@@ -69,6 +73,10 @@ export default function MonitoringPage() {
   const { cameraPetMap } = useCameraPetMap();
   const { updatePetProfile, isSubmitting: isLinkingPet } = useUpdatePetProfile();
   const [showLinkPetModal, setShowLinkPetModal] = useState(false);
+  const [showModelSelector, setShowModelSelector] = useState(false);
+  const [currentModelKeys, setCurrentModelKeys] = useState<string[]>([]);
+  const [aiModelLimit, setAiModelLimit] = useState(1);
+  const [pendingPetAnimal, setPendingPetAnimal] = useState<string | null | undefined>(undefined);
   const { loadRecords } = records;
   const { loadCameraConfig } = cameraConfig;
 
@@ -130,6 +138,51 @@ export default function MonitoringPage() {
     void loadCameraConfig(selectedCamId).catch(() => undefined);
   }, [loadCameraConfig, loadRecords, selectedCamId]);
 
+  useEffect(() => {
+    getMonitoringSettingsLocal()
+      .then((local) => {
+        const profiles = Object.values(local.cameras).map((c) => c.animal_profile);
+        const unique = [...new Set(profiles.filter(Boolean))];
+        if (unique.length > 0) setCurrentModelKeys(unique);
+      })
+      .catch(() => {});
+
+    const role = getRoleFromToken();
+    if (role && role !== 'user') {
+      setAiModelLimit(99);
+    } else {
+      getMonitoringSettings()
+        .then((settings) => {
+          setAiModelLimit(settings.entitlement?.aiModelSelectionLimit ?? 1);
+        })
+        .catch(() => {});
+    }
+  }, []);
+
+  const handleModelSave = useCallback(async (selectedKeys: string[]) => {
+    const role = getRoleFromToken();
+    const awsPromise = role === 'user'
+      ? getMonitoringSettings()
+          .then((settings) => patchMonitoringSettings({
+            selectedCameraIds: settings?.selectedCameraIds ?? [],
+            selectedAiModelKeys: selectedKeys,
+          }))
+          .catch(() => {})
+      : Promise.resolve();
+
+    const [syncResult] = await Promise.all([
+      syncMonitoringModels(selectedKeys),
+      awsPromise,
+    ]);
+
+    if (syncResult.success) {
+      setCurrentModelKeys(selectedKeys);
+      await setPetMonitorActiveCameras([]);
+      await new Promise((r) => setTimeout(r, 1500));
+      await fetch(`${PET_MONITOR_API_BASE_URL}/api/reload_streams`, { method: 'POST' });
+    }
+  }, []);
+
   const linkedPetId = useMemo(() => {
     const id = activeFeed?.petId;
     if (!id || id.startsWith('cam-')) return null;
@@ -138,9 +191,12 @@ export default function MonitoringPage() {
 
   const activeDeviceId = activeFeed?.deviceId ?? null;
 
-  const handleLinkPet = useCallback((petId: string) => {
+  const handleLinkPet = useCallback((petId: string, petAnimal?: string | null) => {
     if (!activeDeviceId) return;
     void updatePetProfile({ monitorCameraId: activeDeviceId }, { petId });
+    setShowLinkPetModal(false);
+    setPendingPetAnimal(petAnimal);
+    setShowModelSelector(true);
   }, [activeDeviceId, updatePetProfile]);
 
   const handleUnlinkPet = useCallback((petId: string) => {
@@ -320,12 +376,24 @@ export default function MonitoringPage() {
     <div id="page-monitoring" className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 select-none animate-in fade-in slide-in-from-bottom-3 duration-300">
       <div id="monitoring-left" className="col-span-1 lg:col-span-8 space-y-6">
         {hasFeeds ? (
-          <PetSelector
-            selectedPetId={activeFeed?.id ?? selectedPetId}
-            setSelectedPetId={setSelectedPetId}
-            cameraFeeds={cameraFeeds}
-            onLinkPet={activeDeviceId ? () => setShowLinkPetModal(true) : undefined}
-          />
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <PetSelector
+                selectedPetId={activeFeed?.id ?? selectedPetId}
+                setSelectedPetId={setSelectedPetId}
+                cameraFeeds={cameraFeeds}
+                onLinkPet={activeDeviceId ? () => setShowLinkPetModal(true) : undefined}
+              />
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setShowModelSelector(true)}
+              title="AI Model"
+            >
+              <Settings2 className="size-4" />
+            </Button>
+          </div>
         ) : hasMonitorError ? (
           <MonitoringPlaceholder
             icon={<WifiOff className="size-8 text-rose-500" />}
@@ -396,6 +464,16 @@ export default function MonitoringPage() {
           onUnlink={handleUnlinkPet}
           isUpdating={isLinkingPet}
           onClose={() => setShowLinkPetModal(false)}
+        />
+      )}
+
+      {showModelSelector && (
+        <ModelSelectorModal
+          currentModelKeys={currentModelKeys}
+          aiModelSelectionLimit={aiModelLimit}
+          petAnimal={pendingPetAnimal !== undefined ? pendingPetAnimal : activeFeed?.petAnimal}
+          onSave={handleModelSave}
+          onClose={() => { setShowModelSelector(false); setPendingPetAnimal(undefined); }}
         />
       )}
     </div>

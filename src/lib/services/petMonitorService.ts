@@ -149,3 +149,46 @@ export async function deletePetMonitorVideoRecord(
       : undefined),
   };
 }
+
+export interface MonitoringSyncResponse {
+  success: boolean;
+  applied_profile?: string;
+  changed_cameras?: number[];
+  error?: string;
+}
+
+export async function syncMonitoringModels(
+  selectedAiModelKeys: string[],
+): Promise<MonitoringSyncResponse> {
+  const response = await requestPetMonitor<MonitoringSyncResponse>({
+    method: 'POST',
+    url: '/api/monitoring/sync',
+    data: { selectedAiModelKeys },
+  });
+
+  const data = (response.data ?? {}) as MonitoringSyncResponse;
+  return {
+    success: isSuccessStatus(response.status) && data.success !== false,
+    applied_profile: data.applied_profile,
+    changed_cameras: data.changed_cameras,
+    error: data.error,
+  };
+}
+
+export interface MonitoringSettingsLocal {
+  success: boolean;
+  cameras: Record<string, { animal_profile: string; name: string }>;
+}
+
+export async function getMonitoringSettingsLocal(): Promise<MonitoringSettingsLocal> {
+  const response = await requestPetMonitor<MonitoringSettingsLocal>({
+    method: 'GET',
+    url: '/api/monitoring/settings',
+  });
+
+  const data = (response.data ?? {}) as MonitoringSettingsLocal;
+  return {
+    success: isSuccessStatus(response.status) && data.success !== false,
+    cameras: isObjectRecord(data.cameras) ? data.cameras as Record<string, { animal_profile: string; name: string }> : {},
+  };
+}
