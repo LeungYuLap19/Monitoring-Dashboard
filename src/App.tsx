@@ -6,11 +6,10 @@ import AuthenticatedLayout from './components/global/AuthenticatedLayout';
 import RoleGuard from './components/global/RoleGuard';
 import RouteScrollReset from './components/global/RouteScrollReset';
 import { Toaster } from './components/ui/sonner';
-import { setStoredAccessToken, setStoredAuthUser } from './lib/utils/auth';
+import { setStoredAccessToken, setStoredAuthUser, getStoredAccessToken, getStoredAuthUser } from './lib/utils/auth';
+import { LOCAL_FRONTEND_BASE } from './constants/navigation';
 
 const LoginPage = lazy(() => import('./pages/LoginPage'));
-const OverviewPage = lazy(() => import('./pages/OverviewPage'));
-const MonitoringPage = lazy(() => import('./pages/MonitoringPage'));
 const PetsPage = lazy(() => import('./pages/PetsPage'));
 const ClientViewPage = lazy(() => import('./pages/ClientViewPage'));
 const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
@@ -34,6 +33,22 @@ function useHashToken() {
   }, []);
 }
 
+function RedirectToLocal({ path }: { path: string }) {
+  useEffect(() => {
+    const token = getStoredAccessToken();
+    const user = getStoredAuthUser();
+    let url = `${LOCAL_FRONTEND_BASE}${path}`;
+    if (token) {
+      const hash = new URLSearchParams();
+      hash.set('access_token', token);
+      if (user) hash.set('user', JSON.stringify(user));
+      url += `#${hash.toString()}`;
+    }
+    window.location.href = url;
+  }, [path]);
+  return null;
+}
+
 export default function App() {
   useHashToken();
   return (
@@ -44,9 +59,9 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<GuestGuard><LoginPage /></GuestGuard>} />
             <Route element={<AuthGuard><AuthenticatedLayout /></AuthGuard>}>
-              <Route index element={<OverviewPage />} />
-              <Route path="overview" element={<Navigate to="/" replace />} />
-              <Route path="monitoring" element={<MonitoringPage />} />
+              <Route index element={<RedirectToLocal path="/" />} />
+              <Route path="overview" element={<RedirectToLocal path="/" />} />
+              <Route path="monitoring" element={<RedirectToLocal path="/monitoring" />} />
               <Route path="pets" element={<PetsPage />} />
               <Route path="subscription" element={<RoleGuard allow={['user']}><SubscriptionPage /></RoleGuard>} />
               <Route path="client-view" element={<RoleGuard allow={['ngo']}><ClientViewPage /></RoleGuard>} />
