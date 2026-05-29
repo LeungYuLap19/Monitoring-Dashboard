@@ -101,66 +101,68 @@ export default function ModelSelectorModal({
   return (
     <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>AI Model</DialogTitle>
-          <DialogDescription>
+        <DialogHeader className="px-6 pt-6 pb-2">
+          <DialogTitle className="text-base font-black text-slate-800">AI Model</DialogTitle>
+          <DialogDescription className="text-xs text-slate-400 mt-0.5">
             Select which AI behavior model to use for monitoring.
           </DialogDescription>
         </DialogHeader>
 
-        {hint && (
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200">
-            <AlertCircle className="size-4 mt-0.5 shrink-0 text-amber-600" />
-            <p className="text-xs text-amber-800">{hint}</p>
-          </div>
-        )}
+        <div className="px-6 pb-6 space-y-4">
+          {hint && (
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200">
+              <AlertCircle className="size-4 mt-0.5 shrink-0 text-amber-600" />
+              <p className="text-xs text-amber-800">{hint}</p>
+            </div>
+          )}
 
-        <div className="space-y-3 py-2">
-          {AVAILABLE_MODELS.map((model) => {
-            const isSelected = selected.includes(model.key);
-            const isSuggested = model.key === suggestedKey;
-            const Icon = model.icon;
-            return (
-              <button
-                key={model.key}
-                type="button"
-                onClick={() => toggleModel(model.key)}
-                className={`w-full flex items-start gap-3 p-3 rounded-lg border-2 transition-colors text-left ${
-                  isSelected
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
-                }`}
-              >
-                <Icon className={`size-5 mt-0.5 shrink-0 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className={`text-sm font-medium ${isSelected ? 'text-blue-900' : 'text-slate-700'}`}>
-                      {model.label}
-                    </p>
-                    {isSuggested && !isSelected && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-medium">
-                        Recommended
-                      </span>
-                    )}
+          <div className="space-y-3">
+            {AVAILABLE_MODELS.map((model) => {
+              const isSelected = selected.includes(model.key);
+              const isSuggested = model.key === suggestedKey;
+              const Icon = model.icon;
+              return (
+                <button
+                  key={model.key}
+                  type="button"
+                  onClick={() => toggleModel(model.key)}
+                  className={`w-full flex items-start gap-3 p-3 rounded-xl border-2 transition-colors text-left ${
+                    isSelected
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-slate-200 hover:border-slate-300 bg-white'
+                  }`}
+                >
+                  <Icon className={`size-5 mt-0.5 shrink-0 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className={`text-sm font-medium ${isSelected ? 'text-blue-900' : 'text-slate-700'}`}>
+                        {model.label}
+                      </p>
+                      {isSuggested && !isSelected && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-medium">
+                          Recommended
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">{model.description}</p>
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5">{model.description}</p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
+                </button>
+              );
+            })}
+          </div>
 
-        <div className="flex justify-end gap-2 pt-2">
-          <Button variant="outline" onClick={onClose} disabled={saving}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={saving || !selected.length || !hasChanged}
-          >
-            {saving ? <Loader2 className="size-4 animate-spin mr-1.5" /> : null}
-            Apply
-          </Button>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={onClose} disabled={saving}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={saving || !selected.length || !hasChanged}
+            >
+              {saving ? <Loader2 className="size-4 animate-spin mr-1.5" /> : null}
+              Apply
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

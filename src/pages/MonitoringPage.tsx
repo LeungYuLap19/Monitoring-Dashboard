@@ -19,7 +19,7 @@ import {
 } from '../lib/utils/services/pet-monitor-ui';
 import { getBehaviorSummary, getBehaviorTimeline } from '../lib/services/behaviorHistoryService';
 import { getMonitoringSettings, patchMonitoringSettings } from '../lib/services/subscriptionService';
-import { syncMonitoringModels, getMonitoringSettingsLocal } from '../lib/services/petMonitorService';
+import { syncMonitoringModels, getMonitoringSettingsLocal, setPetMonitorActiveCameras, PET_MONITOR_API_BASE_URL } from '../lib/services/petMonitorService';
 import { getRoleFromToken } from '../lib/utils/auth';
 import PetSelector from '../components/pages/monitoring/PetSelector';
 import PetProfileCard from '../components/pages/monitoring/PetProfileCard';
@@ -177,6 +177,9 @@ export default function MonitoringPage() {
 
     if (syncResult.success) {
       setCurrentModelKeys(selectedKeys);
+      await setPetMonitorActiveCameras([]);
+      await new Promise((r) => setTimeout(r, 1500));
+      await fetch(`${PET_MONITOR_API_BASE_URL}/api/reload_streams`, { method: 'POST' });
     }
   }, []);
 

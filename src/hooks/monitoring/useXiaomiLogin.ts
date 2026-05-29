@@ -110,15 +110,15 @@ export function useXiaomiLogin(options?: {
               : Promise.resolve(null),
           ]);
           setSources(cams);
-          const savedDeviceIds = new Set(monitoringSettings?.selectedCameraIds ?? []);
-          const persistedDeviceIds = new Set(
+          const savedDeviceIds = new Set<string>(monitoringSettings?.selectedCameraIds ?? []);
+          const persistedDeviceIds = new Set<string>(
             savedDeviceIds.size === 0 ? readPersistedSelectedDeviceIds(id, r) : [],
           );
-          const activeDeviceIds = savedDeviceIds.size > 0
+          const activeDeviceIds: Set<string> = savedDeviceIds.size > 0
             ? savedDeviceIds
             : persistedDeviceIds.size > 0
               ? persistedDeviceIds
-            : new Set(streams.deviceIds);
+            : new Set<string>(streams.deviceIds);
           setSelectedDeviceIds(
             getPreselectedDeviceIds(
               cams,
@@ -187,15 +187,15 @@ export function useXiaomiLogin(options?: {
           : Promise.resolve(null),
       ]);
       setSources(cams);
-      const savedDeviceIds = new Set(monitoringSettings?.selectedCameraIds ?? []);
-      const persistedDeviceIds = new Set(
+      const savedDeviceIds = new Set<string>(monitoringSettings?.selectedCameraIds ?? []);
+      const persistedDeviceIds = new Set<string>(
         savedDeviceIds.size === 0 ? readPersistedSelectedDeviceIds(resolvedId, region) : [],
       );
-      const activeDeviceIds = savedDeviceIds.size > 0
+      const activeDeviceIds: Set<string> = savedDeviceIds.size > 0
         ? savedDeviceIds
         : persistedDeviceIds.size > 0
           ? persistedDeviceIds
-        : new Set(streams.deviceIds);
+        : new Set<string>(streams.deviceIds);
       setSelectedDeviceIds(
         getPreselectedDeviceIds(
           cams,
