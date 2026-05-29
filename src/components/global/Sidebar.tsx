@@ -18,7 +18,7 @@ function buildLocalRedirectUrl(url: string): string {
   if (!token) return url;
   const hash = new URLSearchParams();
   hash.set('access_token', token);
-  if (user) hash.set('user', encodeURIComponent(JSON.stringify(user)));
+  if (user) hash.set('user', JSON.stringify(user));
   return `${url}#${hash.toString()}`;
 }
 

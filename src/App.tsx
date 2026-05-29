@@ -26,7 +26,7 @@ function useHashToken() {
       setStoredAccessToken(token);
       if (userJson) {
         try {
-          setStoredAuthUser(JSON.parse(decodeURIComponent(userJson)));
+          setStoredAuthUser(JSON.parse(userJson));
         } catch { /* ignore */ }
       }
     }
