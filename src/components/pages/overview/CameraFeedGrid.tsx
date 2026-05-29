@@ -112,13 +112,6 @@ function CameraCard({ feed, onSelectCamera }: CameraCardProps) {
               <span>LIVE</span>
             </div>
 
-            {/* Location Tag */}
-            {feed.petId && (
-              <div className="absolute bottom-3 left-3 bg-black/50 backdrop-blur-sm text-white font-bold text-[10px] px-2 py-1 rounded-lg">
-                {t('overview.cameraFeed.currentBehavior')} {feed.currentBehavior}
-              </div>
-            )}
-
             {/* Hover Overlay play button effect */}
             <div className="absolute inset-0 bg-teal-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <div className="size-10 rounded-full bg-white/95 text-teal-600 flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-transform">

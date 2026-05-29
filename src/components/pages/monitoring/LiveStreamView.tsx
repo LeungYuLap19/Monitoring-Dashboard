@@ -64,9 +64,6 @@ export default function LiveStreamView({
             </div>
           </div>
 
-          <div className="absolute bottom-5 right-5 text-[11px] font-bold text-white/50 tracking-wider">
-            {statusText || `HKBR CAM${camId ?? 'LIVE'}`}
-          </div>
         </>
       ) : (
         <div className="flex flex-col items-center justify-center p-8 text-slate-500 gap-3">
