@@ -1,11 +1,12 @@
-import React from 'react';
-import { AlertTriangle, ChevronDown, FileText, RefreshCw, Sparkles } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { AlertTriangle, ChevronDown, FileText, RefreshCw, Sparkles, TrendingUp, TrendingDown, Clock, Utensils, Activity, AlertCircle } from 'lucide-react';
 import { BehaviorStatsProps } from '../../../types';
 import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '../../ui/chart';
 import { Card, CardContent } from '../../ui/card';
 import { Button } from '../../ui/button';
 import { useTranslation } from '../../../lib/i18n';
+import { formatBehaviorDuration } from '../../../lib/utils/services/pet-monitor-ui';
 
 export default function BehaviorStats({
   timeFilter,
@@ -49,6 +50,43 @@ export default function BehaviorStats({
   const todayStats = statsByTime[statsByTime.length - 1];
   const trendData = trendStatsByTime;
 
+  const insights = useMemo(() => {
+    const dominant = activeCategory.length
+      ? activeCategory.reduce((a, b) => (b.value > a.value ? b : a), activeCategory[0])
+      : null;
+
+    let peakLabel: string | null = null;
+    if (statsByTime.length > 1) {
+      let maxTotal = 0;
+      let maxIdx = 0;
+      statsByTime.forEach((s, i) => {
+        const total = s.eatingCount + s.drinkingCount + s.activityCount + s.restingCount;
+        if (total > maxTotal) { maxTotal = total; maxIdx = i; }
+      });
+      if (maxTotal > 0) {
+        peakLabel = timeFilter === '1'
+          ? `${statsByTime[maxIdx].date}:00`
+          : statsByTime[maxIdx].date;
+      }
+    }
+
+    const eatingSeconds = activeCategory.find((c) => c.label.includes('eating'))?.value ?? 0;
+    const drinkingSeconds = activeCategory.find((c) => c.label.includes('drinking'))?.value ?? 0;
+    let alert: string | null = null;
+    let alertLevel: 'warning' | 'ok' = 'ok';
+    if (totalActivities > 0 && eatingSeconds === 0) { alert = t('monitoring.insights.noEating'); alertLevel = 'warning'; }
+    else if (totalActivities > 0 && drinkingSeconds === 0) { alert = t('monitoring.insights.noDrinking'); alertLevel = 'warning'; }
+    else { alert = t('monitoring.insights.allNormal'); }
+
+    let comparison: { pct: number; direction: 'up' | 'down' | 'same' } | null = null;
+    if (avgOver3Days > 0 && totalActivities > 0) {
+      const pct = Math.round(((totalActivities - avgOver3Days) / avgOver3Days) * 100);
+      comparison = { pct: Math.abs(pct), direction: pct > 0 ? 'up' : pct < 0 ? 'down' : 'same' };
+    }
+
+    return { dominant, peakLabel, alert, alertLevel, comparison };
+  }, [activeCategory, statsByTime, timeFilter, totalActivities, avgOver3Days, t]);
+
   const lineChartConfig: ChartConfig = {
     restingCount: { label: t('monitoring.behavior.resting'), color: '#94a3b8' },
     eatingCount: { label: t('monitoring.behavior.eating'), color: '#0d9488' },
@@ -77,12 +115,50 @@ export default function BehaviorStats({
             )}
           </div>
 
-          <div className="p-3.5 bg-emerald-50/40 rounded-xl text-xs text-slate-600 flex gap-2">
-            <span className="text-teal-600 font-bold shrink-0">*</span>
-            <span className="font-medium text-slate-600 leading-normal">
-              {isLoading ? t('monitoring.placeholders.loadingTelemetry') : error ? error.message : summary}
-            </span>
-          </div>
+          {!placeholder && totalActivities > 0 && (
+            <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3">
+              {insights.dominant && (
+                <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <Activity className="size-4 text-teal-500 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-slate-400 font-bold uppercase">{t('monitoring.insights.dominantLabel')}</p>
+                    <p className="text-xs font-bold text-slate-700 truncate">{t(insights.dominant.label)} · {formatBehaviorDuration(insights.dominant.value)}</p>
+                  </div>
+                </div>
+              )}
+              {insights.peakLabel && (
+                <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <Clock className="size-4 text-amber-500 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-slate-400 font-bold uppercase">{t(timeFilter === '1' ? 'monitoring.insights.peakHourLabel' : 'monitoring.insights.peakDayLabel')}</p>
+                    <p className="text-xs font-bold text-slate-700">{insights.peakLabel}</p>
+                  </div>
+                </div>
+              )}
+              {insights.alert && (
+                <div className={`flex items-center gap-2.5 p-3 rounded-xl border ${insights.alertLevel === 'warning' ? 'bg-amber-50 border-amber-100' : 'bg-emerald-50 border-emerald-100'}`}>
+                  <AlertCircle className={`size-4 shrink-0 ${insights.alertLevel === 'warning' ? 'text-amber-600' : 'text-emerald-500'}`} />
+                  <div className="min-w-0">
+                    <p className={`text-[10px] font-bold uppercase ${insights.alertLevel === 'warning' ? 'text-amber-500' : 'text-emerald-400'}`}>{t('monitoring.insights.alertLabel')}</p>
+                    <p className={`text-xs font-bold truncate ${insights.alertLevel === 'warning' ? 'text-amber-700' : 'text-emerald-700'}`}>{insights.alert}</p>
+                  </div>
+                </div>
+              )}
+              {insights.comparison && (
+                <div className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  {insights.comparison.direction === 'up'
+                    ? <TrendingUp className="size-4 text-emerald-500 shrink-0" />
+                    : <TrendingDown className="size-4 text-rose-500 shrink-0" />}
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-slate-400 font-bold uppercase">{t('monitoring.insights.comparisonLabel')}</p>
+                    <p className="text-xs font-bold text-slate-700">
+                      {insights.comparison.direction === 'up' ? '↑' : '↓'}{insights.comparison.pct}% {t('monitoring.insights.vsAverage')}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {placeholder ? (
             <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 p-8 text-center space-y-3">
@@ -114,7 +190,7 @@ export default function BehaviorStats({
                           <span className="size-2.5 rounded-md shrink-0 block" style={{ backgroundColor: cat.color }} />
                           <span className="text-xs font-bold text-slate-600 truncate">{t(cat.label)}</span>
                         </div>
-                        <span className="text-[10px] text-slate-400 font-bold pl-4 truncate">{cat.value} {t('monitoring.stats.activityPerDay')}</span>
+                        <span className="text-[10px] text-slate-400 font-bold pl-4 truncate">{formatBehaviorDuration(cat.value)}</span>
                       </div>
                     ))}
                   </div>
@@ -142,7 +218,7 @@ export default function BehaviorStats({
                   <div className="flex items-center justify-between mb-4">
                     <div className="space-y-0.5">
                       <span className="block text-2xl font-black text-slate-800 tracking-tight">
-                        {timeFilter === '1' ? todayTotal : (todayStats?.activityCount ?? 0)} <span className="text-[10px] text-slate-400 font-bold">{t('monitoring.stats.perToday')}</span>
+                        {formatBehaviorDuration(timeFilter === '1' ? todayTotal : (todayStats?.activityCount ?? 0))} <span className="text-[10px] text-slate-400 font-bold">{t('monitoring.stats.perToday')}</span>
                       </span>
                       {timeFilter === '1' ? (
                         <span className="text-[10px] text-slate-400 font-bold">{t('monitoring.stats.yesterdayAvg')} {statsByTime.length ? Math.round(todayTotal / statsByTime.length) : 0}{t('monitoring.stats.perHour')}</span>
