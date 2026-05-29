@@ -3,13 +3,15 @@ import { getXiaomiAccounts } from '../../lib/services/go2rtcService';
 
 const XIAOMI_REGION_KEY = 'xiaomi_region';
 
-export function useXiaomiStatus() {
+export function useXiaomiStatus(options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true;
   const [accounts, setAccounts] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
 
   const region = localStorage.getItem(XIAOMI_REGION_KEY) || 'sg';
 
   const refresh = useCallback(async () => {
+    if (!enabled) return;
     setLoading(true);
     try {
       const result = await getXiaomiAccounts();
@@ -19,11 +21,11 @@ export function useXiaomiStatus() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (enabled) refresh();
+  }, [enabled, refresh]);
 
   return {
     isConnected: accounts.length > 0,

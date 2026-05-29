@@ -11,8 +11,6 @@ import { usePetMonitorRecords } from '../monitoring';
 import { useXiaomiStatus } from '../monitoring/useXiaomiStatus';
 import { useSessionHeartbeat } from '../auth';
 import { toast } from 'sonner';
-import axios from 'axios';
-import { PET_MONITOR_API_BASE_URL } from '../../lib/services/petMonitorService';
 
 export function useAuthenticatedLayout() {
   const navigate = useNavigate();
@@ -34,8 +32,8 @@ export function useAuthenticatedLayout() {
   const [isXiaomiLoginOpen, setIsXiaomiLoginOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hasUnsentLogs, setHasUnsentLogs] = useState(true);
-  const monitorRecords = usePetMonitorRecords({ autoLoad: true });
-  const xiaomiStatus = useXiaomiStatus();
+  const monitorRecords = usePetMonitorRecords({ autoLoad: false });
+  const xiaomiStatus = useXiaomiStatus({ enabled: false });
 
   const showToast = useCallback((message: string) => {
     toast.success(message);
@@ -90,24 +88,14 @@ export function useAuthenticatedLayout() {
   }, [navigate, showToast]);
 
   const handleLogout = useCallback(() => {
-    axios.post(`${PET_MONITOR_API_BASE_URL}/api/xiaomi/logout`).catch(() => {});
-    axios.post(`${PET_MONITOR_API_BASE_URL}/api/active_cams`, { active_cams: [] }).catch(() => {});
     queryClient.clear();
     logoutAuthSession();
     redirectToLogin(t('auth.toasts.loggedOut'));
   }, [queryClient, redirectToLogin, t]);
 
   const handleXiaomiLogout = useCallback(async () => {
-    try {
-      await axios.post(`${PET_MONITOR_API_BASE_URL}/api/xiaomi/logout`);
-      await axios.post(`${PET_MONITOR_API_BASE_URL}/api/active_cams`, { active_cams: [] });
-      await new Promise((r) => setTimeout(r, 1500));
-      await xiaomiStatus.refresh();
-      toast.success(t('xiaomi.disconnected'));
-    } catch {
-      toast.error(t('xiaomi.disconnectFailed'));
-    }
-  }, [xiaomiStatus, t]);
+    // Xiaomi management moved to local frontend
+  }, []);
 
   const handleSessionExpired = useCallback(() => {
     queryClient.clear();
