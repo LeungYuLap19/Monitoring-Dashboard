@@ -153,7 +153,12 @@ export default function MonitoringPage() {
     } else {
       getMonitoringSettings()
         .then((settings) => {
-          setAiModelLimit(settings.entitlement?.aiModelSelectionLimit ?? 1);
+          const entitlement = settings.entitlement;
+          setAiModelLimit(entitlement?.aiModelSelectionLimit ?? 1);
+          syncMonitoringModels(
+            settings.selectedAiModelKeys ?? [],
+            { cameraLimit: entitlement?.cameraLimit, aiModelSelectionLimit: entitlement?.aiModelSelectionLimit },
+          ).catch(() => {});
         })
         .catch(() => {});
     }
@@ -161,19 +166,26 @@ export default function MonitoringPage() {
 
   const handleModelSave = useCallback(async (selectedKeys: string[]) => {
     const role = getRoleFromToken();
+    let limits: { cameraLimit?: number; aiModelSelectionLimit?: number } | undefined;
+
     const awsPromise = role === 'user'
       ? getMonitoringSettings()
-          .then((settings) => patchMonitoringSettings({
-            selectedCameraIds: settings?.selectedCameraIds ?? [],
-            selectedAiModelKeys: selectedKeys,
-          }))
+          .then((settings) => {
+            limits = {
+              cameraLimit: settings?.entitlement?.cameraLimit,
+              aiModelSelectionLimit: settings?.entitlement?.aiModelSelectionLimit,
+            };
+            return patchMonitoringSettings({
+              selectedCameraIds: settings?.selectedCameraIds ?? [],
+              selectedAiModelKeys: selectedKeys,
+            });
+          })
           .catch(() => {})
       : Promise.resolve();
 
-    const [syncResult] = await Promise.all([
-      syncMonitoringModels(selectedKeys),
-      awsPromise,
-    ]);
+    await awsPromise;
+
+    const syncResult = await syncMonitoringModels(selectedKeys, limits);
 
     if (syncResult.success) {
       setCurrentModelKeys(selectedKeys);

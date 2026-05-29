@@ -159,11 +159,12 @@ export interface MonitoringSyncResponse {
 
 export async function syncMonitoringModels(
   selectedAiModelKeys: string[],
+  limits?: { cameraLimit?: number; aiModelSelectionLimit?: number },
 ): Promise<MonitoringSyncResponse> {
   const response = await requestPetMonitor<MonitoringSyncResponse>({
     method: 'POST',
     url: '/api/monitoring/sync',
-    data: { selectedAiModelKeys },
+    data: { selectedAiModelKeys, ...limits },
   });
 
   const data = (response.data ?? {}) as MonitoringSyncResponse;
