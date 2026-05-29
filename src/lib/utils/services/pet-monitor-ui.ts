@@ -266,12 +266,24 @@ export function toStatsByTime(
   ];
 }
 
+export function formatBehaviorDuration(seconds: number): string {
+  if (seconds >= 3600) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.round((seconds % 3600) / 60);
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  }
+  if (seconds >= 60) {
+    return `${Math.round(seconds / 60)} min`;
+  }
+  return `${seconds}s`;
+}
+
 export function toBehaviorSummary(cameraName: string, totalActivities: number, hasBackendData: boolean): string {
   if (!hasBackendData) {
     return `${cameraName} is waiting for behavior history from the PetMonitor backend.`;
   }
 
-  return `${cameraName} has ${totalActivities} behavior events in the selected monitoring window.`;
+  return `${cameraName} has ${formatBehaviorDuration(totalActivities)} of behavior data in the selected monitoring window.`;
 }
 
 export function toActivityClips(
