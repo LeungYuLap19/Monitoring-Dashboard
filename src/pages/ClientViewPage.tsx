@@ -73,7 +73,7 @@ export default function ClientViewPage() {
   const handleExportPdf = useCallback(async () => {
     const el = document.getElementById('pet-report-card');
     if (!el) return;
-    const html2canvas = (await import('html2canvas')).default;
+    const html2canvas = (await import('html2canvas-pro')).default;
     const { jsPDF } = await import('jspdf');
     const canvas = await html2canvas(el, { scale: 2, useCORS: true });
     const imgData = canvas.toDataURL('image/png');
