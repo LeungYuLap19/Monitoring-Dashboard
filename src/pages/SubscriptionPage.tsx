@@ -50,6 +50,7 @@ export default function SubscriptionPage() {
       ctaLabel: currentTier === 'basic' ? t('subscription.current.currentPlan') : t('subscription.plans.basic.cta'),
       highlighted: false,
       current: currentTier === 'basic',
+      disabled: currentTier !== 'basic',
       features: [
         { text: t('subscription.features.liveCam1'), included: true },
         { text: t('subscription.features.behaviorAi'), included: true },
@@ -71,6 +72,7 @@ export default function SubscriptionPage() {
       ctaLabel: currentTier === 'pro' ? t('subscription.current.currentPlan') : t('subscription.plans.pro.cta'),
       highlighted: currentTier !== 'pro',
       current: currentTier === 'pro',
+      disabled: currentTier !== 'pro',
       features: [
         { text: t('subscription.features.liveCam3'), included: true },
         { text: t('subscription.features.behaviorAi'), included: true },
@@ -90,6 +92,7 @@ export default function SubscriptionPage() {
       ctaLabel: currentTier === 'travel' ? t('subscription.current.currentPlan') : t('subscription.plans.travel.cta'),
       highlighted: false,
       current: currentTier === 'travel',
+      disabled: currentTier !== 'travel',
       features: [
         { text: t('subscription.features.liveCam1'), included: true },
         { text: t('subscription.features.behaviorAi'), included: true },

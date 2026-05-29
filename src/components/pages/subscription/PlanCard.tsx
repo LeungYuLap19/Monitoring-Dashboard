@@ -1,5 +1,6 @@
 import { Check, X } from 'lucide-react';
 import { Button } from '../../ui/button';
+import { useTranslation } from '../../../lib/i18n';
 
 interface PlanFeature {
   text: string;
@@ -18,6 +19,7 @@ interface PlanCardProps {
   ctaLabel: string;
   highlighted?: boolean;
   current?: boolean;
+  disabled?: boolean;
 }
 
 export default function PlanCard({
@@ -32,13 +34,17 @@ export default function PlanCard({
   ctaLabel,
   highlighted = false,
   current = false,
+  disabled = false,
 }: PlanCardProps) {
+  const { t } = useTranslation();
   return (
     <div
       className={`relative flex flex-col rounded-3xl border p-6 transition-shadow ${
-        highlighted
-          ? 'border-teal-200 bg-teal-50/30 shadow-lg ring-2 ring-teal-500/20'
-          : 'border-slate-100 bg-white shadow-sm'
+        disabled
+          ? 'border-slate-100 bg-slate-50/50 opacity-60 cursor-not-allowed'
+          : highlighted
+            ? 'border-teal-200 bg-teal-50/30 shadow-lg ring-2 ring-teal-500/20'
+            : 'border-slate-100 bg-white shadow-sm'
       }`}
     >
       {badge && (
@@ -72,11 +78,11 @@ export default function PlanCard({
       </ul>
 
       <Button
-        variant={highlighted ? 'default' : 'outline'}
-        disabled={current}
-        className={`w-full rounded-xl font-bold ${highlighted ? 'bg-teal-600 hover:bg-teal-700' : ''} ${current ? 'opacity-60' : ''}`}
+        variant={highlighted && !disabled ? 'default' : 'outline'}
+        disabled={current || disabled}
+        className={`w-full rounded-xl font-bold ${highlighted && !disabled ? 'bg-teal-600 hover:bg-teal-700' : ''} ${current || disabled ? 'opacity-60' : ''}`}
       >
-        {ctaLabel}
+        {disabled ? t('subscription.comingSoon') : ctaLabel}
       </Button>
     </div>
   );
