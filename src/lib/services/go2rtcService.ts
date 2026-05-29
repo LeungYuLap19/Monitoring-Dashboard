@@ -1,7 +1,8 @@
 import axios from 'axios';
 import type { Go2rtcXiaomiSource } from '../../types/lib/monitoring';
+import { PET_MONITOR_API_BASE_URL } from './petMonitorService';
 
-export const GO2RTC_BASE_URL = '/go2rtc';
+export const GO2RTC_BASE_URL = `${PET_MONITOR_API_BASE_URL}/go2rtc`;
 
 const go2rtcClient = axios.create({
   baseURL: GO2RTC_BASE_URL,
