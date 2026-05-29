@@ -7,13 +7,14 @@ export default function ActivityLogStats({ activityCounts }: ActivityLogStatsPro
   const { t } = useTranslation();
 
   const chartData = activityCounts.map((item) => ({
-    name: t(item.label),
+    name: item.label.includes('.') ? t(item.label) : item.label,
     value: item.value,
     fill: item.color,
   }));
 
   const chartConfig: ChartConfig = activityCounts.reduce((acc, item) => {
-    acc[t(item.label)] = { label: t(item.label), color: item.color };
+    const label = item.label.includes('.') ? t(item.label) : item.label;
+    acc[label] = { label, color: item.color };
     return acc;
   }, {} as ChartConfig);
 
