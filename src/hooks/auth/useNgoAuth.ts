@@ -18,6 +18,7 @@ export function useNgoAuth() {
     try {
       const result = await loginNgo(email.trim(), password);
       await bootstrapSessionWithToken(result.token, 'ngo', result.ngoId);
+      sessionStorage.setItem('_fresh_login', '1');
       navigate('/', { replace: true });
     } catch (err) {
       if (isAuthApiError(err)) {

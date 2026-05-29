@@ -42,6 +42,10 @@ function RedirectToLocal({ path }: { path: string }) {
       const hash = new URLSearchParams();
       hash.set('access_token', token);
       if (user) hash.set('user', JSON.stringify(user));
+      if (sessionStorage.getItem('_fresh_login')) {
+        hash.set('fresh_login', '1');
+        sessionStorage.removeItem('_fresh_login');
+      }
       url += `#${hash.toString()}`;
     }
     window.location.href = url;

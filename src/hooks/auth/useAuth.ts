@@ -139,6 +139,7 @@ export function useAuth(showToast: (msg: string) => void) {
           name: `${user.lastName ?? ''}${user.firstName ?? ''}` || user.emailOrPhone || 'User',
         }),
       );
+      sessionStorage.setItem('_fresh_login', '1');
       navigate('/', { replace: true });
     } catch (error) {
       showToast(getErrorMessage(error, 'verify'));
@@ -171,6 +172,7 @@ export function useAuth(showToast: (msg: string) => void) {
           name: `${user.lastName ?? ''}${user.firstName ?? ''}` || `${lastName.trim()}${firstName.trim()}`,
         }),
       );
+      sessionStorage.setItem('_fresh_login', '1');
       navigate('/', { replace: true });
     } catch (error) {
       showToast(getErrorMessage(error, 'register'));
