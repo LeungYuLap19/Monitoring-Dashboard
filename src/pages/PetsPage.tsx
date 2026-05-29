@@ -131,7 +131,8 @@ export default function PetsPage() {
     refreshSelectedPet,
   } = usePetManagement();
 
-  const monitorSSE = useBehaviorSSE();
+  // const monitorSSE = useBehaviorSSE();
+  const monitorSSE = { cameraStats: new Map(), connected: false };
   const { updatePetProfile, isSubmitting: isUpdatingPet } = useUpdatePetProfile();
   const { createPet, isSubmitting: isCreatingPet, resetCreateState } = useCreatePetProfile();
   const { cameraPetMap } = useCameraPetMap();
@@ -280,11 +281,6 @@ export default function PetsPage() {
             onSetActiveDetailTab={setActiveDetailTab}
             onBack={closePetDetails}
             onEdit={handleOpenEditModal}
-            availableCameras={availableCameras}
-            onUpdateMonitorCamera={handleUpdateMonitorCamera}
-            isUpdatingCamera={isUpdatingPet}
-            monitorBackendConnected={monitorBackendConnected}
-            onNavigateToMonitoring={handleNavigateToMonitoring}
           />
         ) : null
       ) : (

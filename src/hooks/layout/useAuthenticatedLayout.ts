@@ -32,8 +32,8 @@ export function useAuthenticatedLayout() {
   const [isXiaomiLoginOpen, setIsXiaomiLoginOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hasUnsentLogs, setHasUnsentLogs] = useState(true);
-  const monitorRecords = usePetMonitorRecords({ autoLoad: false });
-  const xiaomiStatus = useXiaomiStatus({ enabled: false });
+  // const monitorRecords = usePetMonitorRecords({ autoLoad: false });
+  // const xiaomiStatus = useXiaomiStatus({ enabled: false });
 
   const showToast = useCallback((message: string) => {
     toast.success(message);
@@ -44,10 +44,11 @@ export function useAuthenticatedLayout() {
     [petsList, selectedPetId],
   );
 
-  const monitorClips = useMemo(
-    () => toActivityClips(monitorRecords.records, monitorRecords.getRecordThumbnailUrl),
-    [monitorRecords.records, monitorRecords.getRecordThumbnailUrl],
-  );
+  // const monitorClips = useMemo(
+  //   () => toActivityClips(monitorRecords.records, monitorRecords.getRecordThumbnailUrl),
+  //   [monitorRecords.records, monitorRecords.getRecordThumbnailUrl],
+  // );
+  const monitorClips: any[] = [];
 
   const activeTab: TabId = useMemo(() => {
     const path = location.pathname;
@@ -157,9 +158,9 @@ export function useAuthenticatedLayout() {
     handleLogSendSuccess,
     handleLogout,
     handleXiaomiLogout,
-    xiaomiConnected: xiaomiStatus.isConnected,
-    refreshXiaomiStatus: xiaomiStatus.refresh,
+    xiaomiConnected: false, // xiaomiStatus.isConnected,
+    refreshXiaomiStatus: () => {}, // xiaomiStatus.refresh,
     monitorClips,
-    getMonitorClipVideoUrl: monitorRecords.getRecordVideoUrl,
+    getMonitorClipVideoUrl: (_url: string) => null as string | null, // monitorRecords.getRecordVideoUrl,
   };
 }
