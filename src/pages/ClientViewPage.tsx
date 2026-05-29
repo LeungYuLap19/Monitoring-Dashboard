@@ -26,7 +26,10 @@ export default function ClientViewPage() {
   const { selectedPetId, setSelectedPetId } = useLayoutContext();
   const { t } = useTranslation();
   const monitor = usePetMonitorDashboard({ autoLoad: true });
-  const records = usePetMonitorRecords({ autoLoad: false });
+  const {
+    records: videoRecords,
+    loadRecords,
+  } = usePetMonitorRecords({ autoLoad: false });
   const { cameraPetMap } = useCameraPetMap();
   const [liked, setLiked] = useState(false);
   const [streamActive, setStreamActive] = useState(true);
@@ -80,8 +83,8 @@ export default function ClientViewPage() {
     if (selectedCamId === null) return;
     const now = new Date();
     const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    void records.loadRecords({ cam_id: selectedCamId, date }).catch(() => undefined);
-  }, [records, selectedCamId]);
+    void loadRecords({ cam_id: selectedCamId, date }).catch(() => undefined);
+  }, [loadRecords, selectedCamId]);
 
   const todayRange = useMemo(() => {
     const now = new Date();
@@ -127,7 +130,7 @@ export default function ClientViewPage() {
   }, [activeFeed, t, totalActivities]);
 
   const liveClips = useMemo(() => (
-    records.records.slice(0, 4).map((record) => ({
+    videoRecords.slice(0, 4).map((record) => ({
       id: `${record.cam_id}-${record.id}`,
       timestamp: new Date(record.start_time).toLocaleString(),
       petName: activeFeed?.petName || activeFeed?.name || '',
@@ -136,7 +139,7 @@ export default function ClientViewPage() {
       videoUrl: getPetMonitorRecordVideoUrl(record.filename),
       isUrgent: /(abnormal|alert|incident|panic|fall)/i.test(record.trigger_action),
     }))
-  ), [activeFeed?.name, activeFeed?.petName, records.records, t]);
+  ), [activeFeed?.name, activeFeed?.petName, t, videoRecords]);
 
   const livePlaceholder = useMemo(() => {
     if (!activeFeed) return null;
