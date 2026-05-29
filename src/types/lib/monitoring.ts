@@ -52,6 +52,7 @@ export interface Go2rtcXiaomiSource {
   name: string;
   info: string;
   url: string;
+  did?: string;
 }
 
 export interface PetMonitorSelectedCamera extends PetMonitorXiaomiCamera {

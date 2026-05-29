@@ -20,6 +20,51 @@ const STREAM_NAMES = [
   'xiaomi_main', 'xiaomi_2', 'xiaomi_3', 'xiaomi_4', 'xiaomi_5',
   'xiaomi_6', 'xiaomi_7', 'xiaomi_8',
 ];
+const XIAOMI_SELECTED_DEVICE_IDS_KEY = 'xiaomi_selected_device_ids';
+
+function getSourceDid(source: Go2rtcXiaomiSource): string | null {
+  if (source.did) return source.did;
+  const match = source.url.match(/[?&]did=(\d+)/);
+  return match ? match[1] : null;
+}
+
+function getSelectedDeviceIdsStorageKey(accountId: string, region: string) {
+  return `${XIAOMI_SELECTED_DEVICE_IDS_KEY}:${accountId}:${region}`;
+}
+
+function readPersistedSelectedDeviceIds(accountId: string, region: string): string[] {
+  try {
+    const raw = localStorage.getItem(getSelectedDeviceIdsStorageKey(accountId, region));
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((value): value is string => typeof value === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+function writePersistedSelectedDeviceIds(accountId: string, region: string, deviceIds: string[]) {
+  localStorage.setItem(
+    getSelectedDeviceIdsStorageKey(accountId, region),
+    JSON.stringify(deviceIds),
+  );
+}
+
+function getPreselectedDeviceIds(
+  cams: Go2rtcXiaomiSource[],
+  activeDeviceIds: Set<string>,
+): Set<string> {
+  const preSelected = new Set<string>();
+
+  cams.forEach((cam) => {
+    const did = getSourceDid(cam);
+    if (did && activeDeviceIds.has(did)) {
+      preSelected.add(did);
+    }
+  });
+
+  return preSelected;
+}
 
 export function useXiaomiLogin(options?: {
   onSuccess?: () => void;
@@ -29,7 +74,7 @@ export function useXiaomiLogin(options?: {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [sources, setSources] = useState<Go2rtcXiaomiSource[]>([]);
-  const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
+  const [selectedDeviceIds, setSelectedDeviceIds] = useState<Set<string>>(new Set());
   const [codeCooldown, setCodeCooldown] = useState(0);
   const [cameraLimit, setCameraLimit] = useState<number>(Infinity);
 
@@ -65,23 +110,21 @@ export function useXiaomiLogin(options?: {
               : Promise.resolve(null),
           ]);
           setSources(cams);
-          const preSelected = new Set<number>();
           const savedDeviceIds = new Set(monitoringSettings?.selectedCameraIds ?? []);
+          const persistedDeviceIds = new Set(
+            savedDeviceIds.size === 0 ? readPersistedSelectedDeviceIds(id, r) : [],
+          );
           const activeDeviceIds = savedDeviceIds.size > 0
             ? savedDeviceIds
+            : persistedDeviceIds.size > 0
+              ? persistedDeviceIds
             : new Set(streams.deviceIds);
-          cams.forEach((cam, index) => {
-            const match = cam.url.match(/[?&]did=(\d+)/);
-            if (match && activeDeviceIds.has(match[1])) {
-              preSelected.add(index);
-            }
-          });
-          if (preSelected.size === 0 && role !== 'user') {
-            for (let i = 0; i < Math.min(streams.names.length, cams.length); i++) {
-              preSelected.add(i);
-            }
-          }
-          setSelectedIndices(preSelected);
+          setSelectedDeviceIds(
+            getPreselectedDeviceIds(
+              cams,
+              activeDeviceIds,
+            ),
+          );
           setStep('cameras');
         } finally {
           setLoading(false);
@@ -133,11 +176,32 @@ export function useXiaomiLogin(options?: {
       localStorage.setItem('xiaomi_region', region);
       const accounts = await getXiaomiAccounts();
       const resolvedId = accounts[0] || accountId || username;
+      const role = getRoleFromToken();
       setAccountId(resolvedId);
       options?.onStatusChange?.();
-      const cams = await getXiaomiSources(resolvedId, region);
+      const [cams, streams, monitoringSettings] = await Promise.all([
+        getXiaomiSources(resolvedId, region),
+        getActiveStreams(),
+        role === 'user'
+          ? getMonitoringSettings().catch(() => null)
+          : Promise.resolve(null),
+      ]);
       setSources(cams);
-      setSelectedIndices(new Set());
+      const savedDeviceIds = new Set(monitoringSettings?.selectedCameraIds ?? []);
+      const persistedDeviceIds = new Set(
+        savedDeviceIds.size === 0 ? readPersistedSelectedDeviceIds(resolvedId, region) : [],
+      );
+      const activeDeviceIds = savedDeviceIds.size > 0
+        ? savedDeviceIds
+        : persistedDeviceIds.size > 0
+          ? persistedDeviceIds
+        : new Set(streams.deviceIds);
+      setSelectedDeviceIds(
+        getPreselectedDeviceIds(
+          cams,
+          activeDeviceIds,
+        ),
+      );
       setStep('cameras');
     } catch (e: any) {
       setError(e.message || 'Verification failed');
@@ -150,11 +214,13 @@ export function useXiaomiLogin(options?: {
     setLoading(true);
     setError('');
     try {
-      const selected = sources.filter((_, i) => selectedIndices.has(i));
-      const deviceIds = selected.map((cam) => {
-        const match = cam.url.match(/[?&]did=(\d+)/);
-        return match ? match[1] : '';
-      }).filter(Boolean);
+      const selected = sources.filter((cam) => {
+        const did = getSourceDid(cam);
+        return did ? selectedDeviceIds.has(did) : false;
+      });
+      const deviceIds = selected
+        .map((cam) => getSourceDid(cam))
+        .filter((did): did is string => Boolean(did));
 
       const role = getRoleFromToken();
       if (role === 'user') {
@@ -162,6 +228,9 @@ export function useXiaomiLogin(options?: {
           selectedCameraIds: deviceIds,
           selectedAiModelKeys: [],
         });
+      }
+      if (accountId || username) {
+        writePersistedSelectedDeviceIds(accountId || username, region, deviceIds);
       }
 
       await axios.post(`${PET_MONITOR_API_BASE_URL}/api/xiaomi/logout`, { keep_token: true });
@@ -187,13 +256,13 @@ export function useXiaomiLogin(options?: {
     } finally {
       setLoading(false);
     }
-  }, [sources, selectedIndices, options]);
+  }, [sources, selectedDeviceIds, options]);
 
-  const toggleCamera = useCallback((index: number) => {
-    setSelectedIndices((prev) => {
+  const toggleCamera = useCallback((did: string) => {
+    setSelectedDeviceIds((prev) => {
       const next = new Set(prev);
-      if (next.has(index)) next.delete(index);
-      else if (next.size < cameraLimit) next.add(index);
+      if (next.has(did)) next.delete(did);
+      else if (next.size < cameraLimit) next.add(did);
       return next;
     });
   }, [cameraLimit]);
@@ -203,12 +272,12 @@ export function useXiaomiLogin(options?: {
     setLoading(false);
     setError('');
     setSources([]);
-    setSelectedIndices(new Set());
+    setSelectedDeviceIds(new Set());
     setVerifyCode('');
   }, []);
 
   return {
-    step, loading, error, sources, selectedIndices, codeCooldown, cameraLimit,
+    step, loading, error, sources, selectedDeviceIds, codeCooldown, cameraLimit,
     username, setUsername,
     password, setPassword,
     region, setRegion,
