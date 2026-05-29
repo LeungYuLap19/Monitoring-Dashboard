@@ -13,12 +13,37 @@ export async function getXiaomiAccounts(): Promise<string[]> {
   return Array.isArray(data) ? data : [];
 }
 
-export async function getActiveStreams(): Promise<string[]> {
+function collectDidMatches(value: unknown, out: Set<string>) {
+  if (typeof value === 'string') {
+    for (const match of value.matchAll(/[?&]did=(\d+)/g)) {
+      out.add(match[1]);
+    }
+    return;
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) collectDidMatches(item, out);
+    return;
+  }
+
+  if (value && typeof value === 'object') {
+    for (const nested of Object.values(value)) {
+      collectDidMatches(nested, out);
+    }
+  }
+}
+
+export async function getActiveStreams(): Promise<{ names: string[]; deviceIds: string[] }> {
   const { data } = await go2rtcClient.get('/api/streams', { validateStatus: () => true });
   if (data && typeof data === 'object') {
-    return Object.keys(data);
+    const deviceIds = new Set<string>();
+    collectDidMatches(data, deviceIds);
+    return {
+      names: Object.keys(data),
+      deviceIds: [...deviceIds],
+    };
   }
-  return [];
+  return { names: [], deviceIds: [] };
 }
 
 export async function getXiaomiSources(

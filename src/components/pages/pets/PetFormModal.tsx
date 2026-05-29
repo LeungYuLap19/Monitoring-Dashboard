@@ -68,13 +68,40 @@ export default function PetFormModal({
             </div>
             <div className="space-y-1">
               <Label className="text-xs font-bold text-slate-500">{t('pets.form.animalLabel')}</Label>
-              <Input
-                type="text"
-                required
-                value={formState.formAnimal}
-                onChange={(e) => onFieldChange('formAnimal', e.target.value)}
-                placeholder={t('pets.form.animalPlaceholder')}
-              />
+              {formState.formAnimal === 'other' || (formState.formAnimal && !['dog', 'cat', 'rabbit'].includes(formState.formAnimal.toLowerCase())) ? (
+                <div className="flex gap-1.5">
+                  <Input
+                    type="text"
+                    required
+                    value={formState.formAnimal === 'other' ? '' : formState.formAnimal}
+                    onChange={(e) => onFieldChange('formAnimal', e.target.value)}
+                    placeholder={t('pets.form.animalOtherPlaceholder')}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-10 px-2 text-slate-400 hover:text-slate-600"
+                    onClick={() => onFieldChange('formAnimal', 'dog')}
+                  >
+                    <X className="size-4" />
+                  </Button>
+                </div>
+              ) : (
+                <select
+                  required
+                  value={formState.formAnimal.toLowerCase()}
+                  onChange={(e) => onFieldChange('formAnimal', e.target.value === 'other' ? 'other' : e.target.value)}
+                  className="w-full h-10 px-3 bg-slate-50 rounded-xl text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                >
+                  <option value="">{t('pets.form.animalPlaceholder')}</option>
+                  <option value="dog">{t('pets.form.animalDog')}</option>
+                  <option value="cat">{t('pets.form.animalCat')}</option>
+                  <option value="rabbit">{t('pets.form.animalRabbit')}</option>
+                  <option value="other">{t('pets.form.animalOther')}</option>
+                </select>
+              )}
             </div>
           </div>
 

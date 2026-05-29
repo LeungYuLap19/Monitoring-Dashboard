@@ -158,40 +158,59 @@ function VerifyStep({ login }: { login: ReturnType<typeof useXiaomiLogin> }) {
 
 function CamerasStep({ login }: { login: ReturnType<typeof useXiaomiLogin> }) {
   const { t } = useTranslation();
+  const atLimit = login.selectedDeviceIds.size >= login.cameraLimit;
   return (
     <div className="space-y-3">
-      <p className="text-xs font-medium text-slate-500">{t('xiaomi.selectCameras')}</p>
-      <div className="max-h-60 overflow-y-auto space-y-2">
-        {login.sources.map((cam, i) => (
-          <button
-            key={cam.url}
-            type="button"
-            onClick={() => login.toggleCamera(i)}
-            className={`w-full text-left rounded-xl border p-3 transition-colors ${
-              login.selectedIndices.has(i)
-                ? 'border-teal-300 bg-teal-50'
-                : 'border-slate-100 bg-white hover:bg-slate-50'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold text-slate-700">{cam.name}</p>
-                <p className="text-[10px] text-slate-400 mt-0.5">{cam.info}</p>
-              </div>
-              {login.selectedIndices.has(i) && (
-                <Check className="size-4 text-teal-600 shrink-0" />
-              )}
-            </div>
-          </button>
-        ))}
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-medium text-slate-500">{t('xiaomi.selectCameras')}</p>
+        {login.cameraLimit < Infinity && (
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${atLimit ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}`}>
+            {login.selectedDeviceIds.size}/{login.cameraLimit}
+          </span>
+        )}
       </div>
+      <div className="max-h-60 overflow-y-auto space-y-2">
+        {login.sources.map((cam) => {
+          const did = cam.did ?? cam.url.match(/[?&]did=(\d+)/)?.[1] ?? '';
+          const selected = did ? login.selectedDeviceIds.has(did) : false;
+          const disabled = !selected && atLimit;
+          return (
+            <button
+              key={cam.url}
+              type="button"
+              onClick={() => did && login.toggleCamera(did)}
+              disabled={disabled || !did}
+              className={`w-full text-left rounded-xl border p-3 transition-colors ${
+                selected
+                  ? 'border-teal-300 bg-teal-50'
+                  : disabled || !did
+                    ? 'border-slate-100 bg-slate-50 opacity-50 cursor-not-allowed'
+                    : 'border-slate-100 bg-white hover:bg-slate-50'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold text-slate-700">{cam.name}</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">{cam.info}</p>
+                </div>
+                {selected && (
+                  <Check className="size-4 text-teal-600 shrink-0" />
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      {atLimit && login.cameraLimit < Infinity && (
+        <p className="text-[10px] text-amber-600 font-medium">{t('xiaomi.cameraLimitReached')}</p>
+      )}
       <Button
         className="w-full"
         onClick={login.addCameras}
-        disabled={login.loading || login.selectedIndices.size === 0}
+        disabled={login.loading || login.selectedDeviceIds.size === 0}
       >
         {login.loading ? <Loader2 className="size-4 animate-spin" /> : <Video className="size-4" />}
-        {t('xiaomi.addCameras')} ({login.selectedIndices.size})
+        {t('xiaomi.addCameras')} ({login.selectedDeviceIds.size})
       </Button>
     </div>
   );
