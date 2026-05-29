@@ -2,14 +2,25 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, CreditCard, LogOut, User } from 'lucide-react';
 import { TabId, SidebarProps } from '../../types';
-import { NAV_ITEMS } from '../../constants';
+import { NAV_ITEMS, LOCAL_TABS, getLocalRedirectUrl } from '../../constants';
 import { useTranslation } from '../../lib/i18n';
+import { getStoredAccessToken, getStoredAuthUser } from '../../lib/utils/auth';
 import HKBRIcon from './HKBRIcon';
 import PHealthIcon from './PHealthIcon';
 import LanguageSwitcher from './LanguageSwitcher';
 import { Button } from '../ui/button';
 import { Sheet, SheetContent } from '../ui/sheet';
 import xiaomiIcon from '../../assets/icons/xiaomi.svg';
+
+function buildLocalRedirectUrl(url: string): string {
+  const token = getStoredAccessToken();
+  const user = getStoredAuthUser();
+  if (!token) return url;
+  const hash = new URLSearchParams();
+  hash.set('access_token', token);
+  if (user) hash.set('user', encodeURIComponent(JSON.stringify(user)));
+  return `${url}#${hash.toString()}`;
+}
 
 export default function Sidebar({
   activeTab,
@@ -29,6 +40,10 @@ export default function Sidebar({
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const handleTabClick = (tab: TabId) => {
+    if (LOCAL_TABS.has(tab)) {
+      window.location.href = buildLocalRedirectUrl(getLocalRedirectUrl(tab));
+      return;
+    }
     setActiveTab(tab);
     if (onClose) onClose();
   };
