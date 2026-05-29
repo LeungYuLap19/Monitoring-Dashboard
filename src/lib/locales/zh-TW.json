@@ -349,7 +349,8 @@
       "linkedTo": "已連結至 {{camera}}",
       "linkedHere": "已連結此攝影機",
       "notLinked": "未連結",
-      "empty": "找不到寵物。"
+      "empty": "找不到寵物。",
+      "conflictError": "請先取消連結目前的寵物，再連結新的寵物。"
     },
     "toasts": {
       "cameraSwitch": "已自動打開監測鏡頭並載入對應寵物住客數據"

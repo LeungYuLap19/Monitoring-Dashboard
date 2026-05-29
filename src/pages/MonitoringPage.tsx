@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { Database, WifiOff, Settings2 } from 'lucide-react';
 import { useLayoutContext } from '../hooks/layout';
 import { useTranslation } from '../lib/i18n';
@@ -205,11 +206,19 @@ export default function MonitoringPage() {
 
   const handleLinkPet = useCallback((petId: string, petAnimal?: string | null) => {
     if (!activeDeviceId) return;
-    void updatePetProfile({ monitorCameraId: activeDeviceId }, { petId });
     setShowLinkPetModal(false);
-    setPendingPetAnimal(petAnimal);
-    setShowModelSelector(true);
-  }, [activeDeviceId, updatePetProfile]);
+    updatePetProfile({ monitorCameraId: activeDeviceId }, { petId })
+      .then(() => {
+        setPendingPetAnimal(petAnimal);
+        setShowModelSelector(true);
+      })
+      .catch((err: any) => {
+        const status = err?.status ?? err?.response?.status;
+        if (status === 409) {
+          toast.error(t('monitoring.linkPet.conflictError'));
+        }
+      });
+  }, [activeDeviceId, updatePetProfile, t]);
 
   const handleUnlinkPet = useCallback((petId: string) => {
     void updatePetProfile({ monitorCameraId: null }, { petId });

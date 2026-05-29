@@ -349,7 +349,8 @@
       "linkedTo": "Linked to {{camera}}",
       "linkedHere": "Linked here",
       "notLinked": "Not linked",
-      "empty": "No pets found."
+      "empty": "No pets found.",
+      "conflictError": "Please disconnect the current pet first before linking another pet."
     },
     "toasts": {
       "cameraSwitch": "Camera switched — loading pet monitoring data."
