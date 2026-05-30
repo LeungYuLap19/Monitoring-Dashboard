@@ -15,7 +15,10 @@ export const I18nContext = createContext<I18nContextValue>({
 function getInitialLocale(): Locale {
   const params = new URLSearchParams(window.location.search);
   const urlLang = params.get('lang');
-  if (urlLang === 'en' || urlLang === 'zh-TW') return urlLang;
+  if (urlLang === 'en' || urlLang === 'zh-TW') {
+    writeStorageJson(window.localStorage, 'hkbr_locale', urlLang);
+    return urlLang;
+  }
   return readStorageJson<Locale>(window.localStorage, 'hkbr_locale', 'zh-TW');
 }
 
