@@ -42,6 +42,8 @@ function RedirectToLocal({ path }: { path: string }) {
       const hash = new URLSearchParams();
       hash.set('access_token', token);
       if (user) hash.set('user', JSON.stringify(user));
+      const lang = localStorage.getItem('hkbr_locale');
+      if (lang) hash.set('lang', lang.replace(/"/g, ''));
       if (sessionStorage.getItem('_fresh_login')) {
         hash.set('fresh_login', '1');
         sessionStorage.removeItem('_fresh_login');
