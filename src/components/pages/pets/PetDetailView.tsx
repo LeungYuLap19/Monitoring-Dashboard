@@ -101,7 +101,6 @@ export default function PetDetailView({
         <div>
           <h2 className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-slate-800">
             {pet.name}
-            <span className="text-lg">🐰</span>
           </h2>
           <p className="mt-0.5 text-xs font-bold text-slate-400">
             {pet.breed || t('pets.notAvailable')}

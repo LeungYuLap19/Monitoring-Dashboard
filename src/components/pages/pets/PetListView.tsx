@@ -41,33 +41,33 @@ export default function PetListView({ pets, onSelectPet }: PetListViewProps) {
                       </div>
                     )}
                   </div>
-                  <div>
-                    <span className="block text-sm font-extrabold text-slate-800">{pet.name}</span>
-                    <span className="block text-[10px] font-bold uppercase text-slate-400">
+                  <div className="min-w-0">
+                    <span className="block text-sm font-extrabold text-slate-800 truncate">{pet.name}</span>
+                    <span className="block text-[10px] font-bold uppercase text-slate-400 truncate">
                       {pet.ngoPetId || pet.id}
                     </span>
                   </div>
                 </td>
-                <td className="px-6 py-4">
-                  <span className="block">{pet.animal || t('pets.notAvailable')}</span>
-                  <span className="block text-[10px] text-slate-400">{pet.breed || t('pets.notAvailable')}</span>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="block">{pet.animal || '-'}</span>
+                  <span className="block text-[10px] text-slate-400">{pet.breed || '-'}</span>
                 </td>
-                <td className="px-6 py-4">
-                  <span className="block">{formatPetDate(pet.birthday, locale) || t('pets.notAvailable')}</span>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="block">{formatPetDate(pet.birthday, locale) || '-'}</span>
                   <span className="block text-[10px] text-slate-400">
                     {getSexLabel(pet.sex, t)}
                     {pet.ageYears !== null ? ` · ${pet.ageYears} ${t('pets.ageUnit')}` : ''}
                   </span>
                 </td>
-                <td className="px-6 py-4">
-                  <span>{pet.weight !== null ? `${pet.weight} kg` : t('pets.notAvailable')}</span>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span>{pet.weight !== null ? `${pet.weight} kg` : '-'}</span>
                   <span className="block text-[10px] text-slate-400">
-                    {pet.location || pet.position || t('pets.notAvailable')}
+                    {pet.location || pet.position || '-'}
                   </span>
                 </td>
                 <td className="px-6 py-4">
                   <Badge className="border-0 bg-slate-100 text-[10px] font-black uppercase text-slate-700">
-                    {pet.status || t('pets.notAvailable')}
+                    {pet.status || '-'}
                   </Badge>
                 </td>
                 <td className="px-6 py-4 text-right">
